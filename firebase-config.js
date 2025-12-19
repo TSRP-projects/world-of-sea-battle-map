@@ -25,6 +25,14 @@ const POINT_VALUES = {
   CANVAS: 50
 };
 
+const DEFAULT_PLAYER_INVENTORY = {
+    beams: 0,
+    bulkheads: 0,
+    plates: 0,
+    canvas: 0,
+    battleMarks: 0
+};
+
 // Tier configuration
 const TIERS = {
     DECKHAND: { name: 'Deckhand', min: 0, support: 0.25, emoji: '🪢' },

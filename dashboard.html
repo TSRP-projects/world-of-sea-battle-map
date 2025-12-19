@@ -372,6 +372,160 @@
         
         .legend-player { background: #2d5a2d; }
         .legend-guild { background: #8b6914; }
+
+        .tier-progress-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .tier-progress-label {
+            font-size: 12px;
+            color: #5c4a3a;
+        }
+        
+        .tier-progress-bar {
+            width: 150px;
+            height: 12px;
+            background: rgba(139, 105, 20, 0.15);
+            border: 1px solid #8b6914;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .tier-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b6914 0%, #c9a227 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .tier-progress-text {
+            font-size: 11px;
+            color: #8b6914;
+            font-weight: bold;
+        }
+        
+        .leaderboard-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .leaderboard-column h4 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        
+        .inventory-item {
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .inventory-item img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .inventory-item-name {
+            font-size: 11px;
+            color: #5c4a3a;
+            font-family: 'Cinzel', Georgia, serif;
+            margin-bottom: 5px;
+        }
+        
+        .inventory-item input {
+            width: 70px;
+            padding: 5px;
+            background: #f5f0e6;
+            border: 1px solid #8b6914;
+            border-radius: 3px;
+            text-align: center;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 14px;
+            color: #3d2b1f;
+        }
+        
+        .inventory-item input:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+        
+        .resource-have-need {
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .resource-sufficient {
+            color: #2d5a2d;
+        }
+        
+        .resource-insufficient {
+            color: #8b3a3a;
+        }
+        
+        .btn-build {
+            padding: 12px 30px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        .btn-build:disabled {
+            background: #888;
+            border-color: #888;
+            cursor: not-allowed;
+        }
+        
+        .btn-build-ready {
+            background: #6b2a2a;
+            border-color: #6b2a2a;
+            animation: pulse 2s infinite;
+        }
+        
+        .btn-build-ready:hover {
+            background: #8b3a3a;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 58, 58, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(139, 58, 58, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 58, 58, 0); }
+        }
+        
+        .bottom-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .bottom-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+            .leaderboard-columns {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .bottom-cards {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -388,8 +542,14 @@
                     </span>
                 </div>
                 <p><span id="userTier">Calculating tier...</span> <span id="tierSupport" class="tier-support"></span></p>
+                <div class="tier-progress-container" id="tierProgressContainer">
+                    <span class="tier-progress-label" id="tierProgressLabel">→ Bosun:</span>
+                    <div class="tier-progress-bar">
+                        <div class="tier-progress-fill" id="tierProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <span class="tier-progress-text" id="tierProgressText">0/50</span>
+                </div>
             </div>
-        </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn btn-secondary" onclick="location.href='index.html'">Back to Map</button>
             <button class="btn btn-danger" onclick="logout()">Logout</button>
@@ -495,27 +655,43 @@
                 <div id="resourceBreakdown" style="display: none; margin-top: 15px;">
                     <h4 style="font-family: 'Cinzel', Georgia, serif; color: #8b6914; margin-bottom: 10px; text-align: center;">Resource Breakdown</h4>
                     <div class="legend" style="justify-content: center;">
-                        <div class="legend-item"><div class="legend-color legend-player"></div> Your Share</div>
+                        <div class="legend-item"><div class="legend-color legend-player"></div> Your Share (Have/Need)</div>
                         <div class="legend-item"><div class="legend-color legend-guild"></div> Guild Support</div>
                     </div>
                     <div class="resource-breakdown" id="resourceBreakdownGrid"></div>
+                    <div style="text-align: center;">
+                        <button class="btn btn-primary btn-build" id="buildShipBtn" onclick="buildShip()" disabled>
+                            ⚓ Build Ship
+                        </button>
+                        <p id="buildShipStatus" style="margin-top: 10px; font-size: 13px; color: #5c4a3a;"></p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="bottom-cards">
             <div class="card">
-                <h3>⚔️ Fort Busting Leaderboard</h3>
-                <div class="leaderboard" id="fortLeaderboard">
-                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                <h3>🏆 Leaderboards</h3>
+                <div class="leaderboard-columns">
+                    <div class="leaderboard-column">
+                        <h4>⚔️ Fort Busting</h4>
+                        <div class="leaderboard" id="fortLeaderboard">
+                            <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard-column">
+                        <h4>💎 Resource Donations</h4>
+                        <div class="leaderboard" id="resourceLeaderboard">
+                            <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="card">
-                <h3>💎 Resource Contribution Leaders</h3>
-                <div class="leaderboard" id="resourceLeaderboard">
-                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
-                </div>
+                <h3>🎒 My Inventory</h3>
+                <div class="inventory-grid" id="inventoryGrid"></div>
+                <button class="btn btn-primary" onclick="saveInventory()" style="margin-top: 15px; width: 100%;">Save Inventory</button>
             </div>
 
             <div class="card">
@@ -523,7 +699,6 @@
                 <div class="resources-grid" id="resourcesGrid"></div>
             </div>
         </div>
-    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -537,7 +712,8 @@
             beams: 'beams.png',
             bulkheads: 'bulkheads.png',
             plates: 'plates.png',
-            canvas: 'canvas.png'
+            canvas: 'canvas.png',
+            battleMarks: 'printshop.png'
         };
 
         auth.onAuthStateChanged(user => {
@@ -580,7 +756,6 @@
         }
 
         function updatePlayerUI(player) {
-
             // Display gamertag
             const gamertagDisplay = document.getElementById('gamertag-display');
             if (player.gamertag) {
@@ -624,12 +799,23 @@
             tierBadge.textContent = `${tier.emoji} ${tier.name}`;
             tierBadge.className = `tier-badge tier-${tier.name.toLowerCase()}`;
 
+            // Update tier progress bar
             const nextTier = getNextTier(tier);
+            const tierProgressContainer = document.getElementById('tierProgressContainer');
             if (nextTier) {
-                const pointsNeeded = nextTier.min - availablePoints;
+                tierProgressContainer.style.display = 'flex';
+                const pointsIntoTier = availablePoints - tier.min;
+                const pointsNeededForNext = nextTier.min - tier.min;
+                const progressPercent = Math.min((pointsIntoTier / pointsNeededForNext) * 100, 100);
+                
+                document.getElementById('tierProgressLabel').textContent = `→ ${nextTier.name}:`;
+                document.getElementById('tierProgressFill').style.width = progressPercent + '%';
+                document.getElementById('tierProgressText').textContent = `${availablePoints}/${nextTier.min}`;
+                
                 document.getElementById('tierDescription').textContent = 
-                    `${pointsNeeded} more points for ${nextTier.name} (${Math.round(nextTier.support * 100)}% guild support)`;
+                    `${nextTier.min - availablePoints} more points for ${nextTier.name} (${Math.round(nextTier.support * 100)}% guild support)`;
             } else {
+                tierProgressContainer.style.display = 'none';
                 document.getElementById('tierDescription').textContent = 
                     'Maximum tier! 75% guild support available';
             }
@@ -647,10 +833,70 @@
                 document.getElementById('activityStatus').style.color = isActive ? '#2d5a2d' : '#8b3a3a';
             }
 
+            // Display player inventory
+            displayInventory(player.inventory || {});
+
             updateShipGoalProgress(player, availablePoints);
 
             if (player.isOfficer) {
                 document.getElementById('adminNav').style.display = 'inline-block';
+            }
+        }
+
+        function displayInventory(inventory) {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = '';
+
+            const resources = [
+                { name: 'Beams', key: 'beams', icon: resourceIcons.beams },
+                { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads },
+                { name: 'Plates', key: 'plates', icon: resourceIcons.plates },
+                { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas },
+                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks }
+            ];
+
+            resources.forEach(resource => {
+                const currentAmount = inventory[resource.key] || 0;
+                const item = document.createElement('div');
+                item.className = 'inventory-item';
+                item.innerHTML = `
+                    <img src="${resource.icon}" alt="${resource.name}">
+                    <div class="inventory-item-name">${resource.name}</div>
+                    <input type="number" 
+                           id="inventory_${resource.key}" 
+                           value="${currentAmount}" 
+                           min="0"
+                           onchange="markInventoryChanged()">
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        let inventoryChanged = false;
+
+        function markInventoryChanged() {
+            inventoryChanged = true;
+        }
+
+        async function saveInventory() {
+            const inventory = {
+                beams: parseInt(document.getElementById('inventory_beams').value) || 0,
+                bulkheads: parseInt(document.getElementById('inventory_bulkheads').value) || 0,
+                plates: parseInt(document.getElementById('inventory_plates').value) || 0,
+                canvas: parseInt(document.getElementById('inventory_canvas').value) || 0,
+                battleMarks: parseInt(document.getElementById('inventory_battleMarks').value) || 0
+            };
+
+            try {
+                await db.collection('players').doc(auth.currentUser.uid).update({
+                    inventory: inventory,
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                inventoryChanged = false;
+                alert('Inventory saved!');
+            } catch (err) {
+                console.error('Error saving inventory:', err);
+                alert('Error: ' + err.message);
             }
         }
 
@@ -735,19 +981,38 @@
             const grid = document.getElementById('resourceBreakdownGrid');
             grid.innerHTML = '';
 
+            const playerInventory = currentPlayer.inventory || {};
+
             const resources = [
-                { name: 'Beams', key: 'beams', icon: resourceIcons.beams },
-                { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads },
-                { name: 'Plates', key: 'plates', icon: resourceIcons.plates },
-                { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas }
+                { name: 'Beams', key: 'beams', icon: resourceIcons.beams, guildSupported: true },
+                { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads, guildSupported: true },
+                { name: 'Plates', key: 'plates', icon: resourceIcons.plates, guildSupported: true },
+                { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas, guildSupported: true },
+                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks, guildSupported: false }
             ];
+
+            let allResourcesMet = true;
 
             resources.forEach(resource => {
                 const total = ship[resource.key] || 0;
                 if (total === 0) return;
 
-                const playerAmount = Math.ceil(total * playerPercent);
-                const guildAmount = Math.floor(total * guildPercent);
+                let playerAmount, guildAmount;
+                
+                if (resource.guildSupported) {
+                    playerAmount = Math.ceil(total * playerPercent);
+                    guildAmount = Math.floor(total * guildPercent);
+                } else {
+                    playerAmount = total;
+                    guildAmount = 0;
+                }
+
+                const playerHas = playerInventory[resource.key] || 0;
+                const hasSufficient = playerHas >= playerAmount;
+                
+                if (!hasSufficient) {
+                    allResourcesMet = false;
+                }
 
                 const item = document.createElement('div');
                 item.className = 'resource-item-goal';
@@ -756,13 +1021,113 @@
                     <div class="resource-details">
                         <div class="resource-name">${resource.name} (${formatNumber(total)} total)</div>
                         <div class="resource-amounts">
-                            <span class="resource-player">You: ${formatNumber(playerAmount)}</span>
-                            <span class="resource-guild">Guild: ${formatNumber(guildAmount)}</span>
+                            <span class="resource-have-need ${hasSufficient ? 'resource-sufficient' : 'resource-insufficient'}">
+                                You: ${formatNumber(playerHas)}/${formatNumber(playerAmount)}
+                            </span>
+                            ${resource.guildSupported ? `<span class="resource-guild">Guild: ${formatNumber(guildAmount)}</span>` : ''}
                         </div>
                     </div>
                 `;
                 grid.appendChild(item);
             });
+
+            // Update build button state
+            updateBuildButtonState(allResourcesMet, ship);
+        }
+
+        async function buildShip() {
+            if (!currentPlayer.goalShipId) {
+                alert('No ship selected');
+                return;
+            }
+
+            const goalShip = allShips.find(s => s.id === currentPlayer.goalShipId);
+            if (!goalShip) {
+                alert('Ship not found');
+                return;
+            }
+
+            const confirmBuild = confirm(`Are you sure you want to mark ${goalShip.name} as built?\n\nThis will consume resources from both your inventory and guild storage.`);
+            if (!confirmBuild) return;
+
+            try {
+                const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                const tier = getTierFromPoints(availablePoints);
+                const guildPercent = tier.support;
+                const playerPercent = 1 - guildPercent;
+
+                const playerInventory = currentPlayer.inventory || {};
+                const newInventory = { ...playerInventory };
+
+                // Calculate resource consumption
+                const resourceKeys = ['beams', 'bulkheads', 'plates', 'canvas'];
+                const guildConsumption = {};
+
+                resourceKeys.forEach(key => {
+                    const total = goalShip[key] || 0;
+                    const playerShare = Math.ceil(total * playerPercent);
+                    const guildShare = Math.floor(total * guildPercent);
+                    
+                    newInventory[key] = (newInventory[key] || 0) - playerShare;
+                    guildConsumption[key] = guildShare;
+                });
+
+                // Battle marks (player only)
+                const battleMarksNeeded = goalShip.battleMarks || 0;
+                newInventory.battleMarks = (newInventory.battleMarks || 0) - battleMarksNeeded;
+
+                // Update player document
+                await db.collection('players').doc(auth.currentUser.uid).update({
+                    inventory: newInventory,
+                    goalShipId: null,
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update guild resources
+                const batch = db.batch();
+                
+                for (const [key, amount] of Object.entries(guildConsumption)) {
+                    if (amount > 0) {
+                        const resourceName = key.charAt(0).toUpperCase() + key.slice(1);
+                        const resourceQuery = await db.collection('guildResources')
+                            .where('materialType', '==', resourceName)
+                            .get();
+                        
+                        if (!resourceQuery.empty) {
+                            const resourceRef = resourceQuery.docs[0].ref;
+                            batch.update(resourceRef, {
+                                currentStock: firebase.firestore.FieldValue.increment(-amount),
+                                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    }
+                }
+
+                await batch.commit();
+
+                alert(`🎉 Congratulations! ${goalShip.name} has been built!\n\nResources have been deducted from your inventory and guild storage.`);
+
+            } catch (err) {
+                console.error('Error building ship:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function updateBuildButtonState(allResourcesMet, ship) {
+            const buildBtn = document.getElementById('buildShipBtn');
+            const buildStatus = document.getElementById('buildShipStatus');
+
+            if (allResourcesMet) {
+                buildBtn.disabled = false;
+                buildBtn.classList.add('btn-build-ready');
+                buildStatus.textContent = `Ready to build ${ship.name}!`;
+                buildStatus.style.color = '#2d5a2d';
+            } else {
+                buildBtn.disabled = true;
+                buildBtn.classList.remove('btn-build-ready');
+                buildStatus.textContent = 'Gather all required resources to build';
+                buildStatus.style.color = '#5c4a3a';
+            }
         }
 
         async function setGoalShip() {
