@@ -39,17 +39,12 @@
             gap: 15px;
         }
         
-        .avatar {
+        .squadron-badge {
             width: 50px;
             height: 50px;
+            object-fit: contain;
             border-radius: 50%;
             border: 2px solid #8b6914;
-        }
-
-        .squadron-badge {
-            width: 45px;
-            height: 45px;
-            object-fit: contain;
         }
         
         .user-info h2 { 
@@ -365,7 +360,6 @@
     <div class="header">
         <div class="header-left">
             <img id="squadronBadge" class="squadron-badge" src="" alt="Squadron" title="" style="display: none;">
-            <img id="userAvatar" class="avatar" src="" alt="Avatar">
             <div class="user-info">
                 <h2 id="userName">Loading...</h2>
                 <div id="gamertag-container">
@@ -563,8 +557,6 @@
 
         function updatePlayerUI(player) {
             document.getElementById('userName').textContent = player.displayName;
-            document.getElementById('userAvatar').src = player.photoURL || 
-                'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect width="50" height="50" fill="%238b6914"/></svg>';
 
             // Display gamertag
             const gamertagDisplay = document.getElementById('gamertag-display');
