@@ -4,20 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - WOSB Guild Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Libre Baskerville', Georgia, serif;
+            background: url('wosb-app-background.png') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
-            color: #e8e8e8;
+            color: #3d2b1f;
             padding: 20px;
         }
         
         .header {
-            background: rgba(26, 26, 46, 0.9);
-            border: 2px solid #d4af37;
+            background: rgba(244, 236, 217, 0.95);
+            border: 2px solid #8b6914;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -26,6 +30,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
         .header-left {
@@ -38,32 +43,50 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            border: 2px solid #d4af37;
+            border: 2px solid #8b6914;
         }
         
-        .user-info h2 { color: #d4af37; font-size: 20px; }
-        .user-info p { color: #a0a0a0; font-size: 14px; }
+        .user-info h2 { 
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914; 
+            font-size: 20px; 
+        }
+        .user-info p { color: #5c4a3a; font-size: 14px; }
         
         .btn {
             padding: 10px 20px;
-            border: none;
+            border: 2px solid #8b6914;
             border-radius: 5px;
             cursor: pointer;
-            font-family: 'Courier New', monospace;
+            font-family: 'Libre Baskerville', Georgia, serif;
             font-weight: bold;
             transition: all 0.3s ease;
+            font-size: 14px;
         }
         
-        .btn-primary { background: #d4af37; color: #1a1a2e; }
-        .btn-primary:hover { background: #b8941f; }
-        .btn-secondary { 
-            background: rgba(255, 255, 255, 0.1); 
-            color: #e8e8e8; 
-            border: 1px solid #d4af37; 
+        .btn-primary { 
+            background: #8b6914; 
+            color: #f5f0e6; 
         }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
-        .btn-danger { background: #dc2626; color: white; }
-        .btn-danger:hover { background: #b91c1c; }
+        .btn-primary:hover { 
+            background: #6d5310; 
+        }
+        .btn-secondary { 
+            background: rgba(244, 236, 217, 0.9); 
+            color: #3d2b1f; 
+        }
+        .btn-secondary:hover { 
+            background: #8b6914;
+            color: #f5f0e6;
+        }
+        .btn-danger { 
+            background: #8b3a3a; 
+            color: #f5f0e6; 
+            border-color: #722;
+        }
+        .btn-danger:hover { 
+            background: #6b2a2a; 
+        }
         
         .navigation {
             display: flex;
@@ -74,18 +97,24 @@
         
         .nav-btn {
             padding: 10px 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #d4af37;
+            background: rgba(244, 236, 217, 0.9);
+            border: 2px solid #8b6914;
             border-radius: 5px;
-            color: #e8e8e8;
+            color: #3d2b1f;
             text-decoration: none;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: 600;
             transition: all 0.3s ease;
         }
         
-        .nav-btn:hover { background: rgba(255, 255, 255, 0.2); }
-        .nav-btn.active { background: #d4af37; color: #1a1a2e; }
+        .nav-btn:hover { 
+            background: #8b6914;
+            color: #f5f0e6;
+        }
+        .nav-btn.active { 
+            background: #8b6914; 
+            color: #f5f0e6; 
+        }
         
         .dashboard-grid {
             display: grid;
@@ -95,14 +124,16 @@
         }
         
         .card {
-            background: rgba(26, 26, 46, 0.9);
-            border: 2px solid #d4af37;
+            background: rgba(244, 236, 217, 0.95);
+            border: 2px solid #8b6914;
             border-radius: 8px;
             padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
         
         .card h3 {
-            color: #d4af37;
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
             margin-bottom: 15px;
             font-size: 18px;
             text-transform: uppercase;
@@ -113,12 +144,12 @@
             display: flex;
             justify-content: space-between;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
         }
         
         .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: #a0a0a0; }
-        .stat-value { color: #d4af37; font-weight: bold; }
+        .stat-label { color: #5c4a3a; }
+        .stat-value { color: #8b6914; font-weight: bold; }
         
         .tier-badge {
             display: inline-block;
@@ -126,18 +157,20 @@
             border-radius: 20px;
             font-weight: bold;
             font-size: 14px;
+            font-family: 'Cinzel', Georgia, serif;
         }
         
-        .tier-none { background: rgba(128, 128, 128, 0.2); color: #a0a0a0; }
-        .tier-bronze { background: rgba(205, 127, 50, 0.2); color: #cd7f32; }
-        .tier-silver { background: rgba(192, 192, 192, 0.2); color: #c0c0c0; }
-        .tier-gold { background: rgba(255, 215, 0, 0.2); color: #ffd700; }
+        .tier-none { background: rgba(128, 128, 128, 0.2); color: #666; }
+        .tier-bronze { background: rgba(205, 127, 50, 0.25); color: #8b5a2b; }
+        .tier-silver { background: rgba(150, 150, 150, 0.25); color: #555; }
+        .tier-gold { background: rgba(139, 105, 20, 0.25); color: #8b6914; }
         
         .progress-bar {
             width: 100%;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            height: 24px;
+            background: rgba(139, 105, 20, 0.15);
+            border: 1px solid #8b6914;
+            border-radius: 12px;
             overflow: hidden;
             margin-top: 10px;
             position: relative;
@@ -145,7 +178,7 @@
         
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #d4af37 0%, #b8941f 100%);
+            background: linear-gradient(90deg, #8b6914 0%, #c9a227 100%);
             transition: width 0.3s ease;
         }
         
@@ -156,18 +189,25 @@
             transform: translate(-50%, -50%);
             font-size: 12px;
             font-weight: bold;
-            color: #1a1a2e;
+            color: #3d2b1f;
         }
         
         .ship-goal-selector {
             width: 100%;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #d4af37;
+            background: #f5f0e6;
+            border: 2px solid #8b6914;
             border-radius: 5px;
-            color: #e8e8e8;
-            font-family: 'Courier New', monospace;
+            color: #3d2b1f;
+            font-family: 'Libre Baskerville', Georgia, serif;
             margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .ship-goal-selector option {
+            background: #f5f0e6;
+            color: #3d2b1f;
+            padding: 8px;
         }
         
         .resources-grid {
@@ -178,14 +218,15 @@
         }
         
         .resource-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
             padding: 10px;
             border-radius: 5px;
             text-align: center;
         }
         
-        .resource-name { font-size: 11px; color: #a0a0a0; margin-bottom: 5px; }
-        .resource-amount { font-size: 16px; color: #d4af37; font-weight: bold; }
+        .resource-name { font-size: 11px; color: #5c4a3a; margin-bottom: 5px; }
+        .resource-amount { font-size: 16px; color: #8b6914; font-weight: bold; }
         
         .leaderboard { margin-top: 10px; }
         
@@ -193,20 +234,31 @@
             display: flex;
             justify-content: space-between;
             padding: 8px 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
             border-radius: 5px;
             margin-bottom: 6px;
         }
         
-        .leaderboard-rank { font-weight: bold; color: #d4af37; margin-right: 10px; }
-        .leaderboard-name { flex: 1; color: #e8e8e8; }
-        .leaderboard-value { color: #d4af37; font-weight: bold; }
+        .leaderboard-rank { 
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: bold; 
+            color: #8b6914; 
+            margin-right: 10px; 
+        }
+        .leaderboard-name { flex: 1; color: #3d2b1f; }
+        .leaderboard-value { color: #8b6914; font-weight: bold; }
         
-        .rank-1 .leaderboard-rank { color: #ffd700; font-size: 16px; }
-        .rank-2 .leaderboard-rank { color: #c0c0c0; }
-        .rank-3 .leaderboard-rank { color: #cd7f32; }
+        .rank-1 .leaderboard-rank { color: #c9a227; font-size: 16px; }
+        .rank-2 .leaderboard-rank { color: #888; }
+        .rank-3 .leaderboard-rank { color: #8b5a2b; }
         
-        .loading { text-align: center; padding: 40px; color: #d4af37; }
+        .loading { 
+            text-align: center; 
+            padding: 40px; 
+            color: #8b6914;
+            font-family: 'Cinzel', Georgia, serif;
+        }
     </style>
 </head>
 <body>
@@ -234,7 +286,6 @@
 
     <div id="dashboard" style="display: none;">
         <div class="dashboard-grid">
-            <!-- Points Card -->
             <div class="card">
                 <h3>⚓ Your Points</h3>
                 <div class="stat-row">
@@ -251,18 +302,16 @@
                 </div>
             </div>
 
-            <!-- Tier Card -->
             <div class="card">
                 <h3>🏆 Your Tier</h3>
                 <div style="text-align: center; padding: 20px 0;">
                     <div id="tierBadge" class="tier-badge tier-none">⚫ None</div>
-                    <p style="margin-top: 15px; color: #a0a0a0; font-size: 14px;" id="tierDescription">
+                    <p style="margin-top: 15px; color: #5c4a3a; font-size: 14px;" id="tierDescription">
                         Earn 50 points to unlock Bronze tier
                     </p>
                 </div>
             </div>
 
-            <!-- Activity Status Card -->
             <div class="card">
                 <h3>📊 Activity Status</h3>
                 <div class="stat-row">
@@ -280,10 +329,9 @@
             </div>
         </div>
 
-        <!-- Ship Goal Tracker -->
         <div class="card">
             <h3>🎯 Ship Goal Progress</h3>
-            <div id="noGoalSet" style="text-align: center; padding: 20px 0; color: #a0a0a0;">
+            <div id="noGoalSet" style="text-align: center; padding: 20px 0; color: #5c4a3a;">
                 <p>Select a ship you're saving for:</p>
                 <select id="goalShipSelector" class="ship-goal-selector" onchange="setGoalShip()">
                     <option value="">-- Choose Goal Ship --</option>
@@ -317,23 +365,20 @@
         </div>
 
         <div class="dashboard-grid">
-            <!-- Fort Busting Leaderboard -->
             <div class="card">
                 <h3>⚔️ Fort Busting Leaderboard</h3>
                 <div class="leaderboard" id="fortLeaderboard">
-                    <div style="text-align: center; color: #a0a0a0;">Loading...</div>
+                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
                 </div>
             </div>
 
-            <!-- Resource Contribution Leaderboard -->
             <div class="card">
                 <h3>💎 Resource Contribution Leaders</h3>
                 <div class="leaderboard" id="resourceLeaderboard">
-                    <div style="text-align: center; color: #a0a0a0;">Loading...</div>
+                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
                 </div>
             </div>
 
-            <!-- Guild Resources -->
             <div class="card">
                 <h3>🏦 Guild Resources</h3>
                 <div class="resources-grid" id="resourcesGrid"></div>
@@ -359,7 +404,6 @@
 
         async function loadDashboard(userId) {
             try {
-                // Real-time player listener
                 db.collection('players').doc(userId).onSnapshot(doc => {
                     if (doc.exists) {
                         currentPlayer = { id: doc.id, ...doc.data() };
@@ -367,18 +411,15 @@
                     }
                 });
 
-                // Load ships for goal selector
                 const shipsSnapshot = await db.collection('shipCosts').orderBy('tier').get();
                 allShips = shipsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 populateShipSelectors();
 
-                // Real-time guild resources listener
                 db.collection('guildResources').onSnapshot(snapshot => {
                     const resources = snapshot.docs.map(doc => doc.data());
                     displayResources(resources);
                 });
 
-                // Load leaderboards
                 loadLeaderboards();
 
                 document.getElementById('loading').style.display = 'none';
@@ -393,7 +434,7 @@
         function updatePlayerUI(player) {
             document.getElementById('userName').textContent = player.displayName;
             document.getElementById('userAvatar').src = player.photoURL || 
-                'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect width="50" height="50" fill="%23d4af37"/></svg>';
+                'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50"><rect width="50" height="50" fill="%238b6914"/></svg>';
 
             const availablePoints = player.totalPoints - player.sharesRedeemed;
 
@@ -418,10 +459,8 @@
                     'Maximum tier! Up to 75% guild support available';
             }
 
-            // Forts count
             document.getElementById('fortsCount').textContent = player.fortsDestroyed || 0;
 
-            // Activity status
             if (player.lastActivity) {
                 const lastActivity = player.lastActivity.toDate();
                 const daysAgo = Math.floor((Date.now() - lastActivity) / (1000 * 60 * 60 * 24));
@@ -430,7 +469,7 @@
                 
                 const isActive = daysAgo <= 30;
                 document.getElementById('activityStatus').textContent = isActive ? 'Active ✓' : 'Inactive ✗';
-                document.getElementById('activityStatus').style.color = isActive ? '#4ade80' : '#dc2626';
+                document.getElementById('activityStatus').style.color = isActive ? '#2d5a2d' : '#8b3a3a';
             }
 
             updateShipGoalProgress(player, availablePoints);
@@ -506,14 +545,13 @@
         }
 
         async function loadLeaderboards() {
-            // Fort Busting Leaderboard
             db.collection('players')
                 .orderBy('fortsDestroyed', 'desc')
                 .limit(10)
                 .onSnapshot(snapshot => {
                     const fortLeaderboard = document.getElementById('fortLeaderboard');
                     if (snapshot.empty) {
-                        fortLeaderboard.innerHTML = '<div style="text-align: center; color: #a0a0a0;">No fort data yet</div>';
+                        fortLeaderboard.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No fort data yet</div>';
                         return;
                     }
                     
@@ -535,11 +573,10 @@
                     });
                     
                     if (rank === 0) {
-                        fortLeaderboard.innerHTML = '<div style="text-align: center; color: #a0a0a0;">No fort data yet</div>';
+                        fortLeaderboard.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No fort data yet</div>';
                     }
                 });
             
-            // Resource Contribution Leaderboard
             db.collection('contributions')
                 .where('activityType', '==', 'Material Donation')
                 .onSnapshot(async snapshot => {
@@ -564,7 +601,7 @@
             const resourceLeaderboard = document.getElementById('resourceLeaderboard');
             
             if (sorted.length === 0) {
-                resourceLeaderboard.innerHTML = '<div style="text-align: center; color: #a0a0a0;">No donations yet</div>';
+                resourceLeaderboard.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No donations yet</div>';
                 return;
             }
             
