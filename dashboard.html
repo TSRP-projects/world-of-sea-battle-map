@@ -955,10 +955,37 @@
             document.getElementById('playerSharePercent').textContent = Math.round(playerSharePercent * 100) + '%';
             document.getElementById('guildSharePercent').textContent = Math.round(guildSupportPercent * 100) + '%';
 
-            // Progress bar based on points toward player's share
-            const totalShipCost = calculateShipCost(goalShip);
-            const playerSharePoints = Math.ceil(totalShipCost * playerSharePercent);
-            const progressPercent = Math.min((availablePoints / playerSharePoints) * 100, 100);
+            // Calculate progress based on resources
+            const playerInventory = player.inventory || {};
+            const resources = [
+                { key: 'beams', guildSupported: true },
+                { key: 'bulkheads', guildSupported: true },
+                { key: 'plates', guildSupported: true },
+                { key: 'canvas', guildSupported: true },
+                { key: 'battleMarks', guildSupported: false }
+            ];
+
+            let totalNeeded = 0;
+            let totalHave = 0;
+
+            resources.forEach(resource => {
+                const shipTotal = goalShip[resource.key] || 0;
+                if (shipTotal === 0) return;
+
+                let playerNeeds;
+                if (resource.guildSupported) {
+                    playerNeeds = Math.ceil(shipTotal * playerSharePercent);
+                } else {
+                    playerNeeds = shipTotal;
+                }
+
+                const playerHas = Math.min(playerInventory[resource.key] || 0, playerNeeds);
+                
+                totalNeeded += playerNeeds;
+                totalHave += playerHas;
+            });
+
+            const progressPercent = totalNeeded > 0 ? Math.min((totalHave / totalNeeded) * 100, 100) : 0;
             
             document.getElementById('goalProgressFill').style.width = progressPercent + '%';
             document.getElementById('goalProgressText').textContent = progressPercent.toFixed(1) + '%';
@@ -968,7 +995,7 @@
             // Show ship image if available
             const shipImageContainer = document.getElementById('shipImageContainer');
             const shipImages = {
-                'redoutable': 'Redoutable Sketch.png'
+                'redoutable': 'Redoutable_Sketch.png'
             };
             
             if (shipImages[goalShip.id]) {
