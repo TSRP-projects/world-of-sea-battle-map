@@ -27,18 +27,18 @@ const POINT_VALUES = {
 
 // Tier configuration
 const TIERS = {
-  NONE: { min: 0, max: 49, support: 0, name: 'None', emoji: '⚫' },
-  BRONZE: { min: 50, max: 200, support: 0.50, name: 'Bronze', emoji: '🥉' },
-  SILVER: { min: 201, max: 500, support: 0.65, name: 'Silver', emoji: '🥈' },
-  GOLD: { min: 501, max: Infinity, support: 0.75, name: 'Gold', emoji: '🥇' }
+    DECKHAND: { name: 'Deckhand', min: 0, support: 0.25, emoji: '🪢' },
+    BOSUN: { name: 'Bosun', min: 50, support: 0.50, emoji: '⚓' },
+    QUARTERMASTER: { name: 'Quartermaster', min: 201, support: 0.65, emoji: '🧭' },
+    CAPTAIN: { name: 'Captain', min: 501, support: 0.75, emoji: '🏴‍☠️' }
 };
 
 // Get tier from available points
 function getTierFromPoints(points) {
-  if (points < TIERS.BRONZE.min) return TIERS.NONE;
-  if (points < TIERS.SILVER.min) return TIERS.BRONZE;
-  if (points < TIERS.GOLD.min) return TIERS.SILVER;
-  return TIERS.GOLD;
+    if (points >= TIERS.CAPTAIN.min) return TIERS.CAPTAIN;
+    if (points >= TIERS.QUARTERMASTER.min) return TIERS.QUARTERMASTER;
+    if (points >= TIERS.BOSUN.min) return TIERS.BOSUN;
+    return TIERS.DECKHAND;
 }
 
 // Calculate points for contribution

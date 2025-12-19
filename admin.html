@@ -81,6 +81,13 @@
             font-size: 18px; 
         }
         
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
         table { width: 100%; border-collapse: collapse; }
         
         th { 
@@ -90,11 +97,13 @@
             text-align: left; 
             font-weight: bold;
             font-family: 'Cinzel', Georgia, serif;
+            font-size: 12px;
         }
         
         td { 
-            padding: 12px; 
-            border-bottom: 1px solid rgba(139, 105, 20, 0.2); 
+            padding: 10px 12px; 
+            border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+            font-size: 13px;
         }
         
         tr:hover { background: rgba(139, 105, 20, 0.1); }
@@ -171,7 +180,7 @@
             border-color: #c9a227;
         }
         
-        .fort-participants {
+        .participant-list {
             max-height: 300px;
             overflow-y: auto;
             background: #f5f0e6;
@@ -180,7 +189,7 @@
             padding: 10px;
         }
         
-        .fort-participants label {
+        .participant-list label {
             display: block;
             padding: 8px;
             cursor: pointer;
@@ -188,11 +197,11 @@
             color: #3d2b1f;
         }
         
-        .fort-participants label:hover {
+        .participant-list label:hover {
             background: rgba(139, 105, 20, 0.15);
         }
         
-        .fort-participants input {
+        .participant-list input {
             margin-right: 10px;
             accent-color: #8b6914;
         }
@@ -202,6 +211,51 @@
             padding-bottom: 10px;
             border-bottom: 1px solid rgba(139, 105, 20, 0.3);
         }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            background: #f5f0e6;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            color: #3d2b1f;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 14px;
+        }
+        
+        .form-group select option {
+            background: #f5f0e6;
+            color: #3d2b1f;
+        }
+        
+        .tier-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .tier-deckhand { background: rgba(128, 128, 128, 0.2); color: #666; }
+        .tier-bosun { background: rgba(205, 127, 50, 0.25); color: #8b5a2b; }
+        .tier-quartermaster { background: rgba(150, 150, 150, 0.25); color: #555; }
+        .tier-captain { background: rgba(139, 105, 20, 0.25); color: #8b6914; }
+        
+        .gamertag { font-weight: bold; color: #8b6914; }
+        .display-name { font-size: 11px; color: #5c4a3a; }
     </style>
 </head>
 <body>
@@ -211,35 +265,69 @@
 
     <div class="navigation">
         <a href="dashboard.html" class="nav-btn">Dashboard</a>
+        <a href="history.html" class="nav-btn">My History</a>
         <a href="admin.html" class="nav-btn active">Officer Panel</a>
     </div>
 
     <div id="loading" class="loading">Loading officer panel...</div>
 
     <div id="adminContent" class="admin-container" style="display: none;">
-        <div class="card">
-            <h3>⚔️ Log Fort Raid</h3>
-            <p style="color: #5c4a3a; margin-bottom: 15px;">
-                Select participants. Each player receives 10 points and +1 fort count.
-            </p>
-            
-            <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: start;">
-                <div>
-                    <label style="display: block; font-family: 'Cinzel', Georgia, serif; color: #8b6914; margin-bottom: 8px; font-weight: bold;">
-                        Select Participants:
-                    </label>
-                    <div class="fort-participants">
+        
+        <div class="card-grid">
+            <div class="card">
+                <h3>⚔️ Log Fort Raid</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Select participants. Each player receives 10 points and +1 fort count.
+                </p>
+                
+                <div class="form-group">
+                    <label>Select Participants:</label>
+                    <div class="participant-list">
                         <div class="select-all-container">
                             <label>
-                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                                <input type="checkbox" id="selectAllFort" onchange="toggleSelectAll('fort')">
                                 <strong>Select All</strong>
                             </label>
                         </div>
                         <div id="fortParticipantsList"></div>
                     </div>
                 </div>
-                <button class="btn btn-success" onclick="logFortRaid()" style="height: fit-content; padding: 15px 25px;">
+                <button class="btn btn-success" onclick="logFortRaid()" style="width: 100%;">
                     Log Fort Raid
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>📦 Log Resource Donation</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Record a player's material contribution to the guild.
+                </p>
+                
+                <div class="form-group">
+                    <label>Select Player:</label>
+                    <select id="donationPlayer">
+                        <option value="">-- Select Player --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Resource Type:</label>
+                    <select id="donationResource">
+                        <option value="">-- Select Resource --</option>
+                        <option value="beams">Beams</option>
+                        <option value="bulkheads">Bulkheads</option>
+                        <option value="plates">Plates</option>
+                        <option value="canvas">Canvas</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="donationQuantity" min="1" placeholder="Enter amount">
+                </div>
+                
+                <button class="btn btn-success" onclick="logResourceDonation()" style="width: 100%;">
+                    Log Donation
                 </button>
             </div>
         </div>
@@ -251,8 +339,9 @@
                     <thead>
                         <tr>
                             <th>Member</th>
-                            <th>Total Points</th>
-                            <th>Shares Redeemed</th>
+                            <th>Gamertag</th>
+                            <th>Total Pts</th>
+                            <th>Redeemed</th>
                             <th>Available</th>
                             <th>Tier</th>
                             <th>Goal Ship</th>
@@ -308,7 +397,7 @@
                     .onSnapshot(snapshot => {
                         allMembers = snapshot.docs;
                         displayMembers(snapshot.docs);
-                        updateFortParticipantsList(snapshot.docs);
+                        updateParticipantLists(snapshot.docs);
                     });
 
                 db.collection('guildResources')
@@ -350,10 +439,11 @@
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td>${member.displayName}</td>
+                    <td><span class="gamertag">${member.gamertag || '-'}</span></td>
                     <td>${formatNumber(member.totalPoints)}</td>
                     <td>${formatNumber(member.sharesRedeemed)}</td>
                     <td>${formatNumber(availablePoints)}</td>
-                    <td>${tier.emoji} ${tier.name}</td>
+                    <td><span class="tier-badge tier-${tier.name.toLowerCase()}">${tier.emoji} ${tier.name}</span></td>
                     <td>${goalShipName}</td>
                     <td>${member.fortsDestroyed || 0}</td>
                     <td>${lastActivityText}</td>
@@ -361,24 +451,39 @@
             });
         }
 
-        function updateFortParticipantsList(docs) {
-            const container = document.getElementById('fortParticipantsList');
-            container.innerHTML = '';
+        function updateParticipantLists(docs) {
+            // Fort participants
+            const fortContainer = document.getElementById('fortParticipantsList');
+            fortContainer.innerHTML = '';
+
+            // Donation player selector
+            const donationSelector = document.getElementById('donationPlayer');
+            donationSelector.innerHTML = '<option value="">-- Select Player --</option>';
 
             docs.forEach(doc => {
                 const member = doc.data();
+                const displayText = member.gamertag || member.displayName;
+                
+                // Fort participant checkbox
                 const label = document.createElement('label');
                 label.innerHTML = `
-                    <input type="checkbox" class="participant-checkbox" value="${doc.id}">
-                    ${member.displayName} (${member.fortsDestroyed || 0} forts)
+                    <input type="checkbox" class="fort-participant" value="${doc.id}">
+                    ${displayText} ${member.gamertag ? `<span class="display-name">(${member.displayName})</span>` : ''} 
+                    <span style="color: #5c4a3a; font-size: 11px;">(${member.fortsDestroyed || 0} forts)</span>
                 `;
-                container.appendChild(label);
+                fortContainer.appendChild(label);
+
+                // Donation player option
+                const option = document.createElement('option');
+                option.value = doc.id;
+                option.textContent = displayText + (member.gamertag ? ` (${member.displayName})` : '');
+                donationSelector.appendChild(option);
             });
         }
 
-        function toggleSelectAll() {
-            const selectAll = document.getElementById('selectAllCheckbox').checked;
-            const checkboxes = document.querySelectorAll('.participant-checkbox');
+        function toggleSelectAll(type) {
+            const selectAll = document.getElementById(`selectAll${type.charAt(0).toUpperCase() + type.slice(1)}`).checked;
+            const checkboxes = document.querySelectorAll(`.${type}-participant`);
             checkboxes.forEach(cb => cb.checked = selectAll);
         }
 
@@ -402,7 +507,7 @@
         }
 
         async function logFortRaid() {
-            const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
+            const checkboxes = document.querySelectorAll('.fort-participant:checked');
             
             if (checkboxes.length === 0) {
                 alert('Select at least one participant');
@@ -428,7 +533,6 @@
                         playerId: playerId,
                         activityType: 'Fort Raid',
                         pointsEarned: POINT_VALUES.FORT_RAID,
-                        hoursParticipated: null,
                         materialType: null,
                         materialQuantity: null,
                         notes: 'Fort raid logged by officer',
@@ -441,10 +545,88 @@
                 alert(`Fort raid logged! ${checkboxes.length} participants awarded ${POINT_VALUES.FORT_RAID} points each.`);
                 
                 checkboxes.forEach(cb => cb.checked = false);
-                document.getElementById('selectAllCheckbox').checked = false;
+                document.getElementById('selectAllFort').checked = false;
 
             } catch (err) {
                 console.error('Error logging fort raid:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function logResourceDonation() {
+            const playerId = document.getElementById('donationPlayer').value;
+            const resourceType = document.getElementById('donationResource').value;
+            const quantity = parseInt(document.getElementById('donationQuantity').value);
+
+            if (!playerId) {
+                alert('Select a player');
+                return;
+            }
+            if (!resourceType) {
+                alert('Select a resource type');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('Enter a valid quantity');
+                return;
+            }
+
+            const pointValue = POINT_VALUES[resourceType.toUpperCase()] || 0;
+            if (pointValue === 0) {
+                alert('Unknown resource type');
+                return;
+            }
+
+            const pointsEarned = pointValue * quantity;
+
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Update player
+                const playerRef = db.collection('players').doc(playerId);
+                batch.update(playerRef, {
+                    totalPoints: firebase.firestore.FieldValue.increment(pointsEarned),
+                    lastActivity: timestamp
+                });
+
+                // Add contribution record
+                const contribRef = db.collection('contributions').doc();
+                batch.set(contribRef, {
+                    playerId: playerId,
+                    activityType: 'Material Donation',
+                    pointsEarned: pointsEarned,
+                    materialType: resourceType,
+                    materialQuantity: quantity,
+                    notes: `Donated ${quantity} ${resourceType}`,
+                    createdAt: timestamp
+                });
+
+                // Update guild resources
+                const resourceQuery = await db.collection('guildResources')
+                    .where('materialType', '==', resourceType.charAt(0).toUpperCase() + resourceType.slice(1))
+                    .get();
+                
+                if (!resourceQuery.empty) {
+                    const resourceRef = resourceQuery.docs[0].ref;
+                    batch.update(resourceRef, {
+                        currentStock: firebase.firestore.FieldValue.increment(quantity),
+                        lastUpdated: timestamp,
+                        updatedBy: auth.currentUser.uid
+                    });
+                }
+
+                await batch.commit();
+
+                alert(`Donation logged! ${quantity} ${resourceType} = ${pointsEarned} points`);
+
+                // Reset form
+                document.getElementById('donationPlayer').value = '';
+                document.getElementById('donationResource').value = '';
+                document.getElementById('donationQuantity').value = '';
+
+            } catch (err) {
+                console.error('Error logging donation:', err);
                 alert('Error: ' + err.message);
             }
         }
