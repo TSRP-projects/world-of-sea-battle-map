@@ -279,7 +279,7 @@
     <div class="navigation">
         <a href="dashboard.html" class="nav-btn active">Dashboard</a>
         <a href="history.html" class="nav-btn">My History</a>
-        <span id="adminNav"></span>
+        <a href="admin.html" class="nav-btn" id="adminNav" style="display: none;">Officer Panel</a>
     </div>
 
     <div id="loading" class="loading">Loading your data...</div>
@@ -475,8 +475,7 @@
             updateShipGoalProgress(player, availablePoints);
 
             if (player.isOfficer) {
-                document.getElementById('adminNav').innerHTML = 
-                    '<a href="admin.html" class="nav-btn">Officer Panel</a>';
+                document.getElementById('adminNav').style.display = 'inline-block';
             }
         }
 
