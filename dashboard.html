@@ -716,7 +716,10 @@
             bulkheads: 'bulkheads.png',
             plates: 'plates.png',
             canvas: 'canvas.png',
-            battleMarks: 'printshop.png'
+            battleMarks: 'printshop.png',
+            escudo: 'escudo.png',
+            constructionLicense: 'construction_licesnse.png',
+            imperialBlueprint: 'imperial_blueprint.png'
         };
 
         auth.onAuthStateChanged(user => {
@@ -855,7 +858,10 @@
                 { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads },
                 { name: 'Plates', key: 'plates', icon: resourceIcons.plates },
                 { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas },
-                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks }
+                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks },
+                { name: 'Escudo', key: 'escudo', icon: resourceIcons.escudo },
+                { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint },
+                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense}
             ];
 
             resources.forEach(resource => {
@@ -887,7 +893,10 @@
                 bulkheads: parseInt(document.getElementById('inventory_bulkheads').value) || 0,
                 plates: parseInt(document.getElementById('inventory_plates').value) || 0,
                 canvas: parseInt(document.getElementById('inventory_canvas').value) || 0,
-                battleMarks: parseInt(document.getElementById('inventory_battleMarks').value) || 0
+                battleMarks: parseInt(document.getElementById('inventory_battleMarks').value) || 0,
+                escudo: parseInt(document.getElementById('inventory_escudo').value) || 0,
+                imperialBlueprint: parseInt(document.getElementById('inventory_imperialBlueprint').value) || 0,
+                constructionLicense: parseInt(document.getElementById('inventory_constructionLicense').value) || 0
             };
 
             try {
@@ -962,7 +971,10 @@
                 { key: 'bulkheads', guildSupported: true },
                 { key: 'plates', guildSupported: true },
                 { key: 'canvas', guildSupported: true },
-                { key: 'battleMarks', guildSupported: false }
+                { key: 'battleMarks', guildSupported: false },
+                { key: 'constructionLicense', guildSupported: false },
+                { key: 'escudo', guildSupported: false },
+                { key: 'imperialBlueprint', guildSupported: false }
             ];
 
             let totalNeeded = 0;
@@ -1018,7 +1030,10 @@
                 { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads, guildSupported: true },
                 { name: 'Plates', key: 'plates', icon: resourceIcons.plates, guildSupported: true },
                 { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas, guildSupported: true },
-                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks, guildSupported: false }
+                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks, guildSupported: false },
+                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense, guildSupported: false },
+                { name: 'Escudo', key: 'escudo', icon: resourceIcons.escudo, guildSupported: false },
+                { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint, guildSupported: false }
             ];
 
             let allResourcesMet = true;
@@ -1105,6 +1120,18 @@
                 // Battle marks (player only)
                 const battleMarksNeeded = goalShip.battleMarks || 0;
                 newInventory.battleMarks = (newInventory.battleMarks || 0) - battleMarksNeeded;
+
+                // Construction license (player only)
+                const constructionLicenseNeeded = goalShip.constructionLicense || 0;
+                newInventory.constructionLicense = (newInventory.constructionLicense || 0) - constructionLicenseNeeded;
+
+                // Escudo (player only)
+                const escudoNeeded = goalShip.escudo || 0;
+                newInventory.escudo = (newInventory.escudo || 0) - escudoNeeded;
+
+                // Imperial Blueprint (player only)
+                const imperialBlueprintNeeded = goalShip.imperialBlueprint || 0;
+                newInventory.imperialBlueprint = (newInventory.imperialBlueprint || 0) - imperialBlueprintNeeded;
 
                 // Update player document
                 await db.collection('players').doc(auth.currentUser.uid).update({

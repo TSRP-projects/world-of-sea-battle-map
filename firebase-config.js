@@ -30,7 +30,10 @@ const DEFAULT_PLAYER_INVENTORY = {
     bulkheads: 0,
     plates: 0,
     canvas: 0,
-    battleMarks: 0
+    battleMarks: 0,
+    constructionLicense: 0,
+    escudo: 0,
+    imperialBlueprint:0
 };
 
 // Tier configuration
