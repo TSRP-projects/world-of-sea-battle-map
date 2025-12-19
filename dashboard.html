@@ -432,7 +432,7 @@
         </div>
 
         <div class="card card-wide">
-            <h3>🎯 Ship Goal Progress</h3>
+            <h3>Ship Goal Progress</h3>
             <div id="shipGoalContent">
                 <div style="display: flex; gap: 20px; align-items: start; flex-wrap: wrap;">
                     <div style="flex: 1; min-width: 250px;">
@@ -447,19 +447,14 @@
                             <span class="stat-value" id="goalShipName">-</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label">Total Ship Cost:</span>
-                            <span class="stat-value" id="goalShipCost">0 pts</span>
+                            <span class="stat-label">Your Share:</span>
+                            <span class="stat-value" id="playerSharePercent">75%</span>
                         </div>
                         <div class="stat-row">
-                            <span class="stat-label">Your Share (<span id="playerSharePercent">75%</span>):</span>
-                            <span class="stat-value" id="goalPlayerShare">0 pts</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Guild Support (<span id="guildSharePercent">25%</span>):</span>
-                            <span class="stat-value" id="goalGuildShare">0 pts</span>
+                            <span class="stat-label">Guild Support:</span>
+                            <span class="stat-value" id="guildSharePercent">25%</span>
                         </div>
                     </div>
-                </div>
                 
                 <div id="goalProgressContainer" style="display: none; margin-top: 20px;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
@@ -514,10 +509,10 @@
         let allShips = [];
 
         const resourceIcons = {
-            beams: 'wood.png',
-            bulkheads: 'iron.png',
-            plates: 'copper.png',
-            canvas: 'resin.png'
+            beams: 'beams.png',
+            bulkheads: 'bulkheads.png',
+            plates: 'plates.png',
+            canvas: 'canvas.png'
         };
 
         auth.onAuthStateChanged(user => {
@@ -530,17 +525,19 @@
 
         async function loadDashboard(userId) {
             try {
+                // Load ships FIRST
+                const shipsSnapshot = await db.collection('shipCosts').orderBy('tier').get();
+                allShips = shipsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                populateShipSelector();
+
+                // THEN set up player listener
                 db.collection('players').doc(userId).onSnapshot(doc => {
                     if (doc.exists) {
                         currentPlayer = { id: doc.id, ...doc.data() };
                         updatePlayerUI(currentPlayer);
                     }
                 });
-
-                const shipsSnapshot = await db.collection('shipCosts').orderBy('tier').get();
-                allShips = shipsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                populateShipSelector();
-
+                
                 db.collection('guildResources').onSnapshot(snapshot => {
                     const resources = snapshot.docs.map(doc => doc.data());
                     displayResources(resources);
@@ -653,7 +650,10 @@
             }
 
             const goalShip = allShips.find(s => s.id === player.goalShipId);
-            if (!goalShip) return;
+            if (!goalShip) {
+                console.log('Goal ship not found:', player.goalShipId);
+                return;
+            }
 
             goalStats.style.display = 'block';
             progressContainer.style.display = 'block';
@@ -663,24 +663,20 @@
             const guildSupportPercent = tier.support;
             const playerSharePercent = 1 - guildSupportPercent;
 
-            const totalShipCost = calculateShipCost(goalShip);
-            const playerShare = Math.ceil(totalShipCost * playerSharePercent);
-            const guildShare = Math.floor(totalShipCost * guildSupportPercent);
-
             document.getElementById('goalShipName').textContent = 
                 `${goalShip.name} (Tier ${goalShip.tier})`;
-            document.getElementById('goalShipCost').textContent = formatNumber(totalShipCost) + ' pts';
             document.getElementById('playerSharePercent').textContent = Math.round(playerSharePercent * 100) + '%';
             document.getElementById('guildSharePercent').textContent = Math.round(guildSupportPercent * 100) + '%';
-            document.getElementById('goalPlayerShare').textContent = formatNumber(playerShare) + ' pts';
-            document.getElementById('goalGuildShare').textContent = formatNumber(guildShare) + ' pts';
 
-            // Progress bar
-            const progressPercent = Math.min((availablePoints / playerShare) * 100, 100);
+            // Progress bar based on points toward player's share
+            const totalShipCost = calculateShipCost(goalShip);
+            const playerSharePoints = Math.ceil(totalShipCost * playerSharePercent);
+            const progressPercent = Math.min((availablePoints / playerSharePoints) * 100, 100);
+            
             document.getElementById('goalProgressFill').style.width = progressPercent + '%';
             document.getElementById('goalProgressText').textContent = progressPercent.toFixed(1) + '%';
             document.getElementById('goalProgressLabel').textContent = 
-                `${formatNumber(availablePoints)} / ${formatNumber(playerShare)} pts`;
+                `${formatNumber(availablePoints)} / ${formatNumber(playerSharePoints)} pts`;
 
             // Resource breakdown
             displayResourceBreakdown(goalShip, playerSharePercent, guildSupportPercent);
