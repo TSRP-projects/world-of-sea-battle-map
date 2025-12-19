@@ -45,6 +45,12 @@
             border-radius: 50%;
             border: 2px solid #8b6914;
         }
+
+        .squadron-badge {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+        }
         
         .user-info h2 { 
             font-family: 'Cinzel', Georgia, serif;
@@ -358,6 +364,7 @@
 <body>
     <div class="header">
         <div class="header-left">
+            <img id="squadronBadge" class="squadron-badge" src="" alt="Squadron" title="" style="display: none;">
             <img id="userAvatar" class="avatar" src="" alt="Avatar">
             <div class="user-info">
                 <h2 id="userName">Loading...</h2>
@@ -562,11 +569,30 @@
             // Display gamertag
             const gamertagDisplay = document.getElementById('gamertag-display');
             if (player.gamertag) {
-                gamertagDisplay.textContent = player.gamertag;
+                const prefix = player.squadron ? `[${player.squadron}] ` : '';
+                gamertagDisplay.textContent = prefix + player.gamertag;
             } else {
                 gamertagDisplay.textContent = 'Set gamertag';
                 gamertagDisplay.style.fontStyle = 'italic';
                 gamertagDisplay.style.color = '#999';
+            }
+
+            // Display squadron badge
+            const squadronBadge = document.getElementById('squadronBadge');
+            if (player.squadron) {
+                const squadronLogos = {
+                    'BWC': 'Blackwolf Chapter Medallion.png',
+                    'BWH': 'Blackwolf Holdings Medallion.png'
+                };
+                const squadronNames = {
+                    'BWC': 'Blackwolf Chapter',
+                    'BWH': 'Blackwolf Holdings'
+                };
+                squadronBadge.src = squadronLogos[player.squadron];
+                squadronBadge.title = squadronNames[player.squadron];
+                squadronBadge.style.display = 'block';
+            } else {
+                squadronBadge.style.display = 'none';
             }
 
             const availablePoints = player.totalPoints - player.sharesRedeemed;

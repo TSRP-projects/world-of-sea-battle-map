@@ -135,9 +135,19 @@
         const loading = document.getElementById('loading');
         const error = document.getElementById('error');
 
+        async function checkPlayerAndRedirect(user) {
+            const playerDoc = await db.collection('players').doc(user.uid).get();
+            
+            if (playerDoc.exists && playerDoc.data().gamertag && playerDoc.data().squadron) {
+                window.location.href = 'dashboard.html';
+            } else {
+                window.location.href = 'onboarding.html';
+            }
+        }
+
         auth.onAuthStateChanged(async user => {
             if (user) {
-                await createPlayerRecord(user);
+                await checkPlayerAndRedirect(user);
             }
         });
 
@@ -150,7 +160,7 @@
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await auth.signInWithPopup(provider);
                 
-                await createPlayerRecord(result.user);
+                await checkPlayerAndRedirect(result.user);
 
             } catch (err) {
                 console.error('Login error:', err);
@@ -160,32 +170,6 @@
                 loading.style.display = 'none';
             }
         });
-
-        async function createPlayerRecord(user) {
-            const playerRef = db.collection('players').doc(user.uid);
-            const playerDoc = await playerRef.get();
-
-            if (!playerDoc.exists) {
-                await playerRef.set({
-                    displayName: user.displayName || 'Unknown',
-                    email: user.email,
-                    photoURL: user.photoURL || null,
-                    totalPoints: 0,
-                    sharesRedeemed: 0,
-                    fortsDestroyed: 0,
-                    isOfficer: false,
-                    goalShipId: null,
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } else {
-                await playerRef.update({
-                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
-
-            window.location.href = 'dashboard.html';
-        }
     </script>
 </body>
 </html>

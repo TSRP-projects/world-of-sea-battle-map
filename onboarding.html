@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - WOSB Guild Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Libre Baskerville', Georgia, serif;
+            background: url('wosb-app-login-background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .onboarding-container {
+            background: rgba(244, 236, 217, 0.92);
+            border: 3px solid #8b6914;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: #5c4a3a;
+            font-style: italic;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: #f5f0e6;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            color: #3d2b1f;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+        
+        .squadron-label {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-align: left;
+        }
+        
+        .squadron-selection {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .squadron-option {
+            cursor: pointer;
+            padding: 15px;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background: rgba(139, 105, 20, 0.05);
+        }
+        
+        .squadron-option:hover {
+            background: rgba(139, 105, 20, 0.15);
+            border-color: rgba(139, 105, 20, 0.3);
+        }
+        
+        .squadron-option.selected {
+            border-color: #8b6914;
+            background: rgba(139, 105, 20, 0.2);
+            box-shadow: 0 4px 12px rgba(139, 105, 20, 0.3);
+        }
+        
+        .squadron-logo {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        
+        .squadron-name {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            background: #8b6914;
+            color: #f5f0e6;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            background: #6d5310;
+        }
+        
+        .btn:disabled {
+            background: #999;
+            border-color: #999;
+            cursor: not-allowed;
+        }
+        
+        .error-message {
+            color: #8b3a3a;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .loading {
+            color: #8b6914;
+            font-family: 'Cinzel', Georgia, serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <h1>Welcome, Sailor</h1>
+        <p class="subtitle">Set up your profile to join the fleet</p>
+        
+        <div class="form-group">
+            <label for="gamertag">In-Game User Name</label>
+            <input type="text" id="gamertag" placeholder="Enter your gamertag" maxlength="30">
+        </div>
+        
+        <div class="squadron-label">For which squadron do you sail?</div>
+        
+        <div class="squadron-selection">
+            <div class="squadron-option" data-squadron="BWC" title="Blackwolf Chapter" onclick="selectSquadron('BWC')">
+                <img src="Blackwolf Chapter Medallion.png" alt="Blackwolf Chapter" class="squadron-logo">
+                <div class="squadron-name">Blackwolf Chapter</div>
+            </div>
+            
+            <div class="squadron-option" data-squadron="BWH" title="Blackwolf Holdings" onclick="selectSquadron('BWH')">
+                <img src="Blackwolf Holdings Medallion.png" alt="Blackwolf Holdings" class="squadron-logo">
+                <div class="squadron-name">Blackwolf Holdings</div>
+            </div>
+        </div>
+        
+        <div class="error-message" id="errorMessage"></div>
+        
+        <button class="btn" onclick="completeOnboarding()">Set Sail</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        let selectedSquadron = null;
+        let currentUser = null;
+
+        auth.onAuthStateChanged(async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = user;
+            
+            // Check if player already exists
+            const playerDoc = await db.collection('players').doc(user.uid).get();
+            if (playerDoc.exists && playerDoc.data().gamertag && playerDoc.data().squadron) {
+                // Already onboarded, go to dashboard
+                window.location.href = 'dashboard.html';
+            }
+        });
+
+        function selectSquadron(code) {
+            selectedSquadron = code;
+            
+            // Update visual selection
+            document.querySelectorAll('.squadron-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`[data-squadron="${code}"]`).classList.add('selected');
+            
+            hideError();
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        async function completeOnboarding() {
+            const gamertag = document.getElementById('gamertag').value.trim();
+            
+            if (!gamertag) {
+                showError('Please enter your in-game user name');
+                return;
+            }
+            
+            if (!selectedSquadron) {
+                showError('Please select your squadron');
+                return;
+            }
+            
+            try {
+                await db.collection('players').doc(currentUser.uid).set({
+                    displayName: currentUser.displayName,
+                    email: currentUser.email,
+                    photoURL: currentUser.photoURL || null,
+                    gamertag: gamertag,
+                    squadron: selectedSquadron,
+                    totalPoints: 0,
+                    sharesRedeemed: 0,
+                    fortsDestroyed: 0,
+                    isOfficer: false,
+                    goalShipId: null,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                window.location.href = 'dashboard.html';
+                
+            } catch (err) {
+                console.error('Error creating profile:', err);
+                showError('Error creating profile: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
