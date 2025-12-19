@@ -361,7 +361,6 @@
         <div class="header-left">
             <img id="squadronBadge" class="squadron-badge" src="" alt="Squadron" title="" style="display: none;">
             <div class="user-info">
-                <h2 id="userName">Loading...</h2>
                 <div id="gamertag-container">
                     <span id="gamertag-display" class="gamertag"></span>
                     <span id="edit-gamertag" class="edit-gamertag" onclick="showGametagInput()" title="Edit gamertag">✏️</span>
@@ -556,7 +555,6 @@
         }
 
         function updatePlayerUI(player) {
-            document.getElementById('userName').textContent = player.displayName;
 
             // Display gamertag
             const gamertagDisplay = document.getElementById('gamertag-display');
@@ -803,7 +801,7 @@
                         const player = doc.data();
                         if (player.fortsDestroyed > 0) {
                             rank++;
-                            const displayName = player.gamertag || player.displayName;
+                            const displayName = player.gamertag || 'Unknown';
                             const item = document.createElement('div');
                             item.className = `leaderboard-item rank-${rank}`;
                             item.innerHTML = `
@@ -854,7 +852,7 @@
                 const entry = sorted[i];
                 const playerDoc = await db.collection('players').doc(entry.playerId).get();
                 const playerData = playerDoc.exists ? playerDoc.data() : {};
-                const displayName = playerData.gamertag || playerData.displayName || 'Unknown';
+                const displayName = playerData.gamertag || 'Unknown';
                 
                 const item = document.createElement('div');
                 item.className = `leaderboard-item rank-${i + 1}`;

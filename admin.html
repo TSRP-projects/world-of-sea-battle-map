@@ -338,7 +338,6 @@
                 <table id="membersTable">
                     <thead>
                         <tr>
-                            <th>Member</th>
                             <th>Gamertag</th>
                             <th>Total Pts</th>
                             <th>Redeemed</th>
@@ -439,7 +438,6 @@
                 const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td>${member.displayName}</td>
                     <td><span class="gamertag">${member.gamertag ? squadronPrefix + member.gamertag : '-'}</span></td>
                     <td>${formatNumber(member.totalPoints)}</td>
                     <td>${formatNumber(member.sharesRedeemed)}</td>
@@ -463,14 +461,14 @@
 
             docs.forEach(doc => {
                 const member = doc.data();
-                const displayText = member.gamertag || member.displayName;
+                const displayText = member.gamertag;
                 
                 // Fort participant checkbox
                 const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
                 const label = document.createElement('label');
                 label.innerHTML = `
                     <input type="checkbox" class="fort-participant" value="${doc.id}">
-                    ${member.gamertag ? squadronPrefix + displayText : displayText} ${member.gamertag ? `<span class="display-name">(${member.displayName})</span>` : ''} 
+                    ${member.gamertag ? squadronPrefix + displayText : 'No gamertag'} 
                     <span style="color: #5c4a3a; font-size: 11px;">(${member.fortsDestroyed || 0} forts)</span>
                 `;
                 fortContainer.appendChild(label);
@@ -478,7 +476,7 @@
                 // Donation player option
                 const option = document.createElement('option');
                 option.value = doc.id;
-                option.textContent = (member.gamertag ? squadronPrefix + displayText : displayText) + (member.gamertag ? ` (${member.displayName})` : '');
+                option.textContent = member.gamertag ? squadronPrefix + displayText : 'No gamertag';
                 donationSelector.appendChild(option);
             });
         }
