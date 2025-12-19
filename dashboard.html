@@ -452,7 +452,7 @@
         <div class="card card-wide">
             <h3>Ship Goal Progress</h3>
             <div id="shipGoalContent">
-                <div style="display: flex; gap: 30px; align-items: start; flex-wrap: wrap;">
+                <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
                     <!-- Left side: Selection and stats -->
                     <div style="flex: 1; min-width: 280px;">
                         <label style="color: #5c4a3a; font-size: 14px;">Select a ship you're saving for:</label>
@@ -475,7 +475,7 @@
                             </div>
                         </div>
                         
-                        <div id="goalProgressContainer" style="display: none; margin-top: 20px;">
+                        <div id="goalProgressContainer" style="display: none; margin-top: 15px;">
                             <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                 <span style="color: #5c4a3a; font-size: 14px;">Your Progress</span>
                             </div>
@@ -487,12 +487,12 @@
                     </div>
                     
                     <!-- Right side: Reserved for ship image -->
-                    <div id="shipImageContainer" style="flex: 0 0 370px; display: none; padding: 20px 0; align-items: center; background: transparent;">
+                    <div id="shipImageContainer" style="flex: 0 0 auto; display: none; background: transparent;">
                         <img id="goalShipImage" src="" alt="Ship" style="max-width: 100%; height: auto;">
                     </div>
                 </div>
                 
-                <div id="resourceBreakdown" style="display: none; margin-top: 30px;">
+                <div id="resourceBreakdown" style="display: none; margin-top: 15px;">
                     <h4 style="font-family: 'Cinzel', Georgia, serif; color: #8b6914; margin-bottom: 10px; text-align: center;">Resource Breakdown</h4>
                     <div class="legend" style="justify-content: center;">
                         <div class="legend-item"><div class="legend-color legend-player"></div> Your Share</div>
