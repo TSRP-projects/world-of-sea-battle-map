@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Panel - WOSB Guild Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e8e8e8;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 { color: #d4af37; font-size: 24px; }
+        
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            color: #e8e8e8;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .nav-btn.active { background: #d4af37; color: #1a1a2e; }
+        
+        .admin-container { max-width: 1400px; margin: 0 auto; }
+        
+        .card {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card h3 { color: #d4af37; margin-bottom: 15px; font-size: 18px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th { background: rgba(212, 175, 55, 0.1); color: #d4af37; padding: 12px; text-align: left; font-weight: bold; }
+        td { padding: 12px; border-bottom: 1px solid rgba(212, 175, 55, 0.2); }
+        tr:hover { background: rgba(255, 255, 255, 0.05); }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary { background: #d4af37; color: #1a1a2e; }
+        .btn-primary:hover { background: #b8941f; }
+        .btn-success { background: #4ade80; color: #1a1a2e; }
+        .btn-success:hover { background: #22c55e; }
+        
+        .loading { text-align: center; padding: 40px; color: #d4af37; }
+        
+        .resources-edit {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .resource-edit-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        .resource-edit-item label {
+            display: block;
+            color: #d4af37;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .resource-edit-item input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            color: #e8e8e8;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+        }
+        
+        .fort-participants {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .fort-participants label {
+            display: block;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        
+        .fort-participants label:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .fort-participants input {
+            margin-right: 10px;
+        }
+        
+        .select-all-container {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚔️ Officer Panel</h1>
+    </div>
+
+    <div class="navigation">
+        <a href="dashboard.html" class="nav-btn">Dashboard</a>
+        <a href="admin.html" class="nav-btn active">Officer Panel</a>
+    </div>
+
+    <div id="loading" class="loading">Loading officer panel...</div>
+
+    <div id="adminContent" class="admin-container" style="display: none;">
+        <!-- Fort Raid Logger -->
+        <div class="card">
+            <h3>⚔️ Log Fort Raid</h3>
+            <p style="color: #a0a0a0; margin-bottom: 15px;">
+                Select participants. Each player receives 10 points and +1 fort count.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: 15px; align-items: start;">
+                <div>
+                    <label style="display: block; color: #d4af37; margin-bottom: 8px; font-weight: bold;">
+                        Select Participants:
+                    </label>
+                    <div class="fort-participants">
+                        <div class="select-all-container">
+                            <label>
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                                <strong>Select All</strong>
+                            </label>
+                        </div>
+                        <div id="fortParticipantsList"></div>
+                    </div>
+                </div>
+                <button class="btn btn-success" onclick="logFortRaid()" style="height: fit-content; padding: 15px 25px;">
+                    Log Fort Raid
+                </button>
+            </div>
+        </div>
+
+        <!-- Members Table -->
+        <div class="card">
+            <h3>👥 All Members</h3>
+            <div style="overflow-x: auto;">
+                <table id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Total Points</th>
+                            <th>Shares Redeemed</th>
+                            <th>Available</th>
+                            <th>Tier</th>
+                            <th>Goal Ship</th>
+                            <th>Forts</th>
+                            <th>Last Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Guild Resources -->
+        <div class="card">
+            <h3>🏦 Guild Resources</h3>
+            <div class="resources-edit" id="resourcesEdit"></div>
+            <button class="btn btn-success" onclick="saveAllResources()" style="margin-top: 20px;">
+                Save All Resources
+            </button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        let allShips = {};
+        let allMembers = [];
+
+        auth.onAuthStateChanged(async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                const playerDoc = await db.collection('players').doc(user.uid).get();
+                if (!playerDoc.exists || !playerDoc.data().isOfficer) {
+                    alert('Access denied. Officers only.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                loadAdminData();
+            }
+        });
+
+        async function loadAdminData() {
+            try {
+                // Load ships
+                const shipsSnapshot = await db.collection('shipCosts').get();
+                shipsSnapshot.docs.forEach(doc => {
+                    allShips[doc.id] = doc.data();
+                });
+
+                // Real-time members listener
+                db.collection('players')
+                    .orderBy('totalPoints', 'desc')
+                    .onSnapshot(snapshot => {
+                        allMembers = snapshot.docs;
+                        displayMembers(snapshot.docs);
+                        updateFortParticipantsList(snapshot.docs);
+                    });
+
+                // Real-time resources listener
+                db.collection('guildResources')
+                    .orderBy('materialType')
+                    .onSnapshot(snapshot => {
+                        displayResources(snapshot.docs);
+                    });
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+
+            } catch (err) {
+                console.error('Error loading admin data:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function displayMembers(docs) {
+            const tbody = document.querySelector('#membersTable tbody');
+            tbody.innerHTML = '';
+
+            docs.forEach(doc => {
+                const member = doc.data();
+                const availablePoints = member.totalPoints - member.sharesRedeemed;
+                const tier = getTierFromPoints(availablePoints);
+
+                let goalShipName = '-';
+                if (member.goalShipId && allShips[member.goalShipId]) {
+                    goalShipName = allShips[member.goalShipId].name;
+                }
+
+                let lastActivityText = 'Never';
+                if (member.lastActivity) {
+                    const lastActivity = member.lastActivity.toDate();
+                    const daysAgo = Math.floor((Date.now() - lastActivity) / (1000 * 60 * 60 * 24));
+                    lastActivityText = daysAgo === 0 ? 'Today' : `${daysAgo}d ago`;
+                }
+
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${member.displayName}</td>
+                    <td>${formatNumber(member.totalPoints)}</td>
+                    <td>${formatNumber(member.sharesRedeemed)}</td>
+                    <td>${formatNumber(availablePoints)}</td>
+                    <td>${tier.emoji} ${tier.name}</td>
+                    <td>${goalShipName}</td>
+                    <td>${member.fortsDestroyed || 0}</td>
+                    <td>${lastActivityText}</td>
+                `;
+            });
+        }
+
+        function updateFortParticipantsList(docs) {
+            const container = document.getElementById('fortParticipantsList');
+            container.innerHTML = '';
+
+            docs.forEach(doc => {
+                const member = doc.data();
+                const label = document.createElement('label');
+                label.innerHTML = `
+                    <input type="checkbox" class="participant-checkbox" value="${doc.id}">
+                    ${member.displayName} (${member.fortsDestroyed || 0} forts)
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAllCheckbox').checked;
+            const checkboxes = document.querySelectorAll('.participant-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll);
+        }
+
+        function displayResources(docs) {
+            const container = document.getElementById('resourcesEdit');
+            container.innerHTML = '';
+
+            docs.forEach(doc => {
+                const resource = doc.data();
+                const item = document.createElement('div');
+                item.className = 'resource-edit-item';
+                item.innerHTML = `
+                    <label>${resource.materialType}:</label>
+                    <input type="number" 
+                           id="resource_${doc.id}" 
+                           value="${resource.currentStock}" 
+                           min="0">
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function logFortRaid() {
+            const checkboxes = document.querySelectorAll('.participant-checkbox:checked');
+            
+            if (checkboxes.length === 0) {
+                alert('Select at least one participant');
+                return;
+            }
+
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+                checkboxes.forEach(checkbox => {
+                    const playerId = checkbox.value;
+                    const playerRef = db.collection('players').doc(playerId);
+                    
+                    batch.update(playerRef, {
+                        totalPoints: firebase.firestore.FieldValue.increment(POINT_VALUES.FORT_RAID),
+                        fortsDestroyed: firebase.firestore.FieldValue.increment(1),
+                        lastActivity: timestamp
+                    });
+                    
+                    const contribRef = db.collection('contributions').doc();
+                    batch.set(contribRef, {
+                        playerId: playerId,
+                        activityType: 'Fort Raid',
+                        pointsEarned: POINT_VALUES.FORT_RAID,
+                        hoursParticipated: null,
+                        materialType: null,
+                        materialQuantity: null,
+                        notes: 'Fort raid logged by officer',
+                        createdAt: timestamp
+                    });
+                });
+
+                await batch.commit();
+                
+                alert(`Fort raid logged! ${checkboxes.length} participants awarded ${POINT_VALUES.FORT_RAID} points each.`);
+                
+                // Uncheck all boxes
+                checkboxes.forEach(cb => cb.checked = false);
+                document.getElementById('selectAllCheckbox').checked = false;
+
+            } catch (err) {
+                console.error('Error logging fort raid:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function saveAllResources() {
+            try {
+                const snapshot = await db.collection('guildResources').get();
+                const batch = db.batch();
+
+                snapshot.docs.forEach(doc => {
+                    const newStock = parseInt(document.getElementById(`resource_${doc.id}`).value) || 0;
+                    batch.update(doc.ref, {
+                        currentStock: newStock,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedBy: auth.currentUser.uid
+                    });
+                });
+
+                await batch.commit();
+                alert('Resources updated successfully!');
+
+            } catch (err) {
+                console.error('Error updating resources:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

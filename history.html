@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contribution History - WOSB Guild Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e8e8e8;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 { color: #d4af37; font-size: 24px; }
+        
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #d4af37;
+            border-radius: 5px;
+            color: #e8e8e8;
+            text-decoration: none;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .nav-btn.active { background: #d4af37; color: #1a1a2e; }
+        
+        .history-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 30px;
+        }
+        
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-item-left { flex: 1; }
+        .history-item-title { color: #d4af37; font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .history-item-details { color: #a0a0a0; font-size: 13px; }
+        .history-item-right { text-align: right; }
+        .history-item-points { color: #d4af37; font-size: 20px; font-weight: bold; }
+        .history-item-date { color: #a0a0a0; font-size: 12px; }
+        
+        .loading { text-align: center; padding: 40px; color: #d4af37; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #a0a0a0;
+        }
+        
+        .empty-state-icon { font-size: 64px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📜 Contribution History</h1>
+    </div>
+
+    <div class="navigation">
+        <a href="dashboard.html" class="nav-btn">Dashboard</a>
+        <a href="history.html" class="nav-btn active">My History</a>
+    </div>
+
+    <div class="history-container">
+        <div id="loading" class="loading">Loading your history...</div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-state-icon">⚓</div>
+            <p>No contributions yet.</p>
+            <p style="margin-top: 10px;">Participate in fort raids and donate materials to earn points!</p>
+        </div>
+
+        <div id="historyList" style="display: none;"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                loadHistory(user.uid);
+            }
+        });
+
+        function loadHistory(userId) {
+            db.collection('contributions')
+                .where('playerId', '==', userId)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot(snapshot => {
+                    document.getElementById('loading').style.display = 'none';
+
+                    if (snapshot.empty) {
+                        document.getElementById('emptyState').style.display = 'block';
+                        document.getElementById('historyList').style.display = 'none';
+                    } else {
+                        document.getElementById('emptyState').style.display = 'none';
+                        document.getElementById('historyList').style.display = 'block';
+                        displayHistory(snapshot.docs);
+                    }
+                }, err => {
+                    console.error('Error loading history:', err);
+                    alert('Error: ' + err.message);
+                });
+        }
+
+        function displayHistory(docs) {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+
+            docs.forEach(doc => {
+                const contrib = doc.data();
+                const item = document.createElement('div');
+                item.className = 'history-item';
+
+                let details = '';
+                if (contrib.hoursParticipated) {
+                    details = `${contrib.hoursParticipated} hours`;
+                } else if (contrib.materialType && contrib.materialQuantity) {
+                    details = `${contrib.materialQuantity.toLocaleString()} ${contrib.materialType}`;
+                }
+
+                if (contrib.notes) {
+                    details += ` • ${contrib.notes}`;
+                }
+
+                let dateStr = 'Just now';
+                if (contrib.createdAt) {
+                    const date = contrib.createdAt.toDate();
+                    dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                }
+
+                item.innerHTML = `
+                    <div class="history-item-left">
+                        <div class="history-item-title">${contrib.activityType}</div>
+                        <div class="history-item-details">${details}</div>
+                    </div>
+                    <div class="history-item-right">
+                        <div class="history-item-points">+${contrib.pointsEarned.toLocaleString()}</div>
+                        <div class="history-item-date">${dateStr}</div>
+                    </div>
+                `;
+
+                historyList.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
