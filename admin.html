@@ -83,7 +83,7 @@
         
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -134,6 +134,23 @@
         .btn-success:hover { 
             background: #1e3d1e; 
         }
+        .btn-danger {
+            background: #8b3a3a;
+            color: #f5f0e6;
+            border-color: #8b3a3a;
+        }
+        .btn-danger:hover {
+            background: #6b2a2a;
+        }
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        .btn-warning {
+            background: #8b6914;
+            color: #f5f0e6;
+            border-color: #8b6914;
+        }
         
         .loading { 
             text-align: center; 
@@ -144,7 +161,7 @@
         
         .resources-edit {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
@@ -161,7 +178,7 @@
             font-family: 'Cinzel', Georgia, serif;
             color: #8b6914;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 12px;
         }
         
         .resource-edit-item input {
@@ -172,7 +189,7 @@
             border-radius: 5px;
             color: #3d2b1f;
             font-family: 'Libre Baskerville', Georgia, serif;
-            font-size: 16px;
+            font-size: 14px;
         }
         
         .resource-edit-item input:focus {
@@ -181,7 +198,7 @@
         }
         
         .participant-list {
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
             background: #f5f0e6;
             border: 2px solid #8b6914;
@@ -225,7 +242,8 @@
         }
         
         .form-group select,
-        .form-group input {
+        .form-group input,
+        .form-group textarea {
             width: 100%;
             padding: 10px;
             background: #f5f0e6;
@@ -234,6 +252,11 @@
             color: #3d2b1f;
             font-family: 'Libre Baskerville', Georgia, serif;
             font-size: 14px;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
         }
         
         .form-group select option {
@@ -255,7 +278,134 @@
         .tier-captain { background: rgba(139, 105, 20, 0.25); color: #8b6914; }
         
         .gamertag { font-weight: bold; color: #8b6914; }
-        .display-name { font-size: 11px; color: #5c4a3a; }
+        
+        .officer-badge {
+            background: #8b6914;
+            color: #f5f0e6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        .ledger-entry {
+            padding: 12px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+        }
+        
+        .ledger-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .ledger-entry:hover {
+            background: rgba(139, 105, 20, 0.05);
+        }
+        
+        .ledger-action {
+            font-weight: bold;
+            color: #8b6914;
+            font-family: 'Cinzel', Georgia, serif;
+        }
+        
+        .ledger-action.action-add { color: #2d5a2d; }
+        .ledger-action.action-remove { color: #8b3a3a; }
+        .ledger-action.action-officer { color: #8b6914; }
+        
+        .ledger-details {
+            font-size: 13px;
+            color: #3d2b1f;
+            margin-top: 5px;
+        }
+        
+        .ledger-meta {
+            font-size: 11px;
+            color: #5c4a3a;
+            margin-top: 5px;
+        }
+        
+        .ledger-justification {
+            font-style: italic;
+            color: #5c4a3a;
+            margin-top: 5px;
+            padding-left: 10px;
+            border-left: 2px solid #8b6914;
+        }
+        
+        .ledger-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: rgba(244, 236, 217, 0.98);
+            border: 3px solid #8b6914;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal h3 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            margin-bottom: 20px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .contributions-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .contribution-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+        }
+        
+        .contribution-item:hover {
+            background: rgba(139, 105, 20, 0.1);
+        }
+        
+        .contribution-info {
+            flex: 1;
+        }
+        
+        .contribution-type {
+            font-weight: bold;
+            color: #8b6914;
+        }
+        
+        .contribution-details {
+            font-size: 12px;
+            color: #5c4a3a;
+        }
     </style>
 </head>
 <body>
@@ -330,6 +480,29 @@
                     Log Donation
                 </button>
             </div>
+
+            <div class="card">
+                <h3>👑 Manage Officers</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Promote or demote players to officer status.
+                </p>
+                
+                <div class="form-group">
+                    <label>Select Player:</label>
+                    <select id="officerPlayer">
+                        <option value="">-- Select Player --</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="promoteToOfficer()" style="flex: 1;">
+                        Promote to Officer
+                    </button>
+                    <button class="btn btn-danger" onclick="demoteOfficer()" style="flex: 1;">
+                        Remove Officer
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="card">
@@ -346,6 +519,7 @@
                             <th>Goal Ship</th>
                             <th>Forts</th>
                             <th>Last Activity</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -353,12 +527,40 @@
             </div>
         </div>
 
-        <div class="card">
-            <h3>🏦 Guild Resources</h3>
-            <div class="resources-edit" id="resourcesEdit"></div>
-            <button class="btn btn-success" onclick="saveAllResources()" style="margin-top: 20px;">
-                Save All Resources
-            </button>
+        <div class="card-grid">
+            <div class="card">
+                <h3>🏦 Guild Resources</h3>
+                <div class="resources-edit" id="resourcesEdit"></div>
+                <button class="btn btn-success" onclick="saveAllResources()" style="margin-top: 20px; width: 100%;">
+                    Save All Resources
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>📜 Admiral's Ledger</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Log of all officer actions.
+                </p>
+                <div class="ledger-container" id="ledgerContainer">
+                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Contribution Modal -->
+    <div class="modal-overlay" id="removeContributionModal">
+        <div class="modal">
+            <h3>🗑️ Remove Contribution</h3>
+            <div id="contributionsList" class="contributions-list"></div>
+            <div class="form-group" style="margin-top: 15px;">
+                <label>Justification (required):</label>
+                <textarea id="removeJustification" placeholder="Explain why this entry is being removed..."></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="closeRemoveModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmRemoveContribution()">Remove Selected</button>
+            </div>
         </div>
     </div>
 
@@ -369,6 +571,9 @@
     <script>
         let allShips = {};
         let allMembers = [];
+        let currentOfficer = null;
+        let selectedPlayerId = null;
+        let selectedContributionId = null;
 
         auth.onAuthStateChanged(async user => {
             if (!user) {
@@ -380,6 +585,7 @@
                     window.location.href = 'dashboard.html';
                     return;
                 }
+                currentOfficer = { id: user.uid, ...playerDoc.data() };
                 loadAdminData();
             }
         });
@@ -403,6 +609,13 @@
                     .orderBy('materialType')
                     .onSnapshot(snapshot => {
                         displayResources(snapshot.docs);
+                    });
+
+                db.collection('admiralLedger')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .onSnapshot(snapshot => {
+                        displayLedger(snapshot.docs);
                     });
 
                 document.getElementById('loading').style.display = 'none';
@@ -436,9 +649,11 @@
                 }
 
                 const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
+                const officerBadge = member.isOfficer ? '<span class="officer-badge">OFFICER</span>' : '';
+
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td><span class="gamertag">${member.gamertag ? squadronPrefix + member.gamertag : '-'}</span></td>
+                    <td><span class="gamertag">${member.gamertag ? squadronPrefix + member.gamertag : '-'}</span>${officerBadge}</td>
                     <td>${formatNumber(member.totalPoints)}</td>
                     <td>${formatNumber(member.sharesRedeemed)}</td>
                     <td>${formatNumber(availablePoints)}</td>
@@ -446,38 +661,50 @@
                     <td>${goalShipName}</td>
                     <td>${member.fortsDestroyed || 0}</td>
                     <td>${lastActivityText}</td>
+                    <td>
+                        <button class="btn btn-small btn-warning" onclick="openRemoveModal('${doc.id}')">
+                            Manage
+                        </button>
+                    </td>
                 `;
             });
         }
 
         function updateParticipantLists(docs) {
-            // Fort participants
             const fortContainer = document.getElementById('fortParticipantsList');
             fortContainer.innerHTML = '';
 
-            // Donation player selector
             const donationSelector = document.getElementById('donationPlayer');
             donationSelector.innerHTML = '<option value="">-- Select Player --</option>';
 
+            const officerSelector = document.getElementById('officerPlayer');
+            officerSelector.innerHTML = '<option value="">-- Select Player --</option>';
+
             docs.forEach(doc => {
                 const member = doc.data();
-                const displayText = member.gamertag;
+                const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
+                const displayText = member.gamertag ? squadronPrefix + member.gamertag : 'No gamertag';
                 
                 // Fort participant checkbox
-                const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
                 const label = document.createElement('label');
                 label.innerHTML = `
                     <input type="checkbox" class="fort-participant" value="${doc.id}">
-                    ${member.gamertag ? squadronPrefix + displayText : 'No gamertag'} 
+                    ${displayText}
                     <span style="color: #5c4a3a; font-size: 11px;">(${member.fortsDestroyed || 0} forts)</span>
                 `;
                 fortContainer.appendChild(label);
 
                 // Donation player option
-                const option = document.createElement('option');
-                option.value = doc.id;
-                option.textContent = member.gamertag ? squadronPrefix + displayText : 'No gamertag';
-                donationSelector.appendChild(option);
+                const donationOption = document.createElement('option');
+                donationOption.value = doc.id;
+                donationOption.textContent = displayText;
+                donationSelector.appendChild(donationOption);
+
+                // Officer player option
+                const officerOption = document.createElement('option');
+                officerOption.value = doc.id;
+                officerOption.textContent = displayText + (member.isOfficer ? ' (Officer)' : '');
+                officerSelector.appendChild(officerOption);
             });
         }
 
@@ -506,6 +733,54 @@
             });
         }
 
+        function displayLedger(docs) {
+            const container = document.getElementById('ledgerContainer');
+            
+            if (docs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No entries yet</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            docs.forEach(doc => {
+                const entry = doc.data();
+                let actionClass = 'action-add';
+                if (entry.action.includes('Remove') || entry.action.includes('Demote')) {
+                    actionClass = 'action-remove';
+                } else if (entry.action.includes('Officer') || entry.action.includes('Promote')) {
+                    actionClass = 'action-officer';
+                }
+
+                const timestamp = entry.timestamp ? entry.timestamp.toDate().toLocaleString() : 'Unknown';
+
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'ledger-entry';
+                entryDiv.innerHTML = `
+                    <div class="ledger-action ${actionClass}">${entry.action}</div>
+                    <div class="ledger-details">${entry.details || ''}</div>
+                    ${entry.justification ? `<div class="ledger-justification">"${entry.justification}"</div>` : ''}
+                    <div class="ledger-meta">By ${entry.performedByName || 'Unknown'} • ${timestamp}</div>
+                `;
+                container.appendChild(entryDiv);
+            });
+        }
+
+        async function logToLedger(action, details, justification = null) {
+            try {
+                await db.collection('admiralLedger').add({
+                    action: action,
+                    details: details,
+                    justification: justification,
+                    performedBy: currentOfficer.id,
+                    performedByName: currentOfficer.gamertag || currentOfficer.displayName || 'Unknown',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (err) {
+                console.error('Error logging to ledger:', err);
+            }
+        }
+
         async function logFortRaid() {
             const checkboxes = document.querySelectorAll('.fort-participant:checked');
             
@@ -517,9 +792,15 @@
             try {
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                const participantNames = [];
 
-                checkboxes.forEach(checkbox => {
+                for (const checkbox of checkboxes) {
                     const playerId = checkbox.value;
+                    const playerDoc = allMembers.find(m => m.id === playerId);
+                    const playerData = playerDoc ? playerDoc.data() : {};
+                    const playerName = playerData.gamertag || 'Unknown';
+                    participantNames.push(playerName);
+
                     const playerRef = db.collection('players').doc(playerId);
                     
                     batch.update(playerRef, {
@@ -531,16 +812,24 @@
                     const contribRef = db.collection('contributions').doc();
                     batch.set(contribRef, {
                         playerId: playerId,
+                        playerName: playerName,
                         activityType: 'Fort Raid',
                         pointsEarned: POINT_VALUES.FORT_RAID,
                         materialType: null,
                         materialQuantity: null,
                         notes: 'Fort raid logged by officer',
+                        loggedBy: currentOfficer.id,
+                        loggedByName: currentOfficer.gamertag || currentOfficer.displayName,
                         createdAt: timestamp
                     });
-                });
+                }
 
                 await batch.commit();
+                
+                await logToLedger(
+                    'Fort Raid Logged',
+                    `${checkboxes.length} participants: ${participantNames.join(', ')} (+${POINT_VALUES.FORT_RAID} pts each)`
+                );
                 
                 alert(`Fort raid logged! ${checkboxes.length} participants awarded ${POINT_VALUES.FORT_RAID} points each.`);
                 
@@ -578,33 +867,37 @@
             }
 
             const pointsEarned = pointValue * quantity;
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            const playerName = playerData.gamertag || 'Unknown';
 
             try {
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-                // Update player
                 const playerRef = db.collection('players').doc(playerId);
                 batch.update(playerRef, {
                     totalPoints: firebase.firestore.FieldValue.increment(pointsEarned),
                     lastActivity: timestamp
                 });
 
-                // Add contribution record
                 const contribRef = db.collection('contributions').doc();
                 batch.set(contribRef, {
                     playerId: playerId,
+                    playerName: playerName,
                     activityType: 'Material Donation',
                     pointsEarned: pointsEarned,
                     materialType: resourceType,
                     materialQuantity: quantity,
                     notes: `Donated ${quantity} ${resourceType}`,
+                    loggedBy: currentOfficer.id,
+                    loggedByName: currentOfficer.gamertag || currentOfficer.displayName,
                     createdAt: timestamp
                 });
 
-                // Update guild resources
+                const resourceName = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
                 const resourceQuery = await db.collection('guildResources')
-                    .where('materialType', '==', resourceType.charAt(0).toUpperCase() + resourceType.slice(1))
+                    .where('materialType', '==', resourceName)
                     .get();
                 
                 if (!resourceQuery.empty) {
@@ -618,15 +911,227 @@
 
                 await batch.commit();
 
+                await logToLedger(
+                    'Resource Donation Logged',
+                    `${playerName} donated ${quantity} ${resourceType} (+${pointsEarned} pts)`
+                );
+
                 alert(`Donation logged! ${quantity} ${resourceType} = ${pointsEarned} points`);
 
-                // Reset form
                 document.getElementById('donationPlayer').value = '';
                 document.getElementById('donationResource').value = '';
                 document.getElementById('donationQuantity').value = '';
 
             } catch (err) {
                 console.error('Error logging donation:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function promoteToOfficer() {
+            const playerId = document.getElementById('officerPlayer').value;
+            if (!playerId) {
+                alert('Select a player');
+                return;
+            }
+
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            
+            if (playerData.isOfficer) {
+                alert('This player is already an officer');
+                return;
+            }
+
+            const playerName = playerData.gamertag || 'Unknown';
+
+            if (!confirm(`Promote ${playerName} to Officer?`)) return;
+
+            try {
+                await db.collection('players').doc(playerId).update({
+                    isOfficer: true
+                });
+
+                await logToLedger(
+                    'Officer Promoted',
+                    `${playerName} was promoted to Officer`
+                );
+
+                alert(`${playerName} is now an Officer!`);
+                document.getElementById('officerPlayer').value = '';
+
+            } catch (err) {
+                console.error('Error promoting officer:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function demoteOfficer() {
+            const playerId = document.getElementById('officerPlayer').value;
+            if (!playerId) {
+                alert('Select a player');
+                return;
+            }
+
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            
+            if (!playerData.isOfficer) {
+                alert('This player is not an officer');
+                return;
+            }
+
+            if (playerId === currentOfficer.id) {
+                alert('You cannot demote yourself');
+                return;
+            }
+
+            const playerName = playerData.gamertag || 'Unknown';
+
+            if (!confirm(`Remove Officer status from ${playerName}?`)) return;
+
+            try {
+                await db.collection('players').doc(playerId).update({
+                    isOfficer: false
+                });
+
+                await logToLedger(
+                    'Officer Demoted',
+                    `${playerName} was removed as Officer`
+                );
+
+                alert(`${playerName} is no longer an Officer`);
+                document.getElementById('officerPlayer').value = '';
+
+            } catch (err) {
+                console.error('Error demoting officer:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function openRemoveModal(playerId) {
+            selectedPlayerId = playerId;
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            const playerName = playerData.gamertag || 'Unknown';
+
+            const contributionsSnapshot = await db.collection('contributions')
+                .where('playerId', '==', playerId)
+                .orderBy('createdAt', 'desc')
+                .limit(20)
+                .get();
+
+            const container = document.getElementById('contributionsList');
+            
+            if (contributionsSnapshot.empty) {
+                container.innerHTML = `<p style="text-align: center; color: #5c4a3a;">No contributions found for ${playerName}</p>`;
+            } else {
+                container.innerHTML = `<p style="margin-bottom: 10px; color: #8b6914; font-weight: bold;">Contributions for ${playerName}:</p>`;
+                
+                contributionsSnapshot.docs.forEach(doc => {
+                    const contrib = doc.data();
+                    const date = contrib.createdAt ? contrib.createdAt.toDate().toLocaleDateString() : 'Unknown';
+                    
+                    const item = document.createElement('div');
+                    item.className = 'contribution-item';
+                    item.innerHTML = `
+                        <input type="radio" name="selectedContribution" value="${doc.id}" style="margin-right: 10px; accent-color: #8b6914;">
+                        <div class="contribution-info">
+                            <div class="contribution-type">${contrib.activityType}</div>
+                            <div class="contribution-details">
+                                ${contrib.materialType ? `${contrib.materialQuantity} ${contrib.materialType} • ` : ''}
+                                +${contrib.pointsEarned} pts • ${date}
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+
+            document.getElementById('removeJustification').value = '';
+            document.getElementById('removeContributionModal').classList.add('active');
+        }
+
+        function closeRemoveModal() {
+            document.getElementById('removeContributionModal').classList.remove('active');
+            selectedPlayerId = null;
+        }
+
+        async function confirmRemoveContribution() {
+            const selectedRadio = document.querySelector('input[name="selectedContribution"]:checked');
+            if (!selectedRadio) {
+                alert('Select a contribution to remove');
+                return;
+            }
+
+            const justification = document.getElementById('removeJustification').value.trim();
+            if (!justification) {
+                alert('Justification is required');
+                return;
+            }
+
+            const contributionId = selectedRadio.value;
+
+            try {
+                const contribDoc = await db.collection('contributions').doc(contributionId).get();
+                if (!contribDoc.exists) {
+                    alert('Contribution not found');
+                    return;
+                }
+
+                const contrib = contribDoc.data();
+                const playerDoc = allMembers.find(m => m.id === contrib.playerId);
+                const playerData = playerDoc ? playerDoc.data() : {};
+                const playerName = playerData.gamertag || contrib.playerName || 'Unknown';
+
+                if (!confirm(`Remove this ${contrib.activityType} entry?\n\nThis will deduct ${contrib.pointsEarned} points from ${playerName}.`)) {
+                    return;
+                }
+
+                const batch = db.batch();
+
+                // Remove points from player
+                const playerRef = db.collection('players').doc(contrib.playerId);
+                const updateData = {
+                    totalPoints: firebase.firestore.FieldValue.increment(-contrib.pointsEarned)
+                };
+
+                if (contrib.activityType === 'Fort Raid') {
+                    updateData.fortsDestroyed = firebase.firestore.FieldValue.increment(-1);
+                }
+
+                batch.update(playerRef, updateData);
+
+                // If material donation, remove from guild resources
+                if (contrib.materialType && contrib.materialQuantity) {
+                    const resourceName = contrib.materialType.charAt(0).toUpperCase() + contrib.materialType.slice(1);
+                    const resourceQuery = await db.collection('guildResources')
+                        .where('materialType', '==', resourceName)
+                        .get();
+                    
+                    if (!resourceQuery.empty) {
+                        batch.update(resourceQuery.docs[0].ref, {
+                            currentStock: firebase.firestore.FieldValue.increment(-contrib.materialQuantity)
+                        });
+                    }
+                }
+
+                // Delete the contribution
+                batch.delete(db.collection('contributions').doc(contributionId));
+
+                await batch.commit();
+
+                await logToLedger(
+                    'Contribution Removed',
+                    `Removed ${contrib.activityType} from ${playerName} (-${contrib.pointsEarned} pts)${contrib.materialType ? ` • ${contrib.materialQuantity} ${contrib.materialType} returned` : ''}`,
+                    justification
+                );
+
+                alert('Contribution removed successfully');
+                closeRemoveModal();
+
+            } catch (err) {
+                console.error('Error removing contribution:', err);
                 alert('Error: ' + err.message);
             }
         }
@@ -646,6 +1151,12 @@
                 });
 
                 await batch.commit();
+
+                await logToLedger(
+                    'Guild Resources Updated',
+                    'Manual update to guild resource stockpiles'
+                );
+
                 alert('Resources updated successfully!');
 
             } catch (err) {
