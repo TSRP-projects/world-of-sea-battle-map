@@ -449,32 +449,22 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Battle Marks</label>
-                        <input type="number" id="newShipBM" value="0" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Beams</label>
-                        <input type="number" id="newShipBeams" value="0" min="0">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Bulkheads</label>
-                        <input type="number" id="newShipBulkheads" value="0" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Plates</label>
-                        <input type="number" id="newShipPlates" value="0" min="0">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
                         <label>Canvas</label>
                         <input type="number" id="newShipCanvas" value="0" min="0">
                     </div>
                     <div class="form-group">
-                        <label>Special Requirements</label>
-                        <input type="text" id="newShipSpecial" placeholder="e.g., 1 Imperial Blueprint">
+                        <label>Imperial Blueprints</label>
+                        <input type="number" id="newShipBlueprints" value="0" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Escudo</label>
+                        <input type="number" id="newShipEscudo" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Construction Licenses</label>
+                        <input type="number" id="newShipLicenses" value="0" min="0">
                     </div>
                 </div>
                 <div class="modal-buttons">
@@ -570,14 +560,16 @@
                     <table class="ship-table">
                         <thead>
                             <tr>
-                                <th style="width: 180px;">Ship</th>
-                                <th style="width: 90px;">Battle Marks</th>
-                                <th style="width: 90px;">Beams</th>
-                                <th style="width: 90px;">Bulkheads</th>
-                                <th style="width: 90px;">Plates</th>
-                                <th style="width: 90px;">Canvas</th>
-                                <th style="width: 160px;">Special</th>
-                                <th style="width: 80px;">Actions</th>
+                                <th style="width: 160px;">Ship</th>
+                                <th style="width: 80px;">Battle Marks</th>
+                                <th style="width: 80px;">Beams</th>
+                                <th style="width: 80px;">Bulkheads</th>
+                                <th style="width: 80px;">Plates</th>
+                                <th style="width: 80px;">Canvas</th>
+                                <th style="width: 70px;">Blueprints</th>
+                                <th style="width: 70px;">Escudo</th>
+                                <th style="width: 70px;">Licenses</th>
+                                <th style="width: 70px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="tier${tier}Body"></tbody>
@@ -607,7 +599,9 @@
                 <td><input type="number" class="resource-input ${ship.bulkheads !== original.bulkheads ? 'changed' : ''}" data-ship="${ship.id}" data-field="bulkheads" value="${ship.bulkheads || 0}" min="0" onchange="updateValue(this)"></td>
                 <td><input type="number" class="resource-input ${ship.plates !== original.plates ? 'changed' : ''}" data-ship="${ship.id}" data-field="plates" value="${ship.plates || 0}" min="0" onchange="updateValue(this)"></td>
                 <td><input type="number" class="resource-input ${ship.canvas !== original.canvas ? 'changed' : ''}" data-ship="${ship.id}" data-field="canvas" value="${ship.canvas || 0}" min="0" onchange="updateValue(this)"></td>
-                <td><input type="text" class="resource-input special-input ${ship.special !== original.special ? 'changed' : ''}" data-ship="${ship.id}" data-field="special" value="${ship.special || ''}" onchange="updateValue(this)" placeholder="e.g., 1 Blueprint"></td>
+                <td><input type="number" class="resource-input ${ship.blueprints !== original.blueprints ? 'changed' : ''}" data-ship="${ship.id}" data-field="blueprints" value="${ship.blueprints || 0}" min="0" onchange="updateValue(this)"></td>
+                <td><input type="number" class="resource-input ${ship.escudo !== original.escudo ? 'changed' : ''}" data-ship="${ship.id}" data-field="escudo" value="${ship.escudo || 0}" min="0" onchange="updateValue(this)"></td>
+                <td><input type="number" class="resource-input ${ship.licenses !== original.licenses ? 'changed' : ''}" data-ship="${ship.id}" data-field="licenses" value="${ship.licenses || 0}" min="0" onchange="updateValue(this)"></td>
                 <td><button class="btn btn-danger" onclick="deleteShip('${ship.id}')" style="padding: 4px 8px; font-size: 11px;">Delete</button></td>
             `;
             return row;
@@ -635,7 +629,7 @@
                 
                 if (!original) { hasChanges = true; return; }
                 
-                ['battleMarks', 'beams', 'bulkheads', 'plates', 'canvas', 'special'].forEach(field => {
+                ['battleMarks', 'beams', 'bulkheads', 'plates', 'canvas', 'blueprints', 'escudo', 'licenses'].forEach(field => {
                     const currentVal = current[field] || (field === 'special' ? '' : 0);
                     const originalVal = original[field] || (field === 'special' ? '' : 0);
                     if (currentVal !== originalVal) hasChanges = true;
@@ -698,7 +692,7 @@
                         let modified = false;
                         const mods = [];
                         
-                        ['battleMarks', 'beams', 'bulkheads', 'plates', 'canvas', 'special'].forEach(field => {
+                        ['battleMarks', 'beams', 'bulkheads', 'plates', 'canvas', 'blueprints', 'escudo', 'licenses'].forEach(field => {
                             const currentVal = current[field] || (field === 'special' ? '' : 0);
                             const originalVal = original[field] || (field === 'special' ? '' : 0);
                             if (currentVal !== originalVal) {
@@ -710,15 +704,17 @@
                         if (modified) {
                             const docRef = db.collection('shipCosts').doc(shipId);
                             batch.update(docRef, {
-                                battleMarks: current.battleMarks || 0,
-                                beams: current.beams || 0,
-                                bulkheads: current.bulkheads || 0,
-                                plates: current.plates || 0,
-                                canvas: current.canvas || 0,
-                                special: current.special || '',
-                                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                                updatedBy: currentUser.uid
-                            });
+                            battleMarks: current.battleMarks || 0,
+                            beams: current.beams || 0,
+                            bulkheads: current.bulkheads || 0,
+                            plates: current.plates || 0,
+                            canvas: current.canvas || 0,
+                            blueprints: current.blueprints || 0,
+                            escudo: current.escudo || 0,
+                            licenses: current.licenses || 0,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedBy: currentUser.uid
+                        });
                             changes.push(`Updated ${current.name || shipId}: ${mods.join(', ')}`);
                         }
                     }
@@ -800,7 +796,9 @@
                 bulkheads: parseInt(document.getElementById('newShipBulkheads').value) || 0,
                 plates: parseInt(document.getElementById('newShipPlates').value) || 0,
                 canvas: parseInt(document.getElementById('newShipCanvas').value) || 0,
-                special: document.getElementById('newShipSpecial').value.trim()
+                blueprints: parseInt(document.getElementById('newShipBlueprints').value) || 0,
+                escudo: parseInt(document.getElementById('newShipEscudo').value) || 0,
+                licenses: parseInt(document.getElementById('newShipLicenses').value) || 0
             };
             
             closeAddShipModal();
