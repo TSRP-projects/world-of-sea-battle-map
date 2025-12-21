@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ship Database - WOSB Guild Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Libre Baskerville', Georgia, serif;
+            background: url('wosb-app-background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #3d2b1f;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(244, 236, 217, 0.95);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header h1 { 
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914; 
+            font-size: 24px; 
+        }
+        
+        .header p {
+            color: #5c4a3a;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(244, 236, 217, 0.9);
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            color: #3d2b1f;
+            text-decoration: none;
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-btn:hover { 
+            background: #8b6914;
+            color: #f5f0e6;
+        }
+        .nav-btn.active { 
+            background: #8b6914; 
+            color: #f5f0e6; 
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: rgba(244, 236, 217, 0.95);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card h2 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+        }
+        
+        .tier-section {
+            margin-bottom: 30px;
+        }
+        
+        .tier-header {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tier-badge {
+            background: #8b6914;
+            color: #f5f0e6;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .ship-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .ship-table th {
+            background: rgba(139, 105, 20, 0.2);
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            padding: 12px 8px;
+            text-align: left;
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            font-weight: 600;
+        }
+        
+        .ship-table td {
+            padding: 10px 8px;
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            vertical-align: middle;
+        }
+        
+        .ship-table tr:nth-child(even) {
+            background: rgba(139, 105, 20, 0.05);
+        }
+        
+        .ship-table tr:hover {
+            background: rgba(139, 105, 20, 0.1);
+        }
+        
+        .ship-name {
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: 600;
+            color: #3d2b1f;
+        }
+        
+        .ship-class {
+            color: #5c4a3a;
+            font-size: 12px;
+        }
+        
+        .resource-input {
+            width: 80px;
+            padding: 6px 8px;
+            border: 1px solid rgba(139, 105, 20, 0.4);
+            border-radius: 4px;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 13px;
+            background: #fff;
+            text-align: right;
+        }
+        
+        .resource-input:focus {
+            outline: none;
+            border-color: #8b6914;
+            box-shadow: 0 0 4px rgba(139, 105, 20, 0.3);
+        }
+        
+        .resource-input.changed {
+            background: #fff8e7;
+            border-color: #d4a017;
+        }
+        
+        .special-input {
+            width: 150px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+        
+        .btn-primary {
+            background: #8b6914;
+            color: #f5f0e6;
+        }
+        
+        .btn-primary:hover {
+            background: #6d5310;
+        }
+        
+        .btn-secondary {
+            background: rgba(244, 236, 217, 0.9);
+            color: #3d2b1f;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(139, 105, 20, 0.2);
+        }
+        
+        .btn-success {
+            background: #2e7d32;
+            border-color: #2e7d32;
+            color: #fff;
+        }
+        
+        .btn-success:hover {
+            background: #1b5e20;
+        }
+        
+        .btn-danger {
+            background: #c62828;
+            border-color: #c62828;
+            color: #fff;
+        }
+        
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .save-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(139, 105, 20, 0.3);
+        }
+        
+        .changes-indicator {
+            color: #d4a017;
+            font-weight: bold;
+            display: none;
+        }
+        
+        .changes-indicator.visible {
+            display: block;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8b6914;
+            font-family: 'Cinzel', Georgia, serif;
+        }
+        
+        .access-denied {
+            text-align: center;
+            padding: 60px 20px;
+            color: #c62828;
+        }
+        
+        .access-denied h2 {
+            font-family: 'Cinzel', Georgia, serif;
+            margin-bottom: 15px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast.success { background: #2e7d32; }
+        .toast.error { background: #c62828; }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-overlay.active { display: flex; }
+        
+        .modal {
+            background: rgba(244, 236, 217, 0.98);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal h3 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #3d2b1f;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(139, 105, 20, 0.4);
+            border-radius: 4px;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 14px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚓ Ship Database Management</h1>
+        <p>Officer-only: Update ship construction costs for guild tracking</p>
+    </div>
+
+    <div class="navigation">
+        <a href="dashboard.html" class="nav-btn">Dashboard</a>
+        <a href="history.html" class="nav-btn">My History</a>
+        <a href="admin.html" class="nav-btn">Admin Panel</a>
+        <a href="ships.html" class="nav-btn active">Ship Database</a>
+    </div>
+
+    <div class="container">
+        <div id="loading" class="card loading">Loading ship database...</div>
+        
+        <div id="accessDenied" class="card access-denied" style="display: none;">
+            <h2>⚠️ Access Denied</h2>
+            <p>Only officers can access the ship database management page.</p>
+            <p style="margin-top: 15px;"><a href="dashboard.html" class="nav-btn">Return to Dashboard</a></p>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="card">
+                <h2>📋 Ship Construction Costs</h2>
+                <p style="margin-bottom: 20px; color: #5c4a3a;">
+                    Edit resource costs below. Changes are highlighted in yellow. Click "Save All Changes" to update the database.
+                </p>
+                
+                <div style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="openAddShipModal()">+ Add New Ship</button>
+                </div>
+
+                <div id="shipTables"></div>
+
+                <div class="save-row">
+                    <span id="changesIndicator" class="changes-indicator">⚠️ You have unsaved changes</span>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="resetChanges()">Reset Changes</button>
+                        <button class="btn btn-success" onclick="saveAllChanges()">Save All Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Ship Modal -->
+    <div id="addShipModal" class="modal-overlay">
+        <div class="modal">
+            <h3>Add New Ship</h3>
+            <form id="addShipForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Ship Name *</label>
+                        <input type="text" id="newShipName" required placeholder="e.g., Constitution">
+                    </div>
+                    <div class="form-group">
+                        <label>Tier *</label>
+                        <select id="newShipTier" required>
+                            <option value="">Select Tier</option>
+                            <option value="1">Tier I</option>
+                            <option value="2">Tier II</option>
+                            <option value="3">Tier III</option>
+                            <option value="4">Tier IV</option>
+                            <option value="5">Tier V</option>
+                            <option value="6">Tier VI</option>
+                            <option value="7">Tier VII</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Class *</label>
+                    <select id="newShipClass" required>
+                        <option value="">Select Class</option>
+                        <option value="Fast">Fast</option>
+                        <option value="Combat">Combat</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Heavy">Heavy</option>
+                        <option value="Siege">Siege</option>
+                        <option value="Imperial">Imperial</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Battle Marks</label>
+                        <input type="number" id="newShipBM" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Beams</label>
+                        <input type="number" id="newShipBeams" value="0" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Bulkheads</label>
+                        <input type="number" id="newShipBulkheads" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Plates</label>
+                        <input type="number" id="newShipPlates" value="0" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Canvas</label>
+                        <input type="number" id="newShipCanvas" value="0" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Special Requirements</label>
+                        <input type="text" id="newShipSpecial" placeholder="e.g., 1 Imperial Blueprint">
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddShipModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Add Ship</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        let currentUser = null;
+        let isOfficer = false;
+        let originalShipData = {};
+        let currentShipData = {};
+        let hasChanges = false;
+
+        auth.onAuthStateChanged(async user => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            currentUser = user;
+            
+            const playerDoc = await db.collection('players').doc(user.uid).get();
+            if (playerDoc.exists && playerDoc.data().isOfficer) {
+                isOfficer = true;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                loadShipDatabase();
+            } else {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('accessDenied').style.display = 'block';
+            }
+        });
+
+        async function loadShipDatabase() {
+            try {
+                const snapshot = await db.collection('shipCosts').get();
+                
+                originalShipData = {};
+                currentShipData = {};
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    originalShipData[doc.id] = { ...data, id: doc.id };
+                    currentShipData[doc.id] = { ...data, id: doc.id };
+                });
+                
+                renderShipTables();
+            } catch (err) {
+                console.error('Error loading ships:', err);
+                showToast('Error loading ship database: ' + err.message, 'error');
+            }
+        }
+
+        function renderShipTables() {
+            const container = document.getElementById('shipTables');
+            container.innerHTML = '';
+            
+            const shipsByTier = {};
+            Object.values(currentShipData).forEach(ship => {
+                const tier = ship.tier || 'Unknown';
+                if (!shipsByTier[tier]) shipsByTier[tier] = [];
+                shipsByTier[tier].push(ship);
+            });
+            
+            const sortedTiers = Object.keys(shipsByTier).sort((a, b) => {
+                return (parseInt(a) || 99) - (parseInt(b) || 99);
+            });
+            
+            sortedTiers.forEach(tier => {
+                const ships = shipsByTier[tier].sort((a, b) => 
+                    (a.name || a.id).localeCompare(b.name || b.id)
+                );
+                
+                const tierNames = { '1': 'I', '2': 'II', '3': 'III', '4': 'IV', '5': 'V', '6': 'VI', '7': 'VII' };
+                
+                const section = document.createElement('div');
+                section.className = 'tier-section';
+                section.innerHTML = `
+                    <div class="tier-header">
+                        <span class="tier-badge">Tier ${tierNames[tier] || tier}</span>
+                        <span>${ships.length} ship${ships.length !== 1 ? 's' : ''}</span>
+                    </div>
+                    <table class="ship-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 180px;">Ship</th>
+                                <th style="width: 90px;">Battle Marks</th>
+                                <th style="width: 90px;">Beams</th>
+                                <th style="width: 90px;">Bulkheads</th>
+                                <th style="width: 90px;">Plates</th>
+                                <th style="width: 90px;">Canvas</th>
+                                <th style="width: 160px;">Special</th>
+                                <th style="width: 80px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tier${tier}Body"></tbody>
+                    </table>
+                `;
+                container.appendChild(section);
+                
+                const tbody = document.getElementById(`tier${tier}Body`);
+                ships.forEach(ship => {
+                    tbody.appendChild(createShipRow(ship));
+                });
+            });
+        }
+
+        function createShipRow(ship) {
+            const row = document.createElement('tr');
+            row.id = `row-${ship.id}`;
+            const original = originalShipData[ship.id] || {};
+            
+            row.innerHTML = `
+                <td>
+                    <div class="ship-name">${ship.name || ship.id}</div>
+                    <div class="ship-class">${ship.class || 'Unknown'}</div>
+                </td>
+                <td><input type="number" class="resource-input ${ship.battleMarks !== original.battleMarks ? 'changed' : ''}" data-ship="${ship.id}" data-field="battleMarks" value="${ship.battleMarks || 0}" min="0" onchange="updateValue(this)"></td>
+                <td><input type="number" class="resource-input ${ship.beams !== original.beams ? 'changed' : ''}" data-ship="${ship.id}" data-field="beams" value="${ship.beams || 0}" min="0" onchange="updateValue(this)"></td>
+                <td><input type="number" class="resource-input ${ship.bulkheads !== original.bulkheads ? 'changed' : ''}" data-ship="${ship.id}" data-field="bulkheads" value="${ship.bulkheads || 0}" min="0" onchange="updateValue(this)"></td>
+                <td><input type="number" class="resource-input ${ship.plates !== original.plates ? 'changed' : ''}" data-ship="${ship.id}" data-field="plates" value="${ship.plates || 0}" min="0" onchange="updateValue(this)"></td>
+                <td><input type="number" class="resource-input ${ship.canvas !== original.canvas ? 'changed' : ''}" data-ship="${ship.id}" data-field="canvas" value="${ship.canvas || 0}" min="0" onchange="updateValue(this)"></td>
+                <td><input type="text" class="resource-input special-input ${ship.special !== original.special ? 'changed' : ''}" data-ship="${ship.id}" data-field="special" value="${ship.special || ''}" onchange="updateValue(this)" placeholder="e.g., 1 Blueprint"></td>
+                <td><button class="btn btn-danger" onclick="deleteShip('${ship.id}')" style="padding: 4px 8px; font-size: 11px;">Delete</button></td>
+            `;
+            return row;
+        }
+
+        function updateValue(input) {
+            const shipId = input.dataset.ship;
+            const field = input.dataset.field;
+            let value = field === 'special' ? input.value : parseInt(input.value) || 0;
+            
+            currentShipData[shipId][field] = value;
+            
+            const original = originalShipData[shipId] || {};
+            const isChanged = value !== (original[field] || (field === 'special' ? '' : 0));
+            input.classList.toggle('changed', isChanged);
+            checkForChanges();
+        }
+
+        function checkForChanges() {
+            hasChanges = false;
+            
+            Object.keys(currentShipData).forEach(shipId => {
+                const current = currentShipData[shipId];
+                const original = originalShipData[shipId];
+                
+                if (!original) { hasChanges = true; return; }
+                
+                ['battleMarks', 'beams', 'bulkheads', 'plates', 'canvas', 'special'].forEach(field => {
+                    const currentVal = current[field] || (field === 'special' ? '' : 0);
+                    const originalVal = original[field] || (field === 'special' ? '' : 0);
+                    if (currentVal !== originalVal) hasChanges = true;
+                });
+            });
+            
+            Object.keys(originalShipData).forEach(shipId => {
+                if (!currentShipData[shipId]) hasChanges = true;
+            });
+            
+            document.getElementById('changesIndicator').classList.toggle('visible', hasChanges);
+        }
+
+        function resetChanges() {
+            if (!confirm('Reset all changes? This will revert to the last saved values.')) return;
+            
+            currentShipData = {};
+            Object.keys(originalShipData).forEach(id => {
+                currentShipData[id] = { ...originalShipData[id] };
+            });
+            
+            renderShipTables();
+            checkForChanges();
+            showToast('Changes reset', 'success');
+        }
+
+        async function saveAllChanges() {
+            if (!hasChanges) {
+                showToast('No changes to save', 'error');
+                return;
+            }
+            
+            if (!confirm('Save all changes to the ship database?')) return;
+            
+            try {
+                const batch = db.batch();
+                const changes = [];
+                
+                const playerDoc = await db.collection('players').doc(currentUser.uid).get();
+                const playerData = playerDoc.data();
+                const officerName = playerData.squadronPrefix 
+                    ? `[${playerData.squadronPrefix}] ${playerData.gamertag}`
+                    : playerData.gamertag;
+                
+                Object.keys(currentShipData).forEach(shipId => {
+                    const current = currentShipData[shipId];
+                    const original = originalShipData[shipId];
+                    
+                    if (!original) {
+                        const docRef = db.collection('shipCosts').doc(shipId);
+                        const { id, ...shipData } = current;
+                        batch.set(docRef, {
+                            ...shipData,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedBy: currentUser.uid
+                        });
+                        changes.push(`Added: ${current.name || shipId}`);
+                    } else {
+                        let modified = false;
+                        const mods = [];
+                        
+                        ['battleMarks', 'beams', 'bulkheads', 'plates', 'canvas', 'special'].forEach(field => {
+                            const currentVal = current[field] || (field === 'special' ? '' : 0);
+                            const originalVal = original[field] || (field === 'special' ? '' : 0);
+                            if (currentVal !== originalVal) {
+                                modified = true;
+                                mods.push(`${field}: ${originalVal} → ${currentVal}`);
+                            }
+                        });
+                        
+                        if (modified) {
+                            const docRef = db.collection('shipCosts').doc(shipId);
+                            batch.update(docRef, {
+                                battleMarks: current.battleMarks || 0,
+                                beams: current.beams || 0,
+                                bulkheads: current.bulkheads || 0,
+                                plates: current.plates || 0,
+                                canvas: current.canvas || 0,
+                                special: current.special || '',
+                                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                updatedBy: currentUser.uid
+                            });
+                            changes.push(`Updated ${current.name || shipId}: ${mods.join(', ')}`);
+                        }
+                    }
+                });
+                
+                Object.keys(originalShipData).forEach(shipId => {
+                    if (!currentShipData[shipId]) {
+                        batch.delete(db.collection('shipCosts').doc(shipId));
+                        changes.push(`Deleted: ${originalShipData[shipId].name || shipId}`);
+                    }
+                });
+                
+                if (changes.length > 0) {
+                    batch.set(db.collection('admiralLedger').doc(), {
+                        action: 'Ship Database Updated',
+                        performedBy: currentUser.uid,
+                        performedByName: officerName,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        details: changes.join('; ')
+                    });
+                }
+                
+                await batch.commit();
+                
+                originalShipData = {};
+                Object.keys(currentShipData).forEach(id => {
+                    originalShipData[id] = { ...currentShipData[id] };
+                });
+                
+                renderShipTables();
+                checkForChanges();
+                showToast(`Saved ${changes.length} change(s)`, 'success');
+                
+            } catch (err) {
+                console.error('Error saving:', err);
+                showToast('Error: ' + err.message, 'error');
+            }
+        }
+
+        function deleteShip(shipId) {
+            const ship = currentShipData[shipId];
+            if (!confirm(`Delete "${ship.name || shipId}"?`)) return;
+            
+            delete currentShipData[shipId];
+            document.getElementById(`row-${shipId}`).remove();
+            checkForChanges();
+            showToast(`${ship.name || shipId} marked for deletion`, 'success');
+        }
+
+        function openAddShipModal() {
+            document.getElementById('addShipModal').classList.add('active');
+            document.getElementById('addShipForm').reset();
+        }
+
+        function closeAddShipModal() {
+            document.getElementById('addShipModal').classList.remove('active');
+        }
+
+        document.getElementById('addShipForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('newShipName').value.trim();
+            const tier = document.getElementById('newShipTier').value;
+            const shipClass = document.getElementById('newShipClass').value;
+            const id = name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+            
+            if (currentShipData[id]) {
+                showToast('Ship already exists', 'error');
+                return;
+            }
+            
+            currentShipData[id] = {
+                id: id,
+                name: name,
+                tier: tier,
+                class: shipClass,
+                battleMarks: parseInt(document.getElementById('newShipBM').value) || 0,
+                beams: parseInt(document.getElementById('newShipBeams').value) || 0,
+                bulkheads: parseInt(document.getElementById('newShipBulkheads').value) || 0,
+                plates: parseInt(document.getElementById('newShipPlates').value) || 0,
+                canvas: parseInt(document.getElementById('newShipCanvas').value) || 0,
+                special: document.getElementById('newShipSpecial').value.trim()
+            };
+            
+            closeAddShipModal();
+            renderShipTables();
+            checkForChanges();
+            showToast(`${name} added`, 'success');
+        });
+
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        document.getElementById('addShipModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAddShipModal();
+        });
+    </script>
+</body>
+</html>
