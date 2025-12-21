@@ -15,14 +15,18 @@ const auth = firebase.auth();
 
 // Point calculation constants - EDIT THESE TO CHANGE VALUES GLOBALLY
 const POINT_VALUES = {
-  FORT_RAID: 10,
-  IRON: 0.007,
-  WOOD: 0.002,
-  PLATES: 75,
-  RESIN: 0.005,
-  BEAMS: 100,
-  BULKHEADS: 120,
-  CANVAS: 50
+    // Crafted resources
+    BEAMS: 1,
+    BULKHEADS: 2,
+    PLATES: 1,
+    CANVAS: 0.5,
+    // Raw materials
+    IRON: 0.01,
+    WOOD: 0.001,
+    RESIN: 0.005,
+    FABRIC: 0.0005,
+    // Activities
+    FORT_RAID: 3
 };
 
 const DEFAULT_PLAYER_INVENTORY = {
@@ -38,10 +42,10 @@ const DEFAULT_PLAYER_INVENTORY = {
 
 // Tier configuration
 const TIERS = {
-    DECKHAND: { name: 'Deckhand', min: 0, support: 0.25, emoji: '🪢' },
-    BOSUN: { name: 'Bosun', min: 50, support: 0.50, emoji: '⚓' },
-    QUARTERMASTER: { name: 'Quartermaster', min: 201, support: 0.65, emoji: '🧭' },
-    CAPTAIN: { name: 'Captain', min: 501, support: 0.75, emoji: '🏴‍☠️' }
+    DECKHAND: { name: 'Deckhand', min: 0, support: 0.10, emoji: '🪢' },
+    BOSUN: { name: 'Bosun', min: 25, support: 0.25, emoji: '⚓' },
+    QUARTERMASTER: { name: 'Quartermaster', min: 60, support: 0.35, emoji: '🧭' },
+    CAPTAIN: { name: 'Captain', min: 120, support: 0.50, emoji: '🏴‍☠️' }
 };
 
 // Get tier from available points

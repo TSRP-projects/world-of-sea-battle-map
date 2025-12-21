@@ -464,10 +464,18 @@
                     <label>Resource Type:</label>
                     <select id="donationResource">
                         <option value="">-- Select Resource --</option>
-                        <option value="beams">Beams</option>
-                        <option value="bulkheads">Bulkheads</option>
-                        <option value="plates">Plates</option>
-                        <option value="canvas">Canvas</option>
+                        <optgroup label="Crafted Resources">
+                            <option value="beams">Beams (1 pt each)</option>
+                            <option value="bulkheads">Bulkheads (2 pts each)</option>
+                            <option value="plates">Plates (1 pt each)</option>
+                            <option value="canvas">Canvas (1 pt per 2)</option>
+                        </optgroup>
+                        <optgroup label="Raw Materials">
+                            <option value="iron">Iron (1 pt per 100)</option>
+                            <option value="wood">Wood (1 pt per 1000)</option>
+                            <option value="resin">Resin (1 pt per 200)</option>
+                            <option value="fabric">Fabric (1 pt per 2000)</option>
+                        </optgroup>
                     </select>
                 </div>
                 
@@ -842,7 +850,7 @@
             }
         }
 
-        async function logResourceDonation() {
+       async function logResourceDonation() {
             const playerId = document.getElementById('donationPlayer').value;
             const resourceType = document.getElementById('donationResource').value;
             const quantity = parseInt(document.getElementById('donationQuantity').value);
@@ -866,10 +874,21 @@
                 return;
             }
 
-            const pointsEarned = pointValue * quantity;
+            const pointsEarned = Math.floor(pointValue * quantity);
+            
+            if (pointsEarned < 1) {
+                alert(`Quantity too low. Minimum for ${resourceType}:\n` +
+                      `- Iron: 100\n- Wood: 1000\n- Resin: 200\n- Fabric: 2000\n- Canvas: 2`);
+                return;
+            }
+
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
             const playerName = playerData.gamertag || 'Unknown';
+
+            // Determine if this is a crafted resource that goes to guild storage
+            const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas'];
+            const isGuildStorageResource = guildStorageResources.includes(resourceType);
 
             try {
                 const batch = db.batch();
@@ -889,34 +908,37 @@
                     pointsEarned: pointsEarned,
                     materialType: resourceType,
                     materialQuantity: quantity,
-                    notes: `Donated ${quantity} ${resourceType}`,
+                    notes: `Donated ${formatNumber(quantity)} ${resourceType}`,
                     loggedBy: currentOfficer.id,
                     loggedByName: currentOfficer.gamertag || currentOfficer.displayName,
                     createdAt: timestamp
                 });
 
-                const resourceName = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
-                const resourceQuery = await db.collection('guildResources')
-                    .where('materialType', '==', resourceName)
-                    .get();
-                
-                if (!resourceQuery.empty) {
-                    const resourceRef = resourceQuery.docs[0].ref;
-                    batch.update(resourceRef, {
-                        currentStock: firebase.firestore.FieldValue.increment(quantity),
-                        lastUpdated: timestamp,
-                        updatedBy: auth.currentUser.uid
-                    });
+                // Only update guild storage for crafted resources
+                if (isGuildStorageResource) {
+                    const resourceName = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+                    const resourceQuery = await db.collection('guildResources')
+                        .where('materialType', '==', resourceName)
+                        .get();
+                    
+                    if (!resourceQuery.empty) {
+                        const resourceRef = resourceQuery.docs[0].ref;
+                        batch.update(resourceRef, {
+                            currentStock: firebase.firestore.FieldValue.increment(quantity),
+                            lastUpdated: timestamp,
+                            updatedBy: auth.currentUser.uid
+                        });
+                    }
                 }
 
                 await batch.commit();
 
                 await logToLedger(
                     'Resource Donation Logged',
-                    `${playerName} donated ${quantity} ${resourceType} (+${pointsEarned} pts)`
+                    `${playerName} donated ${formatNumber(quantity)} ${resourceType} (+${pointsEarned} pts)${isGuildStorageResource ? ' [Added to guild storage]' : ''}`
                 );
 
-                alert(`Donation logged! ${quantity} ${resourceType} = ${pointsEarned} points`);
+                alert(`Donation logged!\n${formatNumber(quantity)} ${resourceType} = ${pointsEarned} points${isGuildStorageResource ? '\nAdded to guild storage' : ''}`);
 
                 document.getElementById('donationPlayer').value = '';
                 document.getElementById('donationResource').value = '';
@@ -927,7 +949,6 @@
                 alert('Error: ' + err.message);
             }
         }
-
         async function promoteToOfficer() {
             const playerId = document.getElementById('officerPlayer').value;
             if (!playerId) {
@@ -1102,17 +1123,20 @@
 
                 batch.update(playerRef, updateData);
 
-                // If material donation, remove from guild resources
+                // If material donation, remove from guild resources (only for crafted resources)
                 if (contrib.materialType && contrib.materialQuantity) {
-                    const resourceName = contrib.materialType.charAt(0).toUpperCase() + contrib.materialType.slice(1);
-                    const resourceQuery = await db.collection('guildResources')
-                        .where('materialType', '==', resourceName)
-                        .get();
-                    
-                    if (!resourceQuery.empty) {
-                        batch.update(resourceQuery.docs[0].ref, {
-                            currentStock: firebase.firestore.FieldValue.increment(-contrib.materialQuantity)
-                        });
+                    const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas'];
+                    if (guildStorageResources.includes(contrib.materialType.toLowerCase())) {
+                        const resourceName = contrib.materialType.charAt(0).toUpperCase() + contrib.materialType.slice(1);
+                        const resourceQuery = await db.collection('guildResources')
+                            .where('materialType', '==', resourceName)
+                            .get();
+                        
+                        if (!resourceQuery.empty) {
+                            batch.update(resourceQuery.docs[0].ref, {
+                                currentStock: firebase.firestore.FieldValue.increment(-contrib.materialQuantity)
+                            });
+                        }
                     }
                 }
 
