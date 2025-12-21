@@ -639,15 +639,27 @@
                         </div>
                         
                         <div id="goalProgressContainer" style="display: none; margin-top: 15px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="color: #5c4a3a; font-size: 14px;">Your Progress</span>
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="color: #5c4a3a; font-size: 14px;">Your Progress</span>
+                                    <span style="color: #2d5a2d; font-size: 12px; font-weight: bold;" id="playerProgressPercent">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="playerProgressFill" style="width: 0%;"></div>
+                                    <div class="progress-text" id="playerProgressText">0%</div>
+                                </div>
                             </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" id="goalProgressFill" style="width: 0%;"></div>
-                                <div class="progress-text" id="goalProgressText">0%</div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="color: #5c4a3a; font-size: 14px;">Guild Progress</span>
+                                    <span style="color: #8b6914; font-size: 12px; font-weight: bold;" id="guildProgressPercent">0%</span>
+                                </div>
+                                <div class="progress-bar" style="background: rgba(139, 105, 20, 0.1);">
+                                    <div class="progress-fill" id="guildProgressFill" style="width: 0%; background: linear-gradient(90deg, #8b6914 0%, #c9a227 100%);"></div>
+                                    <div class="progress-text" id="guildProgressText">0%</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     
                     <!-- Right side: Reserved for ship image -->
                     <div id="shipImageContainer" style="flex: 0 0 520px; min-height: 150px; display: none; background: transparent;">
@@ -710,6 +722,7 @@
     <script>
         let currentPlayer = null;
         let allShips = [];
+        let guildResources = {};
 
         const resourceIcons = {
             beams: 'beams.png',
@@ -746,8 +759,19 @@
                 });
                 
                 db.collection('guildResources').onSnapshot(snapshot => {
+                    guildResources = {};
+                    snapshot.docs.forEach(doc => {
+                        const data = doc.data();
+                        guildResources[data.materialType.toLowerCase()] = data.currentStock || 0;
+                    });
                     const resources = snapshot.docs.map(doc => doc.data());
                     displayResources(resources);
+                    
+                    // Refresh ship goal progress when guild resources update
+                    if (currentPlayer) {
+                        const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                        updateShipGoalProgress(currentPlayer, availablePoints);
+                    }
                 });
 
                 loadLeaderboards();
@@ -964,50 +988,63 @@
             document.getElementById('playerSharePercent').textContent = Math.round(playerSharePercent * 100) + '%';
             document.getElementById('guildSharePercent').textContent = Math.round(guildSupportPercent * 100) + '%';
 
-            // Calculate progress based on resources
+            // Calculate player progress
             const playerInventory = player.inventory || {};
-            const resources = [
-                { key: 'beams', guildSupported: true },
-                { key: 'bulkheads', guildSupported: true },
-                { key: 'plates', guildSupported: true },
-                { key: 'canvas', guildSupported: true },
-                { key: 'battleMarks', guildSupported: false },
-                { key: 'constructionLicense', guildSupported: false },
-                { key: 'escudo', guildSupported: false },
-                { key: 'imperialBlueprint', guildSupported: false }
-            ];
+            const guildSupportedResources = ['beams', 'bulkheads', 'plates', 'canvas'];
+            const playerOnlyResources = ['battleMarks', 'constructionLicense', 'escudo', 'imperialBlueprint'];
 
-            let totalNeeded = 0;
-            let totalHave = 0;
+            let playerTotalNeeded = 0;
+            let playerTotalHave = 0;
+            let guildTotalNeeded = 0;
+            let guildTotalHave = 0;
 
-            resources.forEach(resource => {
-                const shipTotal = goalShip[resource.key] || 0;
+            // Calculate player's share of guild-supported resources
+            guildSupportedResources.forEach(key => {
+                const shipTotal = goalShip[key] || 0;
                 if (shipTotal === 0) return;
 
-                let playerNeeds;
-                if (resource.guildSupported) {
-                    playerNeeds = Math.ceil(shipTotal * playerSharePercent);
-                } else {
-                    playerNeeds = shipTotal;
-                }
-
-                const playerHas = Math.min(playerInventory[resource.key] || 0, playerNeeds);
+                const playerNeeds = Math.ceil(shipTotal * playerSharePercent);
+                const guildNeeds = Math.floor(shipTotal * guildSupportPercent);
                 
-                totalNeeded += playerNeeds;
-                totalHave += playerHas;
+                const playerHas = Math.min(playerInventory[key] || 0, playerNeeds);
+                const guildHas = Math.min(guildResources[key] || 0, guildNeeds);
+                
+                playerTotalNeeded += playerNeeds;
+                playerTotalHave += playerHas;
+                
+                guildTotalNeeded += guildNeeds;
+                guildTotalHave += guildHas;
             });
 
-            const progressPercent = totalNeeded > 0 ? Math.min((totalHave / totalNeeded) * 100, 100) : 0;
-            
-            document.getElementById('goalProgressFill').style.width = progressPercent + '%';
-            document.getElementById('goalProgressText').textContent = progressPercent.toFixed(1) + '%';
+            // Calculate player-only resources
+            playerOnlyResources.forEach(key => {
+                const shipTotal = goalShip[key] || 0;
+                if (shipTotal === 0) return;
+
+                const playerHas = Math.min(playerInventory[key] || 0, shipTotal);
+                
+                playerTotalNeeded += shipTotal;
+                playerTotalHave += playerHas;
+            });
+
+            // Update player progress bar
+            const playerProgressPercent = playerTotalNeeded > 0 ? Math.min((playerTotalHave / playerTotalNeeded) * 100, 100) : 0;
+            document.getElementById('playerProgressFill').style.width = playerProgressPercent + '%';
+            document.getElementById('playerProgressText').textContent = playerProgressPercent.toFixed(1) + '%';
+            document.getElementById('playerProgressPercent').textContent = playerProgressPercent.toFixed(1) + '%';
+
+            // Update guild progress bar
+            const guildProgressPercent = guildTotalNeeded > 0 ? Math.min((guildTotalHave / guildTotalNeeded) * 100, 100) : 100;
+            document.getElementById('guildProgressFill').style.width = guildProgressPercent + '%';
+            document.getElementById('guildProgressText').textContent = guildProgressPercent.toFixed(1) + '%';
+            document.getElementById('guildProgressPercent').textContent = guildProgressPercent.toFixed(1) + '%';
 
             displayResourceBreakdown(goalShip, playerSharePercent, guildSupportPercent);
 
             // Show ship image if available
             const shipImageContainer = document.getElementById('shipImageContainer');
             const shipImages = {
-                'redoutable': 'Redoutable Sketch.png'
+                
             };
             
             if (shipImages[goalShip.id]) {
@@ -1018,7 +1055,6 @@
                 shipImageContainer.style.display = 'none';
             }
         }
-
         function displayResourceBreakdown(ship, playerPercent, guildPercent) {
             const grid = document.getElementById('resourceBreakdownGrid');
             grid.innerHTML = '';
@@ -1036,7 +1072,8 @@
                 { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint, guildSupported: false }
             ];
 
-            let allResourcesMet = true;
+            let allPlayerResourcesMet = true;
+            let allGuildResourcesMet = true;
 
             resources.forEach(resource => {
                 const total = ship[resource.key] || 0;
@@ -1053,10 +1090,16 @@
                 }
 
                 const playerHas = playerInventory[resource.key] || 0;
-                const hasSufficient = playerHas >= playerAmount;
+                const guildHas = guildResources[resource.key] || 0;
                 
-                if (!hasSufficient) {
-                    allResourcesMet = false;
+                const playerSufficient = playerHas >= playerAmount;
+                const guildSufficient = guildAmount === 0 || guildHas >= guildAmount;
+                
+                if (!playerSufficient) {
+                    allPlayerResourcesMet = false;
+                }
+                if (!guildSufficient) {
+                    allGuildResourcesMet = false;
                 }
 
                 const item = document.createElement('div');
@@ -1066,18 +1109,18 @@
                     <div class="resource-details">
                         <div class="resource-name">${resource.name} (${formatNumber(total)} total)</div>
                         <div class="resource-amounts">
-                            <span class="resource-have-need ${hasSufficient ? 'resource-sufficient' : 'resource-insufficient'}">
+                            <span class="resource-have-need ${playerSufficient ? 'resource-sufficient' : 'resource-insufficient'}">
                                 You: ${formatNumber(playerHas)}/${formatNumber(playerAmount)}
                             </span>
-                            ${resource.guildSupported ? `<span class="resource-guild">Guild: ${formatNumber(guildAmount)}</span>` : ''}
+                            ${resource.guildSupported ? `<span class="resource-have-need ${guildSufficient ? 'resource-sufficient' : 'resource-insufficient'}">Guild: ${formatNumber(guildHas)}/${formatNumber(guildAmount)}</span>` : ''}
                         </div>
                     </div>
                 `;
                 grid.appendChild(item);
             });
 
-            // Update build button state
-            updateBuildButtonState(allResourcesMet, ship);
+            // Update build button state - both player AND guild must have resources
+            updateBuildButtonState(allPlayerResourcesMet && allGuildResourcesMet, ship);
         }
 
         async function buildShip() {
@@ -1182,7 +1225,7 @@
             } else {
                 buildBtn.disabled = true;
                 buildBtn.classList.remove('btn-build-ready');
-                buildStatus.textContent = 'Gather all required resources to build';
+                buildStatus.textContent = 'Both you and the guild must have all required resources';
                 buildStatus.style.color = '#5c4a3a';
             }
         }
