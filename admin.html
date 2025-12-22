@@ -474,6 +474,7 @@
                         <optgroup label="Raw Materials">
                             <option value="iron">Iron (1 pt per 100)</option>
                             <option value="wood">Wood (1 pt per 1000)</option>
+                            <option value="coal">Coal (1 pt per 100)</option>
                             <option value="resin">Resin (1 pt per 200)</option>
                             <option value="fabric">Fabric (1 pt per 2000)</option>
                         </optgroup>
@@ -888,7 +889,7 @@
             const playerName = playerData.gamertag || 'Unknown';
 
             // Determine if this is a crafted resource that goes to guild storage
-            const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas'];
+            const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'resin', 'fabric', 'coal'];
             const isGuildStorageResource = guildStorageResources.includes(resourceType);
 
             try {
@@ -1126,7 +1127,7 @@
 
                 // If material donation, remove from guild resources (only for crafted resources)
                 if (contrib.materialType && contrib.materialQuantity) {
-                    const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas'];
+                    const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'resin', 'fabric', 'coal'];
                     if (guildStorageResources.includes(contrib.materialType.toLowerCase())) {
                         const resourceName = contrib.materialType.charAt(0).toUpperCase() + contrib.materialType.slice(1);
                         const resourceQuery = await db.collection('guildResources')

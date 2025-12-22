@@ -15,18 +15,15 @@ const auth = firebase.auth();
 
 // Point calculation constants - EDIT THESE TO CHANGE VALUES GLOBALLY
 const POINT_VALUES = {
-    // Crafted resources
+    FORT_RAID: 3,
     BEAMS: 1,
     BULKHEADS: 2,
     PLATES: 1,
     CANVAS: 0.5,
-    // Raw materials
     IRON: 0.01,
     WOOD: 0.001,
     RESIN: 0.005,
-    FABRIC: 0.0005,
-    // Activities
-    FORT_RAID: 3
+    FABRIC: 0.0005
 };
 
 const DEFAULT_PLAYER_INVENTORY = {
