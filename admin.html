@@ -876,7 +876,7 @@
                 return;
             }
 
-            const pointsEarned = Math.floor(pointValue * quantity);
+            const pointsEarned = parseFloat((pointValue * quantity).toFixed(2));
             
             if (pointsEarned < 1) {
                 alert(`Quantity too low. Minimum for ${resourceType}:\n` +
