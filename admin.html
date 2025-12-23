@@ -878,7 +878,7 @@
 
             const pointsEarned = parseFloat((pointValue * quantity).toFixed(2));
             
-            if (pointsEarned < 1) {
+            if (pointsEarned < 0.01) {
                 alert(`Quantity too low. Minimum for ${resourceType}:\n` +
                       `- Iron: 100\n- Wood: 1000\n- Resin: 200\n- Fabric: 2000\n- Canvas: 2`);
                 return;
