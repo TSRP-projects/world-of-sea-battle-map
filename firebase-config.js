@@ -21,6 +21,7 @@ const POINT_VALUES = {
     PLATES: 1,
     CANVAS: 0.5,
     IRON: 0.01,
+    COAL: 0.01,
     WOOD: 0.001,
     RESIN: 0.005,
     FABRIC: 0.0005
@@ -59,16 +60,19 @@ function calculateContributionPoints(activityType, materialType, quantity) {
     return POINT_VALUES.FORT_RAID;
   }
   
-  if (activityType === 'Material Donation') {
+if (activityType === 'Material Donation') {
     const rates = {
-      'Iron': POINT_VALUES.IRON,
-      'Wood': POINT_VALUES.WOOD,
-      'Plates': POINT_VALUES.PLATES,
-      'Beams': POINT_VALUES.BEAMS,
-      'Bulkheads': POINT_VALUES.BULKHEADS,
-      'Canvas': POINT_VALUES.CANVAS
+      'iron': POINT_VALUES.IRON,
+      'coal': POINT_VALUES.COAL,
+      'wood': POINT_VALUES.WOOD,
+      'resin': POINT_VALUES.RESIN,
+      'fabric': POINT_VALUES.FABRIC,
+      'plates': POINT_VALUES.PLATES,
+      'beams': POINT_VALUES.BEAMS,
+      'bulkheads': POINT_VALUES.BULKHEADS,
+      'canvas': POINT_VALUES.CANVAS
     };
-    return Math.round(quantity * (rates[materialType] || 0));
+    return parseFloat((quantity * (rates[materialType] || 0)).toFixed(2));
   }
   
   return 0;
