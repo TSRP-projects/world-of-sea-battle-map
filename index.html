@@ -1189,7 +1189,7 @@ $(document).ready(function() {
 			
 			if (profitableRecs.length > 0) {
 				profitableRecs.forEach(function(rec, index) {
-					html += buildRecommendation(rec, index + 1);
+					html += buildRecommendation(rec, index + 1, startData.region);
 				});
 			} else {
 				html += '<div class="recommendation"><span style="color: #856404; font-style: italic;">⚠️ No profitable trades from this port at this hold size</span></div>';
@@ -1208,7 +1208,7 @@ $(document).ready(function() {
 			
 			if (profitableReturnRecs.length > 0) {
 				profitableReturnRecs.forEach(function(rec, index) {
-					html += buildRecommendation(rec, index + 1);
+					html += buildRecommendation(rec, index + 1, destData.region);
 				});
 			} else {
 				html += '<div class="recommendation"><span style="color: #856404; font-style: italic;">⚠️ No profitable trades from this port at this hold size</span></div>';
@@ -1221,15 +1221,16 @@ $(document).ready(function() {
         return html;
     }
     
-    function buildRecommendation(rec, priority) {
-        var iconFile = TRADE_DATA.commodityIcons[rec.good] || 'default.png';
-        var goodName = rec.good.charAt(0).toUpperCase() + rec.good.slice(1);
-        
-        var html = '<div class="recommendation">';
-        html += '<img src="commodities/' + iconFile + '" alt="' + goodName + '" onerror="this.style.display=\'none\'">';
-        html += '<div class="recommendation-details">';
-        html += '<div class="recommendation-good">#' + priority + ' ' + goodName + '</div>';
-        html += '<div class="recommendation-prices">Buy: ' + rec.price + ' → Sell: ' + rec.sellPrice + ' at ' + rec.sellAt + '</div>';
+    function buildRecommendation(rec, priority, sourceRegion) {
+		var iconFile = TRADE_DATA.commodityIcons[rec.good] || 'default.png';
+		var goodName = rec.good.charAt(0).toUpperCase() + rec.good.slice(1);
+		var sellDest = TRADE_DATA.getSellDestinations(sourceRegion);
+		
+		var html = '<div class="recommendation">';
+		html += '<img src="commodities/' + iconFile + '" alt="' + goodName + '" onerror="this.style.display=\'none\'">';
+		html += '<div class="recommendation-details">';
+		html += '<div class="recommendation-good">#' + priority + ' ' + goodName + '</div>';
+		html += '<div class="recommendation-prices">Buy: ' + rec.price + ' → ' + sellDest + '</div>';
         
         if (rec.profitPerWeight) {
             html += '<div class="recommendation-profit">+' + rec.profitPerWeight.toFixed(2) + ' profit/weight</div>';
