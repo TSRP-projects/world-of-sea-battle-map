@@ -8,7 +8,8 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-	<script type="text/javascript" src="jquery-1.4.3.min.js" charset="utf-8"></script> 
+	<script type="text/javascript" src="jquery-1.4.3.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="trade-data.js" charset="utf-8"></script> 
 	
 <style>
 body {
@@ -133,6 +134,215 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 	color: #8b6914;
 	font-family: 'Cinzel', Georgia, serif;
 }
+
+/* Trade Calculator Styles */
+#trade-calculator {
+    background: rgba(244, 236, 217, 0.95);
+    border-top: 3px solid #8b6914;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 14px;
+    color: #3d2b1f;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+#trade-calculator h2 {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.trade-controls {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.trade-controls label {
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 600;
+    color: #8b6914;
+    margin-right: 8px;
+}
+
+.trade-controls select {
+    padding: 8px 12px;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 14px;
+    border: 2px solid #8b6914;
+    border-radius: 5px;
+    background: #f5f0e6;
+    color: #3d2b1f;
+    min-width: 180px;
+}
+
+.trade-controls select:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(139, 105, 20, 0.5);
+}
+
+.trade-warnings {
+    margin-bottom: 15px;
+}
+
+.trade-warning {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.warning-shallow {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+}
+
+.warning-no-peace {
+    background: #f8d7da;
+    border: 1px solid #dc3545;
+    color: #721c24;
+}
+
+.warning-low-profit {
+    background: #d1ecf1;
+    border: 1px solid #17a2b8;
+    color: #0c5460;
+}
+
+.warning-max-price {
+    background: #d4edda;
+    border: 1px solid #28a745;
+    color: #155724;
+}
+
+.trade-results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1200px) {
+    .trade-results {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .trade-results {
+        grid-template-columns: 1fr;
+    }
+}
+
+.hold-column {
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid #8b6914;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.hold-column h3 {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 16px;
+    border-bottom: 1px solid #8b6914;
+    padding-bottom: 8px;
+}
+
+.hold-column h4 {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #3d2b1f;
+    margin: 15px 0 8px 0;
+    font-size: 14px;
+}
+
+.recommendation {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin-bottom: 8px;
+    background: rgba(139, 105, 20, 0.1);
+    border-radius: 5px;
+}
+
+.recommendation img {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.recommendation-details {
+    flex: 1;
+}
+
+.recommendation-good {
+    font-weight: bold;
+    color: #3d2b1f;
+    text-transform: capitalize;
+}
+
+.recommendation-prices {
+    font-size: 12px;
+    color: #666;
+}
+
+.recommendation-profit {
+    font-size: 12px;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.recommendation-note {
+    font-size: 11px;
+    color: #856404;
+    font-style: italic;
+}
+
+.no-selection {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.route-info {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(139, 105, 20, 0.15);
+    border-radius: 5px;
+}
+
+.route-info span {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+}
+
+.region-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.region-northern { background: #cce5ff; color: #004085; }
+.region-southern { background: #fff3cd; color: #856404; }
+.region-eastern { background: #d4edda; color: #155724; }
+.region-transitional { background: #e2d5f1; color: #563d7c; }
 </style>
 </head>
 <body>
@@ -740,54 +950,252 @@ If you spot any errors feel free to contact me.
 </p>
 </div>
 
+<div id="trade-calculator">
+    <h2>Trade Route Calculator</h2>
+    
+    <div class="trade-controls">
+        <div>
+            <label for="start-port">Starting Port:</label>
+            <select id="start-port">
+                <option value="">-- Select Port --</option>
+            </select>
+        </div>
+        <div>
+            <label for="dest-port">Destination Port:</label>
+            <select id="dest-port">
+                <option value="">-- Select Port --</option>
+            </select>
+        </div>
+    </div>
+    
+    <div id="trade-warnings" class="trade-warnings"></div>
+    
+    <div id="route-info" class="route-info" style="display: none;"></div>
+    
+    <div id="trade-results">
+        <div class="no-selection">Select a starting port and destination to see trade recommendations.</div>
+    </div>
+</div>
+
 </body>
 
-    <script type="text/javascript">
+<script type="text/javascript">
 $(document).ready(function() {
-  $('#show-ports').click(function() {
-    $('#ports').toggle();
-  });
-  $('#show-lighthouses').click(function() {
-    $('#lighthouses').toggle();
-  });
-  $('#show-portsxy').click(function() {
-    $('#portsxy').toggle();
-  });  
-$('#show-islandsxy').click(function() {
-    $('#islandsxy').toggle();
-  });  
-  $('#show-productionsxy').click(function() {
-    $('#productionsxy').toggle();
-  });  
-	$('#show-fast-travel').click(function() {
-    $('#fast-travel').toggle();
-  });  
-	$('#show-circle').click(function() {
-    $('#circle').toggle();
-  });   
-	$('#show-island').click(function() {
-    $('.island').toggle();
-  });
-  	$('#show-production').click(function() {
-    $('.production').toggle();
-  });
-  	$('#show-altar').click(function() {
-    $('.altar').toggle();
-  });
-    	$('#show-fort').click(function() {
-    $('.fort').toggle();
-  });
-  	$('#show-altarsxy').click(function() {
-    $('#altarsxy').toggle();
-  });
-  	$('#show-fortsxy').click(function() {
-    $('#fortsxy').toggle();
-  });
+    // Existing checkbox toggles
+    $('#show-ports').click(function() {
+        $('#ports').toggle();
+    });
+    $('#show-lighthouses').click(function() {
+        $('#lighthouses').toggle();
+    });
+    $('#show-portsxy').click(function() {
+        $('#portsxy').toggle();
+    });  
+    $('#show-islandsxy').click(function() {
+        $('#islandsxy').toggle();
+    });  
+    $('#show-productionsxy').click(function() {
+        $('#productionsxy').toggle();
+    });  
+    $('#show-fast-travel').click(function() {
+        $('#fast-travel').toggle();
+    });  
+    $('#show-circle').click(function() {
+        $('#circle').toggle();
+    });   
+    $('#show-island').click(function() {
+        $('.island').toggle();
+    });
+    $('#show-production').click(function() {
+        $('.production').toggle();
+    });
+    $('#show-altar').click(function() {
+        $('.altar').toggle();
+    });
+    $('#show-fort').click(function() {
+        $('.fort').toggle();
+    });
+    $('#show-altarsxy').click(function() {
+        $('#altarsxy').toggle();
+    });
+    $('#show-fortsxy').click(function() {
+        $('#fortsxy').toggle();
+    });
+
+    // Trade Calculator Functions
+    function initTradeCalculator() {
+        const ports = Object.keys(TRADE_DATA.ports).sort();
+        const startSelect = $('#start-port');
+        const destSelect = $('#dest-port');
+        
+        // Group ports by region
+        const regionOrder = ['northern', 'southern', 'eastern', 'transitional'];
+        const regionLabels = {
+            northern: 'Northern Region',
+            southern: 'Southern Region',
+            eastern: 'Eastern Region',
+            transitional: 'Transitional Zone'
+        };
+        
+        regionOrder.forEach(function(region) {
+            const regionPorts = ports.filter(function(port) {
+                return TRADE_DATA.getRegion(port) === region;
+            });
+            
+            if (regionPorts.length > 0) {
+                const optgroup = $('<optgroup>').attr('label', regionLabels[region]);
+                regionPorts.forEach(function(port) {
+                    const displayName = TRADE_DATA.getDisplayName(port);
+                    optgroup.append($('<option>').val(port).text(displayName));
+                });
+                startSelect.append(optgroup.clone());
+                destSelect.append(optgroup);
+            }
+        });
+        
+        // Event handlers
+        startSelect.on('change', updateTradeResults);
+        destSelect.on('change', updateTradeResults);
+    }
+    
+    function updateTradeResults() {
+        const startPort = $('#start-port').val();
+        const destPort = $('#dest-port').val();
+        const resultsDiv = $('#trade-results');
+        const warningsDiv = $('#trade-warnings');
+        const routeInfoDiv = $('#route-info');
+        
+        warningsDiv.empty();
+        routeInfoDiv.hide();
+        
+        if (!startPort || !destPort) {
+            resultsDiv.html('<div class="no-selection">Select a starting port and destination to see trade recommendations.</div>');
+            return;
+        }
+        
+        if (startPort === destPort) {
+            resultsDiv.html('<div class="no-selection">Please select different ports for start and destination.</div>');
+            return;
+        }
+        
+        const startData = TRADE_DATA.ports[startPort];
+        const destData = TRADE_DATA.ports[destPort];
+        const startRegion = TRADE_DATA.getRegion(startPort);
+        const destRegion = TRADE_DATA.getRegion(destPort);
+        
+        // Show route info
+        routeInfoDiv.html(
+            '<span>' + TRADE_DATA.getDisplayName(startPort) + '</span>' +
+            '<span class="region-tag region-' + startRegion + '">' + startRegion + '</span>' +
+            '<span>→</span>' +
+            '<span>' + TRADE_DATA.getDisplayName(destPort) + '</span>' +
+            '<span class="region-tag region-' + destRegion + '">' + destRegion + '</span>'
+        ).show();
+        
+        // Generate warnings
+        var warnings = [];
+        
+        // Check shallow water
+        if (startData.shallowWater) {
+            warnings.push('<span class="trade-warning warning-shallow">⚓ ' + TRADE_DATA.getDisplayName(startPort) + ': Shallow water (' + startData.shallowWater + ')</span>');
+        }
+        if (destData.shallowWater) {
+            warnings.push('<span class="trade-warning warning-shallow">⚓ ' + TRADE_DATA.getDisplayName(destPort) + ': Shallow water (' + destData.shallowWater + ')</span>');
+        }
+        
+        // Check peace flag
+        if (startData.peaceFlagAllowed === false) {
+            warnings.push('<span class="trade-warning warning-no-peace">⚔️ ' + TRADE_DATA.getDisplayName(startPort) + ': No peace flag allowed</span>');
+        }
+        if (destData.peaceFlagAllowed === false) {
+            warnings.push('<span class="trade-warning warning-no-peace">⚔️ ' + TRADE_DATA.getDisplayName(destPort) + ': No peace flag allowed</span>');
+        }
+        
+        // Check same region / low profit potential
+        if (startRegion === destRegion && startRegion !== 'transitional') {
+            warnings.push('<span class="trade-warning warning-low-profit">📉 Same-region route: Limited profit potential</span>');
+        }
+        
+        // Check if destination pays max prices for what start port sells
+        if (startRegion === 'southern' && TRADE_DATA.isNorthernPort(destPort)) {
+            warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Southern → Northern (max prices)</span>');
+        } else if (startRegion === 'northern' && TRADE_DATA.isSouthernPort(destPort)) {
+            warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Northern → Southern (max prices)</span>');
+        }
+        
+        if (warnings.length > 0) {
+            warningsDiv.html(warnings.join(''));
+        }
+        
+        // Build results HTML
+        var html = '<div class="trade-results">';
+        
+        ['small', 'medium', 'large'].forEach(function(size) {
+            html += buildHoldColumn(size, startPort, destPort, startData, destData);
+        });
+        
+        html += '</div>';
+        resultsDiv.html(html);
+    }
+    
+    function buildHoldColumn(size, startPort, destPort, startData, destData) {
+        var sizeInfo = TRADE_DATA.holdSizes[size];
+        var html = '<div class="hold-column">';
+        html += '<h3>' + sizeInfo.label + '</h3>';
+        html += '<p style="font-size: 12px; color: #666; margin-bottom: 10px;">' + sizeInfo.description + '</p>';
+        
+        // Outbound recommendations (what to buy at start)
+        html += '<h4>Buy at ' + TRADE_DATA.getDisplayName(startPort) + ':</h4>';
+        
+        if (startData.buy && startData.buy[size]) {
+            startData.buy[size].forEach(function(rec, index) {
+                html += buildRecommendation(rec, index + 1);
+            });
+        } else {
+            html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
+        }
+        
+        // Return trip recommendations (what to buy at destination for return)
+        html += '<h4>Return Trip - Buy at ' + TRADE_DATA.getDisplayName(destPort) + ':</h4>';
+        
+        if (destData.buy && destData.buy[size]) {
+            destData.buy[size].forEach(function(rec, index) {
+                html += buildRecommendation(rec, index + 1);
+            });
+        } else {
+            html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
+        }
+        
+        html += '</div>';
+        return html;
+    }
+    
+    function buildRecommendation(rec, priority) {
+        var iconFile = TRADE_DATA.commodityIcons[rec.good] || 'default.png';
+        var goodName = rec.good.charAt(0).toUpperCase() + rec.good.slice(1);
+        
+        var html = '<div class="recommendation">';
+        html += '<img src="commodities/' + iconFile + '" alt="' + goodName + '" onerror="this.style.display=\'none\'">';
+        html += '<div class="recommendation-details">';
+        html += '<div class="recommendation-good">#' + priority + ' ' + goodName + '</div>';
+        html += '<div class="recommendation-prices">Buy: ' + rec.price + ' → Sell: ' + rec.sellPrice + ' at ' + rec.sellAt + '</div>';
+        
+        if (rec.profitPerWeight) {
+            html += '<div class="recommendation-profit">+' + rec.profitPerWeight.toFixed(2) + ' profit/weight</div>';
+        }
+        
+        if (rec.note) {
+            html += '<div class="recommendation-note">' + rec.note + '</div>';
+        }
+        
+        html += '</div></div>';
+        return html;
+    }
+    
+    // Initialize trade calculator
+    initTradeCalculator();
 });
-
-
-
-	</script> 
+</script>
 
 
 </html>
