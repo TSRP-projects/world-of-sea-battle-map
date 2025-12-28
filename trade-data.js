@@ -1304,7 +1304,7 @@ const TRADE_DATA = {
                 pineapples: { localPrice: 17, maxPrice: 19 },
                 vanilla: { localPrice: 33, maxPrice: 38 },
                 leather: { localPrice: 30, maxPrice: 34 },
-                coffee: { localPrice: 38, maxPrice: 43 },v
+                coffee: { localPrice: 38, maxPrice: 43 },
                 oil: { localPrice: 20, maxPrice: 22 },
                 pepper: { localPrice: 32, maxPrice: 36 },
                 sugar: { localPrice: 45, maxPrice: 51 },
