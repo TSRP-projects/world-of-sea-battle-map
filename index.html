@@ -349,6 +349,291 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 .production { display: none; }
 .altar { display: none; }
 
+/* NEW Trade Calculator Styles - Commodity Grid */
+.port-selection {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+    max-width: 350px;
+}
+
+.port-select-group label {
+    display: block;
+    font-family: 'Cinzel', Georgia, serif;
+    font-weight: 600;
+    color: #8b6914;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.port-select-group select {
+    width: 100%;
+    padding: 10px 12px;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 14px;
+    border: 2px solid #8b6914;
+    border-radius: 5px;
+    background: #f5f0e6;
+    color: #3d2b1f;
+}
+
+.commodity-section {
+    background: #3d3020;
+    border: 2px solid #8b6914;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    max-width: 500px;
+}
+
+.commodity-grid-header {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #c9a227;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.selection-counter {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 12px;
+}
+
+.selection-counter span {
+    color: #c9a227;
+    font-weight: bold;
+}
+
+.commodity-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: #1a1510;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.commodity-item {
+    background: #2a2218;
+    border: 2px solid #3d3020;
+    border-radius: 5px;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.commodity-item:hover {
+    border-color: #5c4a3a;
+    background: #3d3020;
+}
+
+.commodity-item.selected {
+    border-color: #c9a227;
+    background: #3d3020;
+    box-shadow: 0 0 10px rgba(201, 162, 39, 0.5);
+}
+
+.commodity-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    color: #4ade80;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.commodity-item img {
+    width: 48px;
+    height: 48px;
+    display: block;
+    margin: 0 auto 5px;
+    border-radius: 4px;
+}
+
+.commodity-item .commodity-name {
+    font-size: 11px;
+    color: #f5f0e6;
+    font-family: 'Libre Baskerville', Georgia, serif;
+}
+
+.trade-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    max-width: 500px;
+}
+
+.trade-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #8b6914;
+    border-radius: 5px;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.trade-btn-primary {
+    background: #8b6914;
+    color: #f5f0e6;
+}
+
+.trade-btn-primary:hover {
+    background: #a67c00;
+}
+
+.trade-btn-secondary {
+    background: transparent;
+    color: #3d2b1f;
+}
+
+.trade-btn-secondary:hover {
+    background: rgba(139, 105, 20, 0.2);
+}
+
+.trade-results {
+    display: none;
+}
+
+.trade-results.active {
+    display: block;
+}
+
+.results-header {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+    font-size: 18px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #8b6914;
+}
+
+.results-route {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(139, 105, 20, 0.15);
+    border-radius: 5px;
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+}
+
+.results-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1200px) {
+    .results-columns { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 800px) {
+    .results-columns { grid-template-columns: 1fr; }
+    .commodity-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.results-column {
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid #8b6914;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.results-column-header {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+    font-size: 16px;
+    text-align: center;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #8b6914;
+}
+
+.results-column-header .hold-size {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    margin-top: 3px;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(139, 105, 20, 0.1);
+    border-radius: 5px;
+    border-left: 4px solid #8b6914;
+}
+
+.result-item.max-profit {
+    border-left-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.result-item img {
+    width: 40px;
+    height: 40px;
+    margin-right: 12px;
+    border-radius: 4px;
+}
+
+.result-item-details {
+    flex: 1;
+}
+
+.result-item-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #3d2b1f;
+    margin-bottom: 3px;
+}
+
+.result-item-prices {
+    font-size: 12px;
+    color: #666;
+}
+
+.result-item-profit {
+    text-align: right;
+}
+
+.result-item-profit .profit-value {
+    font-size: 15px;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.result-item-profit .profit-weight {
+    font-size: 11px;
+    color: #666;
+}
+
+.result-item-profit .max-badge {
+    display: inline-block;
+    background: #28a745;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.no-results {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
 </style>
 </head>
 <body>
@@ -962,27 +1247,45 @@ If you spot any errors feel free to contact me.
 <div id="trade-calculator">
     <h2>Trade Route Calculator</h2>
     
-    <div class="trade-controls">
-        <div>
-            <label for="start-port">Starting Port:</label>
-            <select id="start-port">
-                <option value="">-- Select Port --</option>
-            </select>
-        </div>
-        <div>
-            <label for="dest-port">Destination Port:</label>
+    <div class="port-selection">
+        <div class="port-select-group">
+            <label for="dest-port">Destination Port</label>
             <select id="dest-port">
-                <option value="">-- Select Port --</option>
+                <option value="">-- Select Destination --</option>
             </select>
         </div>
     </div>
     
     <div id="trade-warnings" class="trade-warnings"></div>
     
-    <div id="route-info" class="route-info" style="display: none;"></div>
+    <div class="commodity-section">
+        <div class="commodity-grid-header">Select Commodities Available for Purchase</div>
+        <div class="selection-counter"><span id="selectedCount">0</span> commodities selected</div>
+        <div class="commodity-grid" id="commodityGrid"></div>
+    </div>
     
-    <div id="trade-results">
-        <div class="no-selection">Select a starting port and destination to see trade recommendations.</div>
+    <div class="trade-actions">
+        <button class="trade-btn trade-btn-secondary" id="clearSelection">Clear Selection</button>
+        <button class="trade-btn trade-btn-primary" id="calculateTrades">Calculate Best Trades</button>
+    </div>
+    
+    <div class="trade-results" id="tradeResults">
+        <div class="results-header">Trade Recommendations</div>
+        <div class="results-route" id="resultsRoute"></div>
+        <div class="results-columns">
+            <div class="results-column" id="resultsSmall">
+                <div class="results-column-header">Small Hold<span class="hold-size">&lt; 7,000</span></div>
+                <div class="results-list"></div>
+            </div>
+            <div class="results-column" id="resultsMedium">
+                <div class="results-column-header">Medium Hold<span class="hold-size">7,000 - 25,000</span></div>
+                <div class="results-list"></div>
+            </div>
+            <div class="results-column" id="resultsLarge">
+                <div class="results-column-header">Large Hold<span class="hold-size">&gt; 25,000</span></div>
+                <div class="results-list"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -991,55 +1294,35 @@ If you spot any errors feel free to contact me.
 <script type="text/javascript">
 $(document).ready(function() {
     // Existing checkbox toggles
-    $('#show-ports').click(function() {
-        $('#ports').toggle();
-    });
-    $('#show-lighthouses').click(function() {
-        $('#lighthouses').toggle();
-    });
-    $('#show-portsxy').click(function() {
-        $('#portsxy').toggle();
-    });  
-    $('#show-islandsxy').click(function() {
-        $('#islandsxy').toggle();
-    });  
-    $('#show-productionsxy').click(function() {
-        $('#productionsxy').toggle();
-    });  
-    $('#show-fast-travel').click(function() {
-        $('#fast-travel').toggle();
-    });  
-    $('#show-circle').click(function() {
-        $('#circle').toggle();
-    });   
-    $('#show-island').click(function() {
-        $('.island').toggle();
-    });
-    $('#show-production').click(function() {
-        $('.production').toggle();
-    });
-    $('#show-altar').click(function() {
-        $('.altar').toggle();
-    });
-    $('#show-fort').click(function() {
-        $('.fort').toggle();
-    });
-    $('#show-altarsxy').click(function() {
-        $('#altarsxy').toggle();
-    });
-    $('#show-fortsxy').click(function() {
-        $('#fortsxy').toggle();
-    });
+    $('#show-ports').click(function() { $('#ports').toggle(); });
+    $('#show-lighthouses').click(function() { $('#lighthouses').toggle(); });
+    $('#show-portsxy').click(function() { $('#portsxy').toggle(); });  
+    $('#show-islandsxy').click(function() { $('#islandsxy').toggle(); });  
+    $('#show-productionsxy').click(function() { $('#productionsxy').toggle(); });  
+    $('#show-fast-travel').click(function() { $('#fast-travel').toggle(); });  
+    $('#show-circle').click(function() { $('#circle').toggle(); });   
+    $('#show-island').click(function() { $('.island').toggle(); });
+    $('#show-production').click(function() { $('.production').toggle(); });
+    $('#show-altar').click(function() { $('.altar').toggle(); });
+    $('#show-fort').click(function() { $('.fort').toggle(); });
+    $('#show-altarsxy').click(function() { $('#altarsxy').toggle(); });
+    $('#show-fortsxy').click(function() { $('#fortsxy').toggle(); });
 
     // Trade Calculator Functions
     function initTradeCalculator() {
-        const ports = Object.keys(TRADE_DATA.ports).sort();
-        const startSelect = $('#start-port');
-        const destSelect = $('#dest-port');
+        populatePortDropdown();
+        buildCommodityGrid();
         
-        // Group ports by region
-        const regionOrder = ['northern', 'southern', 'arabian', 'sell_only'];
-        const regionLabels = {
+        $('#dest-port').change(updatePortWarnings);
+        $('#clearSelection').click(clearCommoditySelection);
+        $('#calculateTrades').click(calculateTradeRecommendations);
+    }
+    
+    function populatePortDropdown() {
+        var destSelect = $('#dest-port');
+        
+        var regionOrder = ['northern', 'southern', 'arabian', 'sell_only'];
+        var regionLabels = {
             northern: 'Northern Region',
             southern: 'Southern Region',
             arabian: 'Arabian Region',
@@ -1047,201 +1330,162 @@ $(document).ready(function() {
         };
         
         regionOrder.forEach(function(region) {
-			const regionPorts = ports.filter(function(port) {
-				var portData = TRADE_DATA.ports[port];
-				return TRADE_DATA.getRegion(port) === region && portData.type !== 'pirate_stronghold';
-			});
+            var ports = TRADE_DATA.regions[region];
+            if (!ports || ports.length === 0) return;
             
-            if (regionPorts.length > 0) {
-                const optgroup = $('<optgroup>').attr('label', regionLabels[region]);
-                regionPorts.forEach(function(port) {
-                    var displayName = TRADE_DATA.getDisplayName(port);
-                    var portData = TRADE_DATA.ports[port];
-                    if (portData.canBuy === false) {
-                        displayName += ' (sell only)';
-                    }
-                    optgroup.append($('<option>').val(port).text(displayName));
-                });
-                startSelect.append(optgroup.clone());
+            var optgroup = $('<optgroup>').attr('label', regionLabels[region]);
+            
+            ports.forEach(function(port) {
+                if (TRADE_DATA.noSellPorts.indexOf(port) === -1) {
+                    var option = $('<option>').val(port).text(TRADE_DATA.getDisplayName(port));
+                    optgroup.append(option);
+                }
+            });
+            
+            if (optgroup.children().length > 0) {
                 destSelect.append(optgroup);
             }
         });
-        
-        // Event handlers
-        startSelect.change(updateTradeResults);
-		destSelect.change(updateTradeResults);
     }
     
-    function updateTradeResults() {
-        const startPort = $('#start-port').val();
-        const destPort = $('#dest-port').val();
-        const resultsDiv = $('#trade-results');
-        const warningsDiv = $('#trade-warnings');
-        const routeInfoDiv = $('#route-info');
+    function buildCommodityGrid() {
+        var grid = $('#commodityGrid');
+        grid.empty();
         
+        TRADE_DATA.commodityOrder.forEach(function(commodityKey) {
+            var commodity = TRADE_DATA.commodities[commodityKey];
+            if (!commodity) return;
+            
+            var iconFile = TRADE_DATA.commodityIcons[commodityKey] || 'default.png';
+            
+            var item = $('<div>')
+                .addClass('commodity-item')
+                .attr('data-commodity', commodityKey)
+                .html(
+                    '<img src="commodities/' + iconFile + '" alt="' + commodity.name + '" onerror="this.style.opacity=0.3">' +
+                    '<div class="commodity-name">' + commodity.name + '</div>'
+                );
+            
+            item.click(function() {
+                $(this).toggleClass('selected');
+                updateSelectionCount();
+            });
+            
+            grid.append(item);
+        });
+    }
+    
+    function updateSelectionCount() {
+        var count = $('.commodity-item.selected').length;
+        $('#selectedCount').text(count);
+    }
+    
+    function updatePortWarnings() {
+        var destPort = $('#dest-port').val();
+        var warningsDiv = $('#trade-warnings');
         warningsDiv.empty();
-        routeInfoDiv.hide();
         
-        if (!startPort || !destPort) {
-            resultsDiv.html('<div class="no-selection">Select a starting port and destination to see trade recommendations.</div>');
-            return;
-        }
+        if (!destPort) return;
         
-        if (startPort === destPort) {
-            resultsDiv.html('<div class="no-selection">Please select different ports for start and destination.</div>');
-            return;
-        }
-        
-        const startData = TRADE_DATA.ports[startPort];
-        const destData = TRADE_DATA.ports[destPort];
-        const startRegion = TRADE_DATA.getRegion(startPort);
-        const destRegion = TRADE_DATA.getRegion(destPort);
-        
-        // Show route info
-        routeInfoDiv.html(
-            '<span>' + TRADE_DATA.getDisplayName(startPort) + '</span>' +
-            '<span class="region-tag region-' + startRegion + '">' + startRegion + '</span>' +
-            '<span>→</span>' +
-            '<span>' + TRADE_DATA.getDisplayName(destPort) + '</span>' +
-            '<span class="region-tag region-' + destRegion + '">' + destRegion + '</span>'
-        ).show();
-        
-		// Generate warnings
         var warnings = [];
+        var portMeta = TRADE_DATA.portMeta;
+        var destName = TRADE_DATA.getDisplayName(destPort);
         
         // Check shallow water
-        if (startData.shallowWater) {
-            warnings.push('<span class="trade-warning warning-shallow">⚓ ' + TRADE_DATA.getDisplayName(startPort) + ': Shallow water (' + startData.shallowWater + ')</span>');
-        }
-        if (destData.shallowWater) {
-            warnings.push('<span class="trade-warning warning-shallow">⚓ ' + TRADE_DATA.getDisplayName(destPort) + ': Shallow water (' + destData.shallowWater + ')</span>');
+        if (portMeta.shallowWater && portMeta.shallowWater[destPort]) {
+            warnings.push('<span class="trade-warning warning-shallow">⚓ ' + destName + ': Shallow water (' + portMeta.shallowWater[destPort] + ')</span>');
         }
         
         // Check peace flag
-        if (startData.peaceFlagAllowed === false) {
-            warnings.push('<span class="trade-warning warning-no-peace">⚔️ ' + TRADE_DATA.getDisplayName(startPort) + ': No peace flag allowed</span>');
-        }
-        if (destData.peaceFlagAllowed === false) {
-            warnings.push('<span class="trade-warning warning-no-peace">⚔️ ' + TRADE_DATA.getDisplayName(destPort) + ': No peace flag allowed</span>');
-        }
-        
-        // Check sell-only ports
-        if (startData.canBuy === false) {
-            warnings.push('<span class="trade-warning warning-low-profit">📦 ' + TRADE_DATA.getDisplayName(startPort) + ': Sell-only port (no goods to buy)</span>');
-        }
-        if (destData.canBuy === false) {
-            warnings.push('<span class="trade-warning warning-low-profit">📦 ' + TRADE_DATA.getDisplayName(destPort) + ': Sell-only port (no goods to buy)</span>');
-        }
-        
-        // Check same region / low profit potential (only for buying regions)
-        var buyingRegions = ['southern', 'arabian', 'northern'];
-        if (buyingRegions.indexOf(startRegion) !== -1 && startRegion === destRegion) {
-            warnings.push('<span class="trade-warning warning-low-profit">📉 Same-region route: Limited profit potential</span>');
-        }
-        
-        // Check optimal routes
-        if (startRegion === 'southern' && destRegion === 'northern') {
-            warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Southern → Northern (max prices)</span>');
-        } else if (startRegion === 'northern' && destRegion === 'southern') {
-            warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Northern → Southern (max prices)</span>');
-        } else if (startRegion === 'arabian' && destRegion === 'southern') {
-            warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Arabian → Southern (max prices)</span>');
+        if (portMeta.noPeaceFlag && portMeta.noPeaceFlag.indexOf(destPort) !== -1) {
+            warnings.push('<span class="trade-warning warning-no-peace">⚔️ ' + destName + ': No peace flag allowed</span>');
         }
         
         if (warnings.length > 0) {
             warningsDiv.html(warnings.join(''));
         }
+    }
+    
+    function clearCommoditySelection() {
+        $('.commodity-item.selected').removeClass('selected');
+        updateSelectionCount();
+        $('#tradeResults').removeClass('active');
+        $('#trade-warnings').empty();
+        $('#dest-port').val('');
+    }
+    
+    function calculateTradeRecommendations() {
+        var destPort = $('#dest-port').val();
         
-        // Build results HTML
-        var html = '<div class="trade-results">';
+        if (!destPort) {
+            alert('Please select a destination port');
+            return;
+        }
         
-        ['small', 'medium', 'large'].forEach(function(size) {
-            html += buildHoldColumn(size, startPort, destPort, startData, destData);
+        var selectedCommodities = [];
+        $('.commodity-item.selected').each(function() {
+            selectedCommodities.push($(this).attr('data-commodity'));
         });
         
-        html += '</div>';
-        resultsDiv.html(html);
-    }
-    
-    function buildHoldColumn(size, startPort, destPort, startData, destData) {
-		var sizeInfo = TRADE_DATA.holdSizes[size];
-		var capacityText = '';
-		
-		if (size === 'small') {
-			capacityText = '≤ ' + sizeInfo.max.toLocaleString();
-		} else if (size === 'medium') {
-			capacityText = sizeInfo.min.toLocaleString() + ' - ' + sizeInfo.max.toLocaleString();
-		} else if (size === 'large') {
-			capacityText = '≥ ' + sizeInfo.min.toLocaleString();
-		}
-		
-		var html = '<div class="hold-column">';
-		html += '<h3>' + sizeInfo.label + ' <span style="font-size: 13px; font-weight: normal; color: #666;">(' + capacityText + ')</span></h3>';
-		html += '<p style="font-size: 12px; color: #666; margin-bottom: 10px;">' + sizeInfo.description + '</p>';
-        
-        // Outbound recommendations (what to buy at start)
-		html += '<h4>Buy at ' + TRADE_DATA.getDisplayName(startPort) + ':</h4>';
-
-		if (startData.buy && startData.buy[size]) {
-			var profitableRecs = startData.buy[size].filter(function(rec) {
-				return rec.profitPerWeight && rec.profitPerWeight > 0 && !rec.note;
-			});
-			
-			if (profitableRecs.length > 0) {
-				profitableRecs.forEach(function(rec, index) {
-					html += buildRecommendation(rec, index + 1, startData.region);
-				});
-			} else {
-				html += '<div class="recommendation"><span style="color: #856404; font-style: italic;">⚠️ No profitable trades from this port at this hold size</span></div>';
-			}
-		} else {
-			html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
-		}
-        
-        // Return trip recommendations (what to buy at destination for return)
-		html += '<h4>Return Trip - Buy at ' + TRADE_DATA.getDisplayName(destPort) + ':</h4>';
-
-		if (destData.buy && destData.buy[size]) {
-			var profitableReturnRecs = destData.buy[size].filter(function(rec) {
-				return rec.profitPerWeight && rec.profitPerWeight > 0 && !rec.note;
-			});
-			
-			if (profitableReturnRecs.length > 0) {
-				profitableReturnRecs.forEach(function(rec, index) {
-					html += buildRecommendation(rec, index + 1, destData.region);
-				});
-			} else {
-				html += '<div class="recommendation"><span style="color: #856404; font-style: italic;">⚠️ No profitable trades from this port at this hold size</span></div>';
-			}
-		} else {
-			html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
-		}
-
-			        html += '</div>';
-        return html;
-    }
-    
-    function buildRecommendation(rec, priority, sourceRegion) {
-		var iconFile = TRADE_DATA.commodityIcons[rec.good] || 'default.png';
-		var goodName = rec.good.charAt(0).toUpperCase() + rec.good.slice(1);
-		var sellDest = TRADE_DATA.getSellDestinations(sourceRegion);
-		
-		var html = '<div class="recommendation">';
-		html += '<img src="commodities/' + iconFile + '" alt="' + goodName + '" onerror="this.style.display=\'none\'">';
-		html += '<div class="recommendation-details">';
-		html += '<div class="recommendation-good">#' + priority + ' ' + goodName + '</div>';
-		html += '<div class="recommendation-prices">Buy: ' + rec.price + ' → ' + sellDest + '</div>';
-        
-        if (rec.profitPerWeight) {
-            html += '<div class="recommendation-profit">+' + rec.profitPerWeight.toFixed(2) + ' profit/weight</div>';
+        if (selectedCommodities.length === 0) {
+            alert('Please select at least one commodity');
+            return;
         }
         
-        if (rec.note) {
-            html += '<div class="recommendation-note">' + rec.note + '</div>';
+        var recommendations = TRADE_DATA.getRecommendations(selectedCommodities, destPort);
+        displayResults(recommendations, destPort);
+    }
+    
+    function displayResults(recommendations, destPort) {
+        var resultsDiv = $('#tradeResults');
+        resultsDiv.addClass('active');
+        
+        $('#resultsRoute').html('Selling at: <strong>' + TRADE_DATA.getDisplayName(destPort) + '</strong>');
+        
+        $('#resultsSmall .results-list').empty();
+        $('#resultsMedium .results-list').empty();
+        $('#resultsLarge .results-list').empty();
+        
+        if (recommendations.length === 0) {
+            var noResults = '<div class="no-results">No profitable trades found for selected commodities</div>';
+            $('#resultsSmall .results-list').html(noResults);
+            $('#resultsMedium .results-list').html(noResults);
+            $('#resultsLarge .results-list').html(noResults);
+            return;
         }
         
-        html += '</div></div>';
-        return html;
+        // Small hold: top 3
+        recommendations.slice(0, 3).forEach(function(rec, i) {
+            $('#resultsSmall .results-list').append(createResultItem(rec, i + 1));
+        });
+        
+        // Medium hold: top 4
+        recommendations.slice(0, 4).forEach(function(rec, i) {
+            $('#resultsMedium .results-list').append(createResultItem(rec, i + 1));
+        });
+        
+        // Large hold: top 5
+        recommendations.slice(0, 5).forEach(function(rec, i) {
+            $('#resultsLarge .results-list').append(createResultItem(rec, i + 1));
+        });
+    }
+    
+    function createResultItem(rec, rank) {
+        var iconFile = TRADE_DATA.commodityIcons[rec.commodity] || 'default.png';
+        var maxBadge = rec.isMaxProfit ? '<span class="max-badge">MAX</span>' : '';
+        var itemClass = rec.isMaxProfit ? 'result-item max-profit' : 'result-item';
+        
+        return '<div class="' + itemClass + '">' +
+            '<img src="commodities/' + iconFile + '" alt="' + rec.name + '" onerror="this.style.opacity=0.3">' +
+            '<div class="result-item-details">' +
+                '<div class="result-item-name">#' + rank + ' ' + rec.name + '</div>' +
+                '<div class="result-item-prices">Buy: ' + rec.buyPrice + ' → Sell: ' + rec.sellPrice + ' (wt: ' + rec.weight + ')</div>' +
+            '</div>' +
+            '<div class="result-item-profit">' +
+                '<div class="profit-value">+' + rec.profit + maxBadge + '</div>' +
+                '<div class="profit-weight">' + rec.profitPerWeight.toFixed(2) + '/wt</div>' +
+            '</div>' +
+        '</div>';
     }
     
     // Initialize trade calculator
