@@ -1054,8 +1054,8 @@ $(document).ready(function() {
         });
         
         // Event handlers
-        startSelect.on('change', updateTradeResults);
-        destSelect.on('change', updateTradeResults);
+        startSelect.change(updateTradeResults);
+		destSelect.change(updateTradeResults);
     }
     
     function updateTradeResults() {
