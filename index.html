@@ -1038,9 +1038,10 @@ $(document).ready(function() {
         };
         
         regionOrder.forEach(function(region) {
-            const regionPorts = ports.filter(function(port) {
-                return TRADE_DATA.getRegion(port) === region;
-            });
+			const regionPorts = ports.filter(function(port) {
+				var portData = TRADE_DATA.ports[port];
+				return TRADE_DATA.getRegion(port) === region && portData.type !== 'pirate_stronghold';
+			});
             
             if (regionPorts.length > 0) {
                 const optgroup = $('<optgroup>').attr('label', regionLabels[region]);
