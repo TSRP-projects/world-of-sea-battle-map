@@ -343,6 +343,9 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 .region-southern { background: #fff3cd; color: #856404; }
 .region-eastern { background: #d4edda; color: #155724; }
 .region-transitional { background: #e2d5f1; color: #563d7c; }
+.region-arabian { background: #f8d7da; color: #721c24; }
+.region-sell_only { background: #e2e3e5; color: #383d41; }
+.region-no_trade { background: #d6d8d9; color: #1b1e21; }
 .production { display: none; }
 .altar { display: none; }
 
@@ -1032,12 +1035,12 @@ $(document).ready(function() {
         const destSelect = $('#dest-port');
         
         // Group ports by region
-        const regionOrder = ['northern', 'southern', 'eastern', 'transitional'];
+        const regionOrder = ['northern', 'southern', 'arabian', 'sell_only'];
         const regionLabels = {
             northern: 'Northern Region',
             southern: 'Southern Region',
-            eastern: 'Eastern Region',
-            transitional: 'Transitional Zone'
+            arabian: 'Arabian Region',
+            sell_only: 'Sell-Only Ports'
         };
         
         regionOrder.forEach(function(region) {
@@ -1049,7 +1052,11 @@ $(document).ready(function() {
             if (regionPorts.length > 0) {
                 const optgroup = $('<optgroup>').attr('label', regionLabels[region]);
                 regionPorts.forEach(function(port) {
-                    const displayName = TRADE_DATA.getDisplayName(port);
+                    var displayName = TRADE_DATA.getDisplayName(port);
+                    var portData = TRADE_DATA.ports[port];
+                    if (portData.canBuy === false) {
+                        displayName += ' (sell only)';
+                    }
                     optgroup.append($('<option>').val(port).text(displayName));
                 });
                 startSelect.append(optgroup.clone());
@@ -1096,7 +1103,7 @@ $(document).ready(function() {
             '<span class="region-tag region-' + destRegion + '">' + destRegion + '</span>'
         ).show();
         
-        // Generate warnings
+		// Generate warnings
         var warnings = [];
         
         // Check shallow water
@@ -1115,16 +1122,27 @@ $(document).ready(function() {
             warnings.push('<span class="trade-warning warning-no-peace">⚔️ ' + TRADE_DATA.getDisplayName(destPort) + ': No peace flag allowed</span>');
         }
         
-        // Check same region / low profit potential
-        if (startRegion === destRegion && startRegion !== 'transitional') {
+        // Check sell-only ports
+        if (startData.canBuy === false) {
+            warnings.push('<span class="trade-warning warning-low-profit">📦 ' + TRADE_DATA.getDisplayName(startPort) + ': Sell-only port (no goods to buy)</span>');
+        }
+        if (destData.canBuy === false) {
+            warnings.push('<span class="trade-warning warning-low-profit">📦 ' + TRADE_DATA.getDisplayName(destPort) + ': Sell-only port (no goods to buy)</span>');
+        }
+        
+        // Check same region / low profit potential (only for buying regions)
+        var buyingRegions = ['southern', 'arabian', 'northern'];
+        if (buyingRegions.indexOf(startRegion) !== -1 && startRegion === destRegion) {
             warnings.push('<span class="trade-warning warning-low-profit">📉 Same-region route: Limited profit potential</span>');
         }
         
-        // Check if destination pays max prices for what start port sells
-        if (startRegion === 'southern' && TRADE_DATA.isNorthernPort(destPort)) {
+        // Check optimal routes
+        if (startRegion === 'southern' && destRegion === 'northern') {
             warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Southern → Northern (max prices)</span>');
-        } else if (startRegion === 'northern' && TRADE_DATA.isSouthernPort(destPort)) {
+        } else if (startRegion === 'northern' && destRegion === 'southern') {
             warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Northern → Southern (max prices)</span>');
+        } else if (startRegion === 'arabian' && destRegion === 'southern') {
+            warnings.push('<span class="trade-warning warning-max-price">💰 Optimal route: Arabian → Southern (max prices)</span>');
         }
         
         if (warnings.length > 0) {

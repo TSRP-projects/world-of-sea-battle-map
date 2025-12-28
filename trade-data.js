@@ -1,5 +1,5 @@
 // Trade Data for WOSB Map
-// Converted from YAML - Last Updated: 2024-12-27
+// Converted from YAML v2 - Last Updated: 2024-12-27
 
 const TRADE_DATA = {
     
@@ -48,10 +48,18 @@ const TRADE_DATA = {
     
     // Region definitions
     regions: {
-        southern: ['Devios', 'Los Catuano', 'Puerto Salada', 'Santa Maria', 'El Tigre', 'Pirate City', 'Bord Radel', 'San Cristobel', 'San Martinas', 'South Bastion'],
-        northern: ['Aldansk', 'Corsa-Nois Bay', 'Nisogora', 'Northside', 'Oneg', 'Gray Island', 'Everston', 'Aruba', 'Severoangelsk', 'North Bastion', 'Gelbion'],
-        eastern: ['Cursed City', 'West Bastion', 'Al-Khalif', 'Assab', 'Masadora', 'Sharhat', 'Naabad Stronghold'],
-        transitional: ['Surako', 'Brandport', 'Freedom Bay', 'Fiji', 'Freebooter Bay', 'La Navidad', 'Charleston', 'Bridgetown', 'Laguna Blanco', 'Nevis', 'Thermopylae', 'Tortuga']
+        southern: ['Devios', 'El Tigre', 'San Cristobel', 'San Martinas', 'South Bastion', 'Bord Radel', 'Los Catuano', 'Puerto Salada', 'Santa Maria'],
+        arabian: ['Sharhat', 'Assab', 'Al-Khalif', 'West Bastion', 'Masadora', 'Cursed City'],
+        northern: ['Northside', 'North Bastion', 'Severoangelsk', 'Gray Island', 'Aldansk', 'Aruba', 'Everston', 'Oneg', 'Nordberg', 'Nisogora'],
+        sell_only: ['Gelbion', 'Surako', 'Nevis', 'Thermopylae', 'Fiji', 'Brandport', 'Freedom Bay', 'La Navidad', 'Charleston', 'Bridgetown', 'Laguna Blanco', 'St. John'],
+        no_trade: ['Tortuga', 'Pirate City', 'Corsa-Nois Bay', 'Naabad Stronghold', 'Freebooter Bay']
+    },
+    
+    // Goods available by region
+    goodsByRegion: {
+        southern: ['pineapples', 'vanilla', 'leather', 'coffee', 'oil', 'nuts', 'pepper', 'sugar', 'tobacco'],
+        arabian: ['paprika', 'silk', 'mango', 'cinnamon', 'rugs', 'dates', 'saffron'],
+        northern: ['beer', 'wine', 'grog', 'salt']
     },
     
     // Get region for a port
@@ -62,1257 +70,1446 @@ const TRADE_DATA = {
         return 'unknown';
     },
     
-    // Check if destination qualifies as "Any Northern port"
-    isNorthernPort: function(portName) {
-        return this.regions.northern.includes(portName);
+    // Check if port can buy goods
+    canBuy: function(portName) {
+        const portData = this.ports[portName];
+        return portData && portData.canBuy === true;
     },
     
-    // Check if destination qualifies as "Any Southern port"
-    isSouthernPort: function(portName) {
-        return this.regions.southern.includes(portName);
+    // Check if port can sell goods
+    canSell: function(portName) {
+        const portData = this.ports[portName];
+        return portData && portData.canSell === true;
+    },
+    
+    // Get optimal sell destinations for a region's goods
+    getSellDestinations: function(buyRegion) {
+        switch(buyRegion) {
+            case 'southern':
+                return 'Northern ports (max prices)';
+            case 'arabian':
+                return 'Southern ports (max prices)';
+            case 'northern':
+                return 'Southern ports (max prices)';
+            default:
+                return 'Various ports';
+        }
     },
     
     // Port data with trade recommendations
     ports: {
-        // SOUTHERN REGION
+        // =========================================================================
+        // SOUTHERN REGION PORTS (Buy Southern goods)
+        // =========================================================================
+        
         'Devios': {
             region: 'southern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
             buy: {
                 small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
                 ],
                 medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
                 ],
                 large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
                 ]
             },
             sell: {
-                rugs: { localPrice: 29, maxPrice: 41 },
-                cinnamon: { localPrice: 28, maxPrice: 39 },
-                saffron: { localPrice: 44, maxPrice: 63 },
-                silk: { localPrice: 62, maxPrice: 88 }
-            }
-        },
-        
-        'Los Catuano': {
-            region: 'southern',
-            type: 'city',
-            shallowWater: 'rates 6-7',
-            buy: {
-                small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
-                ],
-                medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            }
-        },
-        
-        'Puerto Salada': {
-            region: 'southern',
-            type: 'city',
-            shallowWater: 'rates 6-7',
-            buy: {
-                small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
-                ],
-                medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            }
-        },
-        
-        'Santa Maria': {
-            region: 'southern',
-            type: 'city',
-            shallowWater: 'rates 6-7',
-            buy: {
-                small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
-                ],
-                medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
+                rugs: { price: 29, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 28, isMax: false, maxPrice: 39 },
+                saffron: { price: 44, isMax: false, maxPrice: 63 },
+                silk: { price: 62, isMax: false, maxPrice: 88 },
+                mango: { price: 14, isMax: false, maxPrice: 19 },
+                paprika: { price: 18, isMax: false, maxPrice: 26 },
+                dates: { price: 10, isMax: false, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
             }
         },
         
         'El Tigre': {
             region: 'southern',
             type: 'trading_port',
+            canBuy: true,
+            canSell: true,
             shallowWater: 'rates 3-7',
             buy: {
                 small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 },
-                    { good: 'vanilla', price: 22, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 2.29 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 },
+                    { good: 'vanilla', price: 22, profitPerWeight: 2.29 }
                 ],
                 medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
                 ],
                 large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 },
-                    { good: 'coffee', price: 25, sellAt: 'Any Northern port', sellPrice: 43, profitPerWeight: 1.50 }
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 },
+                    { good: 'coffee', price: 25, profitPerWeight: 1.50 }
                 ]
             },
             sell: {
-                rugs: { localPrice: 31, maxPrice: 41 },
-                cinnamon: { localPrice: 30, maxPrice: 39 },
-                saffron: { localPrice: 48, maxPrice: 63 },
-                silk: { localPrice: 68, maxPrice: 88 }
+                rugs: { price: 31, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 30, isMax: false, maxPrice: 39 },
+                saffron: { price: 48, isMax: false, maxPrice: 63 },
+                silk: { price: 68, isMax: false, maxPrice: 88 },
+                mango: { price: 15, isMax: false, maxPrice: 19 },
+                paprika: { price: 20, isMax: false, maxPrice: 26 },
+                dates: { price: 11, isMax: false, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
             },
-            notes: ['Leather price elevated (25 vs 20) - not optimal for leather']
-        },
-        
-        'Pirate City': {
-            region: 'southern',
-            type: 'pirate_stronghold',
-            peaceFlagAllowed: false,
-            buy: {
-                small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
-                ],
-                medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 39, maxPrice: 41 },
-                cinnamon: { localPrice: 37, maxPrice: 39 },
-                saffron: { localPrice: 59, maxPrice: 63 },
-                silk: { localPrice: 83, maxPrice: 88 }
-            }
-        },
-        
-        'Bord Radel': {
-            region: 'southern',
-            type: 'trading_port',
-            buy: {
-                small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
-                ],
-                medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            }
+            notes: ['Leather price elevated (25 vs 20) - buy leather elsewhere']
         },
         
         'San Cristobel': {
             region: 'southern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
             shallowWater: 'rates 4-7',
             buy: {
                 small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
                 ],
                 medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
                 ],
                 large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
                 ]
             },
             sell: {
-                rugs: { localPrice: 35, maxPrice: 41 },
-                cinnamon: { localPrice: 34, maxPrice: 39 },
-                saffron: { localPrice: 54, maxPrice: 63 },
-                silk: { localPrice: 76, maxPrice: 88 }
+                rugs: { price: 35, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 34, isMax: false, maxPrice: 39 },
+                saffron: { price: 54, isMax: false, maxPrice: 63 },
+                silk: { price: 76, isMax: false, maxPrice: 88 },
+                mango: { price: 17, isMax: false, maxPrice: 19 },
+                paprika: { price: 22, isMax: false, maxPrice: 26 },
+                dates: { price: 12, isMax: false, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 30, isMax: false, maxPrice: 31 }
             }
         },
         
         'San Martinas': {
             region: 'southern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
             buy: {
                 small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
                 ],
                 medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
                 ],
                 large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
                 ]
             },
             sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 15, isMax: false, maxPrice: 16 },
+                grog: { price: 15, isMax: false, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
             }
         },
         
         'South Bastion': {
             region: 'southern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
             shallowWater: 'rates 5-7',
             buy: {
                 small: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'pepper', price: 21, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 2.50 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
                 ],
                 medium: [
-                    { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
                 ],
                 large: [
-                    { good: 'tobacco', price: 32, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.64 },
-                    { good: 'leather', price: 20, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.80 },
-                    { good: 'sugar', price: 30, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 1.05 }
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
                 ]
             },
             sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
             }
         },
         
-        // NORTHERN REGION
-        'Aldansk': {
-            region: 'northern',
+        'Bord Radel': {
+            region: 'southern',
             type: 'trading_port',
-            shallowWater: 'rates 4-7',
+            canBuy: true,
+            canSell: true,
             buy: {
                 small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'mango', price: 19, sellAt: 'Devios', sellPrice: 14, note: 'Check price variance' }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
                 ],
                 medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' },
-                    { good: 'cinnamon', price: 39, sellAt: 'Any Southern port', sellPrice: 39, note: 'Already at max' }
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
                 ],
                 large: [
-                    { good: 'silk', price: 88, sellAt: 'Any Southern port', sellPrice: 88, note: 'Already at max' },
-                    { good: 'saffron', price: 63, sellAt: 'Any Southern port', sellPrice: 63, note: 'Already at max' },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
                 ]
             },
             sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
             }
         },
         
-        'Corsa-Nois Bay': {
-            region: 'northern',
-            type: 'pirate_stronghold',
-            peaceFlagAllowed: false,
-            buy: {
-                small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
-                ],
-                medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 39, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 0.33 },
-                    { good: 'cinnamon', price: 37, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 0.29 }
-                ],
-                large: [
-                    { good: 'silk', price: 83, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 0.25 },
-                    { good: 'saffron', price: 59, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 0.27 },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            }
-        },
-        
-        'Nisogora': {
-            region: 'northern',
+        'Los Catuano': {
+            region: 'southern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 6-7',
+            buy: {
+                small: [
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
+                ],
+                medium: [
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
+                ],
+                large: [
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
+                ]
+            },
+            sell: {
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
+            }
+        },
+        
+        'Puerto Salada': {
+            region: 'southern',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 6-7',
+            buy: {
+                small: [
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
+                ],
+                medium: [
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
+                ],
+                large: [
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
+                ]
+            },
+            sell: {
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
+            }
+        },
+        
+        'Santa Maria': {
+            region: 'southern',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 6-7',
+            buy: {
+                small: [
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'pepper', price: 21, profitPerWeight: 2.50 }
+                ],
+                medium: [
+                    { good: 'oil', price: 13, profitPerWeight: 3.00 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 }
+                ],
+                large: [
+                    { good: 'tobacco', price: 32, profitPerWeight: 1.64 },
+                    { good: 'leather', price: 20, profitPerWeight: 2.80 },
+                    { good: 'sugar', price: 30, profitPerWeight: 1.05 }
+                ]
+            },
+            sell: {
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 15, isMax: false, maxPrice: 16 },
+                grog: { price: 15, isMax: false, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 30, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        // =========================================================================
+        // ARABIAN REGION PORTS (Buy Arabian goods)
+        // =========================================================================
+        
+        'Sharhat': {
+            region: 'arabian',
+            type: 'trading_port_transport',
+            canBuy: true,
+            canSell: true,
+            buy: {
+                small: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'mango', price: 11, profitPerWeight: 2.00 }
+                ],
+                medium: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 }
+                ],
+                large: [
+                    { good: 'silk', price: 52, profitPerWeight: 1.80 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 },
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 14, isMax: false, maxPrice: 19 },
+                vanilla: { price: 27, isMax: false, maxPrice: 38 },
+                leather: { price: 25, isMax: false, maxPrice: 34 },
+                coffee: { price: 30, isMax: false, maxPrice: 43 },
+                oil: { price: 16, isMax: false, maxPrice: 22 },
+                nuts: { price: 11, isMax: false, maxPrice: 16 },
+                pepper: { price: 25, isMax: false, maxPrice: 36 },
+                sugar: { price: 36, isMax: false, maxPrice: 51 },
+                tobacco: { price: 38, isMax: false, maxPrice: 55 },
+                wine: { price: 15, isMax: false, maxPrice: 16 },
+                grog: { price: 15, isMax: false, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 30, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'Assab': {
+            region: 'arabian',
+            type: 'trading_port_transport',
+            canBuy: true,
+            canSell: true,
+            buy: {
+                small: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'mango', price: 11, profitPerWeight: 2.00 }
+                ],
+                medium: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 }
+                ],
+                large: [
+                    { good: 'silk', price: 52, profitPerWeight: 1.80 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 },
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 16, isMax: false, maxPrice: 19 },
+                vanilla: { price: 31, isMax: false, maxPrice: 38 },
+                leather: { price: 28, isMax: false, maxPrice: 34 },
+                coffee: { price: 35, isMax: false, maxPrice: 43 },
+                oil: { price: 18, isMax: false, maxPrice: 22 },
+                nuts: { price: 13, isMax: false, maxPrice: 16 },
+                pepper: { price: 29, isMax: false, maxPrice: 36 },
+                sugar: { price: 42, isMax: false, maxPrice: 51 },
+                tobacco: { price: 44, isMax: false, maxPrice: 55 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
+            }
+        },
+        
+        'Al-Khalif': {
+            region: 'arabian',
+            type: 'trading_port_transport',
+            canBuy: true,
+            canSell: true,
+            buy: {
+                small: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'mango', price: 11, profitPerWeight: 2.00 }
+                ],
+                medium: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 }
+                ],
+                large: [
+                    { good: 'silk', price: 52, profitPerWeight: 1.80 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 },
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 16, isMax: false, maxPrice: 19 },
+                vanilla: { price: 31, isMax: false, maxPrice: 38 },
+                leather: { price: 28, isMax: false, maxPrice: 34 },
+                coffee: { price: 35, isMax: false, maxPrice: 43 },
+                oil: { price: 18, isMax: false, maxPrice: 22 },
+                nuts: { price: 13, isMax: false, maxPrice: 16 },
+                pepper: { price: 29, isMax: false, maxPrice: 36 },
+                sugar: { price: 42, isMax: false, maxPrice: 51 },
+                tobacco: { price: 44, isMax: false, maxPrice: 55 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
+            }
+        },
+        
+        'West Bastion': {
+            region: 'arabian',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            buy: {
+                small: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'mango', price: 11, profitPerWeight: 2.00 }
+                ],
+                medium: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 }
+                ],
+                large: [
+                    { good: 'silk', price: 52, profitPerWeight: 1.80 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 },
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 16, isMax: false, maxPrice: 19 },
+                vanilla: { price: 32, isMax: false, maxPrice: 38 },
+                leather: { price: 29, isMax: false, maxPrice: 34 },
+                coffee: { price: 36, isMax: false, maxPrice: 43 },
+                oil: { price: 19, isMax: false, maxPrice: 22 },
+                nuts: { price: 13, isMax: false, maxPrice: 16 },
+                pepper: { price: 30, isMax: false, maxPrice: 36 },
+                sugar: { price: 43, isMax: false, maxPrice: 51 },
+                tobacco: { price: 46, isMax: false, maxPrice: 55 },
+                wine: { price: 12, isMax: false, maxPrice: 16 },
+                grog: { price: 12, isMax: false, maxPrice: 16 },
+                beer: { price: 7, isMax: false, maxPrice: 9 },
+                salt: { price: 24, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'Masadora': {
+            region: 'arabian',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            buy: {
+                small: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'mango', price: 11, profitPerWeight: 2.00 }
+                ],
+                medium: [
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 }
+                ],
+                large: [
+                    { good: 'silk', price: 52, profitPerWeight: 1.80 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 },
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 15, isMax: false, maxPrice: 19 },
+                vanilla: { price: 29, isMax: false, maxPrice: 38 },
+                leather: { price: 26, isMax: false, maxPrice: 34 },
+                coffee: { price: 32, isMax: false, maxPrice: 43 },
+                oil: { price: 17, isMax: false, maxPrice: 22 },
+                nuts: { price: 12, isMax: false, maxPrice: 16 },
+                pepper: { price: 27, isMax: false, maxPrice: 36 },
+                sugar: { price: 39, isMax: false, maxPrice: 51 },
+                tobacco: { price: 41, isMax: false, maxPrice: 55 },
+                wine: { price: 14, isMax: false, maxPrice: 16 },
+                grog: { price: 14, isMax: false, maxPrice: 16 },
+                beer: { price: 8, isMax: false, maxPrice: 9 },
+                salt: { price: 27, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'Cursed City': {
+            region: 'arabian',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
             shallowWater: 'rates 3-7',
             buy: {
                 small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'mango', price: 11, profitPerWeight: 2.00 }
                 ],
                 medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 28, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.17 },
-                    { good: 'cinnamon', price: 27, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 1.71 }
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 },
+                    { good: 'cinnamon', price: 23, profitPerWeight: 2.29 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 }
                 ],
                 large: [
-                    { good: 'silk', price: 60, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.40 },
-                    { good: 'saffron', price: 43, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.33 },
-                    { good: 'rugs', price: 28, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.17 }
+                    { good: 'silk', price: 52, profitPerWeight: 1.80 },
+                    { good: 'saffron', price: 37, profitPerWeight: 1.73 },
+                    { good: 'rugs', price: 24, profitPerWeight: 2.83 }
                 ]
             },
             sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            },
-            notes: ['Excellent buy location for Rugs, Cinnamon, Silk, Saffron at discounted Northern prices']
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 37, isMax: false, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 42, isMax: false, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 54, isMax: false, maxPrice: 55 },
+                wine: { price: 11, isMax: false, maxPrice: 16 },
+                grog: { price: 11, isMax: false, maxPrice: 16 },
+                beer: { price: 6, isMax: false, maxPrice: 9 },
+                salt: { price: 22, isMax: false, maxPrice: 31 }
+            }
         },
+        
+        // =========================================================================
+        // NORTHERN REGION PORTS (Buy Northern goods)
+        // =========================================================================
         
         'Northside': {
             region: 'northern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
             shallowWater: 'rates 5-7',
             buy: {
                 small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ],
                 medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' },
-                    { good: 'cinnamon', price: 39, sellAt: 'Any Southern port', sellPrice: 39, note: 'Already at max' }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ],
                 large: [
-                    { good: 'silk', price: 88, sellAt: 'Any Southern port', sellPrice: 88, note: 'Already at max' },
-                    { good: 'saffron', price: 63, sellAt: 'Any Southern port', sellPrice: 63, note: 'Already at max' },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ]
             },
             sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            }
-        },
-        
-        'Oneg': {
-            region: 'northern',
-            type: 'city',
-            shallowWater: 'rates 2-7',
-            buy: {
-                small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
-                ],
-                medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 37, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 0.67 },
-                    { good: 'cinnamon', price: 35, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 0.57 }
-                ],
-                large: [
-                    { good: 'silk', price: 79, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 0.45 },
-                    { good: 'saffron', price: 56, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 0.47 },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            }
-        },
-        
-        'Gray Island': {
-            region: 'northern',
-            type: 'city',
-            buy: {
-                small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
-                ],
-                medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' },
-                    { good: 'cinnamon', price: 39, sellAt: 'Any Southern port', sellPrice: 39, note: 'Already at max' }
-                ],
-                large: [
-                    { good: 'silk', price: 88, sellAt: 'Any Southern port', sellPrice: 88, note: 'Already at max' },
-                    { good: 'saffron', price: 63, sellAt: 'Any Southern port', sellPrice: 63, note: 'Already at max' },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 35, maxPrice: 36 },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            }
-        },
-        
-        'Everston': {
-            region: 'northern',
-            type: 'city',
-            shallowWater: 'rates 2-7',
-            buy: {
-                small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
-                ],
-                medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 39, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 0.33 },
-                    { good: 'cinnamon', price: 37, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 0.29 }
-                ],
-                large: [
-                    { good: 'silk', price: 84, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 0.20 },
-                    { good: 'saffron', price: 60, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 0.20 },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            }
-        },
-        
-        'Aruba': {
-            region: 'northern',
-            type: 'city',
-            shallowWater: 'rates 2-7',
-            buy: {
-                small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
-                ],
-                medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' },
-                    { good: 'cinnamon', price: 39, sellAt: 'Any Southern port', sellPrice: 39, note: 'Already at max' }
-                ],
-                large: [
-                    { good: 'silk', price: 88, sellAt: 'Any Southern port', sellPrice: 88, note: 'Already at max' },
-                    { good: 'saffron', price: 63, sellAt: 'Any Southern port', sellPrice: 63, note: 'Already at max' },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            }
-        },
-        
-        'Severoangelsk': {
-            region: 'northern',
-            type: 'city',
-            shallowWater: 'rates 4-7',
-            buy: {
-                small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
-                ],
-                medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' },
-                    { good: 'cinnamon', price: 39, sellAt: 'Any Southern port', sellPrice: 39, note: 'Already at max' }
-                ],
-                large: [
-                    { good: 'silk', price: 88, sellAt: 'Any Southern port', sellPrice: 88, note: 'Already at max' },
-                    { good: 'saffron', price: 63, sellAt: 'Any Southern port', sellPrice: 63, note: 'Already at max' },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
             }
         },
         
         'North Bastion': {
             region: 'northern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
             shallowWater: 'rates 4-7',
             buy: {
                 small: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'wine', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 2.33 },
-                    { good: 'grog', price: 9, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.40 }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ],
                 medium: [
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' },
-                    { good: 'cinnamon', price: 39, sellAt: 'Any Southern port', sellPrice: 39, note: 'Already at max' }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ],
                 large: [
-                    { good: 'silk', price: 88, sellAt: 'Any Southern port', sellPrice: 88, note: 'Already at max' },
-                    { good: 'saffron', price: 63, sellAt: 'Any Southern port', sellPrice: 63, note: 'Already at max' },
-                    { good: 'salt', price: 18, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.60 }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ]
             },
             sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 37, maxPrice: 38 },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 42, maxPrice: 43 },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 35, maxPrice: 36 },
-                sugar: { localPrice: 50, maxPrice: 51 },
-                tobacco: { localPrice: 54, maxPrice: 55 }
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 37, isMax: false, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 42, isMax: false, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 15, isMax: false, maxPrice: 16 },
+                pepper: { price: 35, isMax: false, maxPrice: 36 },
+                sugar: { price: 50, isMax: false, maxPrice: 51 },
+                tobacco: { price: 54, isMax: false, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
             }
         },
         
-        'Gelbion': {
+        'Severoangelsk': {
             region: 'northern',
             type: 'city',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 4-7',
+            buy: {
+                small: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                medium: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                large: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
+        },
+        
+        'Gray Island': {
+            region: 'northern',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            buy: {
+                small: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                medium: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                large: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 35, isMax: false, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
+        },
+        
+        'Aldansk': {
+            region: 'northern',
+            type: 'trading_port',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 4-7',
+            buy: {
+                small: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                medium: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                large: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
+        },
+        
+        'Aruba': {
+            region: 'northern',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 2-7',
+            buy: {
+                small: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                medium: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                large: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
+        },
+        
+        'Everston': {
+            region: 'northern',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 2-7',
+            buy: {
+                small: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                medium: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                large: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
+        },
+        
+        'Oneg': {
+            region: 'northern',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
+            shallowWater: 'rates 2-7',
+            buy: {
+                small: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                medium: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                large: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
+        },
+        
+        'Nordberg': {
+            region: 'northern',
+            type: 'trading_port',
+            canBuy: true,
+            canSell: true,
+            buy: {
+                small: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                medium: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ],
+                large: [
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
+                ]
+            },
+            sell: {
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
+        },
+        
+        'Nisogora': {
+            region: 'northern',
+            type: 'city',
+            canBuy: true,
+            canSell: true,
             shallowWater: 'rates 3-7',
             buy: {
                 small: [
-                    { good: 'salt', price: 22, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.80 },
-                    { good: 'wine', price: 11, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.67 },
-                    { good: 'grog', price: 11, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.00 }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ],
                 medium: [
-                    { good: 'rugs', price: 31, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 1.67 },
-                    { good: 'cinnamon', price: 30, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 1.29 },
-                    { good: 'salt', price: 22, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.80 }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ],
                 large: [
-                    { good: 'silk', price: 66, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.10 },
-                    { good: 'saffron', price: 47, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.07 },
-                    { good: 'rugs', price: 31, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 1.67 }
+                    { good: 'salt', price: 18, profitPerWeight: 2.60 },
+                    { good: 'wine', price: 9, profitPerWeight: 2.33 },
+                    { good: 'grog', price: 9, profitPerWeight: 1.40 }
                 ]
             },
             sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 38, maxPrice: 38, note: 'Maximum price location' },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 43, maxPrice: 43, note: 'Maximum price location' },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 55, maxPrice: 55, note: 'Maximum price location' }
-            },
-            notes: ['Prices slightly elevated compared to other Northern ports', 'Good location for buying Rugs, Silk, Saffron at discount']
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 38, isMax: true, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 43, isMax: true, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 16, isMax: true, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 55, isMax: true, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 }
+            }
         },
         
-        // EASTERN REGION
-        'Cursed City': {
-            region: 'eastern',
+        // =========================================================================
+        // SELL-ONLY PORTS (Cannot buy commodities, only sell)
+        // =========================================================================
+        
+        'Gelbion': {
+            region: 'sell_only',
             type: 'city',
+            canBuy: false,
+            canSell: true,
             shallowWater: 'rates 3-7',
-            buy: {
-                small: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'salt', price: 21, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.00 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'mango', price: 11, sellAt: 'Devios', sellPrice: 14, profitPerWeight: 0.75 }
-                ],
-                large: [
-                    { good: 'silk', price: 52, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.80 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 },
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 }
-                ]
-            },
             sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 37, maxPrice: 38 },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 42, maxPrice: 43 },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 54, maxPrice: 55 }
-            },
-            notes: ['EXCELLENT buy location for Rugs, Cinnamon, Silk, Saffron at MINIMUM Eastern prices', 'Best profit margins in the Eastern region']
-        },
-        
-        'West Bastion': {
-            region: 'eastern',
-            type: 'city',
-            buy: {
-                small: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'mango', price: 11, sellAt: 'Devios', sellPrice: 14, profitPerWeight: 0.75 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 }
-                ],
-                large: [
-                    { good: 'silk', price: 52, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.80 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 },
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 16, maxPrice: 19 },
-                vanilla: { localPrice: 32, maxPrice: 38 },
-                leather: { localPrice: 29, maxPrice: 34 },
-                coffee: { localPrice: 36, maxPrice: 43 },
-                oil: { localPrice: 19, maxPrice: 22 },
-                pepper: { localPrice: 30, maxPrice: 36 },
-                sugar: { localPrice: 43, maxPrice: 51 },
-                tobacco: { localPrice: 46, maxPrice: 55 }
-            },
-            notes: ['Same excellent prices as Cursed City for Rugs, Cinnamon, Silk, Saffron']
-        },
-        
-        'Al-Khalif': {
-            region: 'eastern',
-            type: 'trading_port_transport',
-            buy: {
-                small: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'mango', price: 11, sellAt: 'Devios', sellPrice: 14, profitPerWeight: 0.75 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 }
-                ],
-                large: [
-                    { good: 'silk', price: 52, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.80 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 },
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 16, maxPrice: 19 },
-                vanilla: { localPrice: 31, maxPrice: 38 },
-                leather: { localPrice: 28, maxPrice: 34 },
-                coffee: { localPrice: 35, maxPrice: 43 },
-                oil: { localPrice: 18, maxPrice: 22 },
-                pepper: { localPrice: 29, maxPrice: 36 },
-                sugar: { localPrice: 42, maxPrice: 51 },
-                tobacco: { localPrice: 44, maxPrice: 55 }
+                pineapples: { price: 17, isMax: false, maxPrice: 19 },
+                vanilla: { price: 33, isMax: false, maxPrice: 38 },
+                leather: { price: 30, isMax: false, maxPrice: 34 },
+                coffee: { price: 38, isMax: false, maxPrice: 43 },
+                oil: { price: 20, isMax: false, maxPrice: 22 },
+                nuts: { price: 14, isMax: false, maxPrice: 16 },
+                pepper: { price: 32, isMax: false, maxPrice: 36 },
+                sugar: { price: 45, isMax: false, maxPrice: 51 },
+                tobacco: { price: 49, isMax: false, maxPrice: 55 },
+                rugs: { price: 31, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 30, isMax: false, maxPrice: 39 },
+                saffron: { price: 47, isMax: false, maxPrice: 63 },
+                silk: { price: 67, isMax: false, maxPrice: 88 },
+                mango: { price: 15, isMax: false, maxPrice: 19 },
+                paprika: { price: 20, isMax: false, maxPrice: 26 },
+                dates: { price: 11, isMax: false, maxPrice: 14 },
+                wine: { price: 13, isMax: false, maxPrice: 16 },
+                grog: { price: 13, isMax: false, maxPrice: 16 },
+                beer: { price: 7, isMax: false, maxPrice: 9 },
+                salt: { price: 26, isMax: false, maxPrice: 31 }
             }
         },
         
-        'Assab': {
-            region: 'eastern',
-            type: 'trading_port_transport',
-            buy: {
-                small: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'mango', price: 11, sellAt: 'Devios', sellPrice: 14, profitPerWeight: 0.75 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 }
-                ],
-                large: [
-                    { good: 'silk', price: 52, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.80 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 },
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 16, maxPrice: 19 },
-                vanilla: { localPrice: 31, maxPrice: 38 },
-                leather: { localPrice: 28, maxPrice: 34 },
-                coffee: { localPrice: 35, maxPrice: 43 },
-                oil: { localPrice: 18, maxPrice: 22 },
-                pepper: { localPrice: 29, maxPrice: 36 },
-                sugar: { localPrice: 42, maxPrice: 51 },
-                tobacco: { localPrice: 44, maxPrice: 55 }
-            }
-        },
-        
-        'Masadora': {
-            region: 'eastern',
-            type: 'city',
-            buy: {
-                small: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'mango', price: 11, sellAt: 'Devios', sellPrice: 14, profitPerWeight: 0.75 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 }
-                ],
-                large: [
-                    { good: 'silk', price: 52, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.80 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 },
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 15, maxPrice: 19 },
-                vanilla: { localPrice: 29, maxPrice: 38 },
-                leather: { localPrice: 26, maxPrice: 34 },
-                coffee: { localPrice: 32, maxPrice: 43 },
-                oil: { localPrice: 17, maxPrice: 22 },
-                pepper: { localPrice: 27, maxPrice: 36 },
-                sugar: { localPrice: 39, maxPrice: 51 },
-                tobacco: { localPrice: 41, maxPrice: 55 }
-            }
-        },
-        
-        'Sharhat': {
-            region: 'eastern',
-            type: 'trading_port_transport',
-            buy: {
-                small: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'mango', price: 11, sellAt: 'Devios', sellPrice: 14, profitPerWeight: 0.75 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 }
-                ],
-                large: [
-                    { good: 'silk', price: 52, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.80 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 },
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 14, maxPrice: 19 },
-                vanilla: { localPrice: 27, maxPrice: 38 },
-                leather: { localPrice: 25, maxPrice: 34 },
-                coffee: { localPrice: 30, maxPrice: 43 },
-                oil: { localPrice: 16, maxPrice: 22 },
-                pepper: { localPrice: 25, maxPrice: 36 },
-                sugar: { localPrice: 36, maxPrice: 51 },
-                tobacco: { localPrice: 38, maxPrice: 55 }
-            }
-        },
-        
-        'Naabad Stronghold': {
-            region: 'eastern',
-            type: 'pirate_stronghold',
-            peaceFlagAllowed: false,
-            buy: {
-                small: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'mango', price: 11, sellAt: 'Devios', sellPrice: 14, profitPerWeight: 0.75 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 },
-                    { good: 'cinnamon', price: 23, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 2.29 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 }
-                ],
-                large: [
-                    { good: 'silk', price: 52, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.80 },
-                    { good: 'saffron', price: 37, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.73 },
-                    { good: 'rugs', price: 24, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.83 }
-                ]
-            },
-            sell: {
-                pineapples: { localPrice: 17, maxPrice: 19 },
-                vanilla: { localPrice: 33, maxPrice: 38 },
-                leather: { localPrice: 30, maxPrice: 34 },
-                coffee: { localPrice: 37, maxPrice: 43 },
-                oil: { localPrice: 19, maxPrice: 22 },
-                pepper: { localPrice: 31, maxPrice: 36 },
-                sugar: { localPrice: 44, maxPrice: 51 },
-                tobacco: { localPrice: 47, maxPrice: 55 }
-            }
-        },
-        
-        // TRANSITIONAL REGION
         'Surako': {
-            region: 'transitional',
+            region: 'sell_only',
             type: 'trading_port',
-            buy: {
-                small: [
-                    { good: 'rugs', price: 28, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.17 },
-                    { good: 'cinnamon', price: 27, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 1.71 },
-                    { good: 'salt', price: 24, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.40 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 28, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.17 },
-                    { good: 'cinnamon', price: 27, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 1.71 },
-                    { good: 'saffron', price: 43, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.33 }
-                ],
-                large: [
-                    { good: 'silk', price: 60, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 1.40 },
-                    { good: 'saffron', price: 43, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 1.33 },
-                    { good: 'rugs', price: 28, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 2.17 }
-                ]
-            },
+            canBuy: false,
+            canSell: true,
             sell: {
-                pineapples: { localPrice: 18, maxPrice: 19 },
-                vanilla: { localPrice: 36, maxPrice: 38 },
-                leather: { localPrice: 33, maxPrice: 34 },
-                coffee: { localPrice: 41, maxPrice: 43 },
-                oil: { localPrice: 21, maxPrice: 22 },
-                pepper: { localPrice: 34, maxPrice: 36 },
-                sugar: { localPrice: 49, maxPrice: 51 },
-                tobacco: { localPrice: 52, maxPrice: 55 }
-            }
-        },
-        
-        'Brandport': {
-            region: 'transitional',
-            type: 'trading_port',
-            buy: {
-                small: [
-                    { good: 'oil', price: 17, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.67 },
-                    { good: 'leather', price: 26, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.60 },
-                    { good: 'pepper', price: 28, sellAt: 'Any Northern port', sellPrice: 36, profitPerWeight: 1.33 }
-                ],
-                medium: [
-                    { good: 'oil', price: 17, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.67 },
-                    { good: 'leather', price: 26, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.60 },
-                    { good: 'tobacco', price: 42, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.93 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 42, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.93 },
-                    { good: 'leather', price: 26, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.60 },
-                    { good: 'sugar', price: 39, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.60 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            }
-        },
-        
-        'Freedom Bay': {
-            region: 'transitional',
-            type: 'trading_port',
-            buy: {
-                small: [
-                    { good: 'oil', price: 19, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.00 },
-                    { good: 'leather', price: 30, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 0.80 },
-                    { good: 'vanilla', price: 33, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 0.71 }
-                ],
-                medium: [
-                    { good: 'oil', price: 19, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.00 },
-                    { good: 'leather', price: 30, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 0.80 },
-                    { good: 'tobacco', price: 47, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.57 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 47, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.57 },
-                    { good: 'sugar', price: 44, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.35 },
-                    { good: 'leather', price: 30, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 0.80 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            }
-        },
-        
-        'Fiji': {
-            region: 'transitional',
-            type: 'city',
-            shallowWater: 'rates 6-7',
-            buy: {
-                small: [
-                    { good: 'oil', price: 17, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.67 },
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'vanilla', price: 29, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 1.29 }
-                ],
-                medium: [
-                    { good: 'oil', price: 17, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.67 },
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'tobacco', price: 42, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.93 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 42, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.93 },
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'sugar', price: 40, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.55 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            }
-        },
-        
-        'Freebooter Bay': {
-            region: 'transitional',
-            type: 'pirate_stronghold',
-            peaceFlagAllowed: false,
-            shallowWater: 'rates 6-7',
-            buy: {
-                small: [
-                    { good: 'oil', price: 15, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 2.33 },
-                    { good: 'leather', price: 23, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.20 },
-                    { good: 'vanilla', price: 25, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 1.86 }
-                ],
-                medium: [
-                    { good: 'oil', price: 15, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 2.33 },
-                    { good: 'leather', price: 23, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.20 },
-                    { good: 'tobacco', price: 37, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.29 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 37, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.29 },
-                    { good: 'leather', price: 23, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 2.20 },
-                    { good: 'sugar', price: 34, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.85 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            },
-            notes: ['Excellent transitional location with discounted Southern goods']
-        },
-        
-        'La Navidad': {
-            region: 'transitional',
-            type: 'city',
-            buy: {
-                small: [
-                    { good: 'oil', price: 17, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.67 },
-                    { good: 'leather', price: 26, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.60 },
-                    { good: 'vanilla', price: 29, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 1.29 }
-                ],
-                medium: [
-                    { good: 'oil', price: 17, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.67 },
-                    { good: 'leather', price: 26, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.60 },
-                    { good: 'tobacco', price: 42, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.93 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 42, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.93 },
-                    { good: 'leather', price: 26, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.60 },
-                    { good: 'sugar', price: 39, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.60 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 41, maxPrice: 41, note: 'Maximum price location' },
-                cinnamon: { localPrice: 39, maxPrice: 39, note: 'Maximum price location' },
-                saffron: { localPrice: 63, maxPrice: 63, note: 'Maximum price location' },
-                silk: { localPrice: 88, maxPrice: 88, note: 'Maximum price location' }
-            }
-        },
-        
-        'Charleston': {
-            region: 'transitional',
-            type: 'city',
-            buy: {
-                small: [
-                    { good: 'oil', price: 16, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 2.00 },
-                    { good: 'leather', price: 25, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.80 },
-                    { good: 'vanilla', price: 27, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 1.57 }
-                ],
-                medium: [
-                    { good: 'oil', price: 16, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 2.00 },
-                    { good: 'leather', price: 25, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.80 },
-                    { good: 'tobacco', price: 39, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.14 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 39, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 1.14 },
-                    { good: 'leather', price: 25, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.80 },
-                    { good: 'sugar', price: 37, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.70 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 30, maxPrice: 41 },
-                cinnamon: { localPrice: 29, maxPrice: 39 },
-                saffron: { localPrice: 46, maxPrice: 63 },
-                silk: { localPrice: 46, maxPrice: 88 }
-            }
-        },
-        
-        'Bridgetown': {
-            region: 'transitional',
-            type: 'city',
-            buy: {
-                small: [
-                    { good: 'oil', price: 18, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.33 },
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'vanilla', price: 29, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 1.29 }
-                ],
-                medium: [
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'oil', price: 18, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.33 },
-                    { good: 'tobacco', price: 43, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.86 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 43, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.86 },
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'sugar', price: 40, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.55 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 28, maxPrice: 41 },
-                cinnamon: { localPrice: 27, maxPrice: 39 },
-                saffron: { localPrice: 43, maxPrice: 63 },
-                silk: { localPrice: 61, maxPrice: 88 }
-            }
-        },
-        
-        'Laguna Blanco': {
-            region: 'transitional',
-            type: 'city',
-            buy: {
-                small: [
-                    { good: 'oil', price: 18, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.33 },
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'vanilla', price: 30, sellAt: 'Any Northern port', sellPrice: 38, profitPerWeight: 1.14 }
-                ],
-                medium: [
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'oil', price: 18, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 1.33 },
-                    { good: 'tobacco', price: 44, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.79 }
-                ],
-                large: [
-                    { good: 'tobacco', price: 44, sellAt: 'Any Northern port', sellPrice: 55, profitPerWeight: 0.79 },
-                    { good: 'leather', price: 27, sellAt: 'Any Northern port', sellPrice: 34, profitPerWeight: 1.40 },
-                    { good: 'sugar', price: 41, sellAt: 'Any Northern port', sellPrice: 51, profitPerWeight: 0.50 }
-                ]
-            },
-            sell: {
-                rugs: { localPrice: 35, maxPrice: 41 },
-                cinnamon: { localPrice: 33, maxPrice: 39 },
-                saffron: { localPrice: 53, maxPrice: 63 },
-                silk: { localPrice: 75, maxPrice: 88 }
+                pineapples: { price: 18, isMax: false, maxPrice: 19 },
+                vanilla: { price: 36, isMax: false, maxPrice: 38 },
+                leather: { price: 33, isMax: false, maxPrice: 34 },
+                coffee: { price: 41, isMax: false, maxPrice: 43 },
+                oil: { price: 21, isMax: false, maxPrice: 22 },
+                nuts: { price: 15, isMax: false, maxPrice: 16 },
+                pepper: { price: 34, isMax: false, maxPrice: 36 },
+                sugar: { price: 49, isMax: false, maxPrice: 51 },
+                tobacco: { price: 52, isMax: false, maxPrice: 55 },
+                rugs: { price: 28, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 27, isMax: false, maxPrice: 39 },
+                saffron: { price: 43, isMax: false, maxPrice: 63 },
+                silk: { price: 60, isMax: false, maxPrice: 88 },
+                mango: { price: 14, isMax: false, maxPrice: 19 },
+                paprika: { price: 18, isMax: false, maxPrice: 26 },
+                dates: { price: 10, isMax: false, maxPrice: 14 },
+                wine: { price: 14, isMax: false, maxPrice: 16 },
+                grog: { price: 14, isMax: false, maxPrice: 16 },
+                beer: { price: 8, isMax: false, maxPrice: 9 },
+                salt: { price: 27, isMax: false, maxPrice: 31 }
             }
         },
         
         'Nevis': {
-            region: 'transitional',
+            region: 'sell_only',
             type: 'city',
-            buy: {
-                small: [
-                    { good: 'salt', price: 23, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.60 },
-                    { good: 'wine', price: 12, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.33 },
-                    { good: 'rugs', price: 33, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 1.33 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 33, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 1.33 },
-                    { good: 'cinnamon', price: 32, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 1.00 },
-                    { good: 'salt', price: 23, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.60 }
-                ],
-                large: [
-                    { good: 'silk', price: 72, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 0.80 },
-                    { good: 'saffron', price: 51, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 0.80 },
-                    { good: 'rugs', price: 33, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 1.33 }
-                ]
-            },
+            canBuy: false,
+            canSell: true,
             sell: {
-                pineapples: { localPrice: 19, maxPrice: 19, note: 'Maximum price location' },
-                vanilla: { localPrice: 37, maxPrice: 38 },
-                leather: { localPrice: 34, maxPrice: 34, note: 'Maximum price location' },
-                coffee: { localPrice: 42, maxPrice: 43 },
-                oil: { localPrice: 22, maxPrice: 22, note: 'Maximum price location' },
-                pepper: { localPrice: 36, maxPrice: 36, note: 'Maximum price location' },
-                sugar: { localPrice: 51, maxPrice: 51, note: 'Maximum price location' },
-                tobacco: { localPrice: 54, maxPrice: 55 }
+                pineapples: { price: 19, isMax: true, maxPrice: 19 },
+                vanilla: { price: 37, isMax: false, maxPrice: 38 },
+                leather: { price: 34, isMax: true, maxPrice: 34 },
+                coffee: { price: 42, isMax: false, maxPrice: 43 },
+                oil: { price: 22, isMax: true, maxPrice: 22 },
+                nuts: { price: 15, isMax: false, maxPrice: 16 },
+                pepper: { price: 36, isMax: true, maxPrice: 36 },
+                sugar: { price: 51, isMax: true, maxPrice: 51 },
+                tobacco: { price: 54, isMax: false, maxPrice: 55 },
+                rugs: { price: 33, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 32, isMax: false, maxPrice: 39 },
+                saffron: { price: 51, isMax: false, maxPrice: 63 },
+                silk: { price: 72, isMax: false, maxPrice: 88 },
+                mango: { price: 16, isMax: false, maxPrice: 19 },
+                paprika: { price: 21, isMax: false, maxPrice: 26 },
+                dates: { price: 12, isMax: false, maxPrice: 14 },
+                wine: { price: 12, isMax: false, maxPrice: 16 },
+                grog: { price: 12, isMax: false, maxPrice: 16 },
+                beer: { price: 7, isMax: false, maxPrice: 9 },
+                salt: { price: 23, isMax: false, maxPrice: 31 }
             }
         },
         
         'Thermopylae': {
-            region: 'transitional',
+            region: 'sell_only',
             type: 'city',
-            buy: {
-                small: [
-                    { good: 'salt', price: 21, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.00 },
-                    { good: 'wine', price: 11, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.67 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' }
-                ],
-                medium: [
-                    { good: 'salt', price: 21, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.00 },
-                    { good: 'rugs', price: 41, sellAt: 'Any Southern port', sellPrice: 41, note: 'Already at max' },
-                    { good: 'cinnamon', price: 39, sellAt: 'Any Southern port', sellPrice: 39, note: 'Already at max' }
-                ],
-                large: [
-                    { good: 'silk', price: 88, sellAt: 'Any Southern port', sellPrice: 88, note: 'Already at max' },
-                    { good: 'saffron', price: 63, sellAt: 'Any Southern port', sellPrice: 63, note: 'Already at max' },
-                    { good: 'salt', price: 21, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 2.00 }
-                ]
-            },
+            canBuy: false,
+            canSell: true,
             sell: {
-                pineapples: { localPrice: 18, maxPrice: 19 },
-                vanilla: { localPrice: 35, maxPrice: 38 },
-                leather: { localPrice: 32, maxPrice: 34 },
-                coffee: { localPrice: 40, maxPrice: 43 },
-                oil: { localPrice: 21, maxPrice: 22 },
-                pepper: { localPrice: 33, maxPrice: 36 },
-                sugar: { localPrice: 47, maxPrice: 51 },
-                tobacco: { localPrice: 51, maxPrice: 55 }
+                pineapples: { price: 18, isMax: false, maxPrice: 19 },
+                vanilla: { price: 35, isMax: false, maxPrice: 38 },
+                leather: { price: 32, isMax: false, maxPrice: 34 },
+                coffee: { price: 40, isMax: false, maxPrice: 43 },
+                oil: { price: 21, isMax: false, maxPrice: 22 },
+                nuts: { price: 15, isMax: false, maxPrice: 16 },
+                pepper: { price: 33, isMax: false, maxPrice: 36 },
+                sugar: { price: 47, isMax: false, maxPrice: 51 },
+                tobacco: { price: 51, isMax: false, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 11, isMax: false, maxPrice: 16 },
+                grog: { price: 11, isMax: false, maxPrice: 16 },
+                beer: { price: 6, isMax: false, maxPrice: 9 },
+                salt: { price: 21, isMax: false, maxPrice: 31 }
             }
         },
         
-        'Tortuga': {
-            region: 'transitional',
-            type: 'pirate_stronghold',
-            peaceFlagAllowed: false,
-            buy: {
-                small: [
-                    { good: 'salt', price: 25, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.20 },
-                    { good: 'wine', price: 13, sellAt: 'Any Southern port', sellPrice: 16, profitPerWeight: 1.00 },
-                    { good: 'rugs', price: 39, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 0.33 }
-                ],
-                medium: [
-                    { good: 'rugs', price: 39, sellAt: 'Southern max ports', sellPrice: 41, profitPerWeight: 0.33 },
-                    { good: 'cinnamon', price: 37, sellAt: 'Southern max ports', sellPrice: 39, profitPerWeight: 0.29 },
-                    { good: 'salt', price: 25, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.20 }
-                ],
-                large: [
-                    { good: 'silk', price: 83, sellAt: 'Southern max ports', sellPrice: 88, profitPerWeight: 0.25 },
-                    { good: 'saffron', price: 59, sellAt: 'Southern max ports', sellPrice: 63, profitPerWeight: 0.27 },
-                    { good: 'salt', price: 25, sellAt: 'Any Southern port', sellPrice: 31, profitPerWeight: 1.20 }
-                ]
-            },
+        'Fiji': {
+            region: 'sell_only',
+            type: 'city',
+            canBuy: false,
+            canSell: true,
+            shallowWater: 'rates 6-7',
             sell: {
-                pineapples: { localPrice: 17, maxPrice: 19 },
-                vanilla: { localPrice: 33, maxPrice: 38 },
-                leather: { localPrice: 30, maxPrice: 34 },
-                coffee: { localPrice: 38, maxPrice: 43 },
-                oil: { localPrice: 20, maxPrice: 22 },
-                pepper: { localPrice: 32, maxPrice: 36 },
-                sugar: { localPrice: 45, maxPrice: 51 },
-                tobacco: { localPrice: 48, maxPrice: 55 }
+                pineapples: { price: 17, isMax: false, maxPrice: 19 },
+                vanilla: { price: 34, isMax: false, maxPrice: 38 },
+                leather: { price: 31, isMax: false, maxPrice: 34 },
+                coffee: { price: 39, isMax: false, maxPrice: 43 },
+                oil: { price: 20, isMax: false, maxPrice: 22 },
+                nuts: { price: 14, isMax: false, maxPrice: 16 },
+                pepper: { price: 32, isMax: false, maxPrice: 36 },
+                sugar: { price: 46, isMax: false, maxPrice: 51 },
+                tobacco: { price: 49, isMax: false, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 11, isMax: false, maxPrice: 16 },
+                grog: { price: 11, isMax: false, maxPrice: 16 },
+                beer: { price: 6, isMax: false, maxPrice: 9 },
+                salt: { price: 22, isMax: false, maxPrice: 31 }
             }
+        },
+        
+        'Brandport': {
+            region: 'sell_only',
+            type: 'trading_port',
+            canBuy: false,
+            canSell: true,
+            sell: {
+                pineapples: { price: 17, isMax: false, maxPrice: 19 },
+                vanilla: { price: 33, isMax: false, maxPrice: 38 },
+                leather: { price: 30, isMax: false, maxPrice: 34 },
+                coffee: { price: 38, isMax: false, maxPrice: 43 },
+                oil: { price: 20, isMax: false, maxPrice: 22 },
+                nuts: { price: 14, isMax: false, maxPrice: 16 },
+                pepper: { price: 32, isMax: false, maxPrice: 36 },
+                sugar: { price: 45, isMax: false, maxPrice: 51 },
+                tobacco: { price: 49, isMax: false, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 11, isMax: false, maxPrice: 16 },
+                grog: { price: 11, isMax: false, maxPrice: 16 },
+                beer: { price: 6, isMax: false, maxPrice: 9 },
+                salt: { price: 22, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'Freedom Bay': {
+            region: 'sell_only',
+            type: 'trading_port',
+            canBuy: false,
+            canSell: true,
+            sell: {
+                pineapples: { price: 16, isMax: false, maxPrice: 19 },
+                vanilla: { price: 33, isMax: false, maxPrice: 38 },
+                leather: { price: 30, isMax: false, maxPrice: 34 },
+                coffee: { price: 38, isMax: false, maxPrice: 43 },
+                oil: { price: 19, isMax: false, maxPrice: 22 },
+                nuts: { price: 14, isMax: false, maxPrice: 16 },
+                pepper: { price: 31, isMax: false, maxPrice: 36 },
+                sugar: { price: 44, isMax: false, maxPrice: 51 },
+                tobacco: { price: 47, isMax: false, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 11, isMax: false, maxPrice: 16 },
+                grog: { price: 11, isMax: false, maxPrice: 16 },
+                beer: { price: 6, isMax: false, maxPrice: 9 },
+                salt: { price: 22, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'La Navidad': {
+            region: 'sell_only',
+            type: 'city',
+            canBuy: false,
+            canSell: true,
+            sell: {
+                pineapples: { price: 15, isMax: false, maxPrice: 19 },
+                vanilla: { price: 29, isMax: false, maxPrice: 38 },
+                leather: { price: 26, isMax: false, maxPrice: 34 },
+                coffee: { price: 33, isMax: false, maxPrice: 43 },
+                oil: { price: 17, isMax: false, maxPrice: 22 },
+                nuts: { price: 12, isMax: false, maxPrice: 16 },
+                pepper: { price: 28, isMax: false, maxPrice: 36 },
+                sugar: { price: 39, isMax: false, maxPrice: 51 },
+                tobacco: { price: 42, isMax: false, maxPrice: 55 },
+                rugs: { price: 41, isMax: true, maxPrice: 41 },
+                cinnamon: { price: 39, isMax: true, maxPrice: 39 },
+                saffron: { price: 63, isMax: true, maxPrice: 63 },
+                silk: { price: 88, isMax: true, maxPrice: 88 },
+                mango: { price: 19, isMax: true, maxPrice: 19 },
+                paprika: { price: 26, isMax: true, maxPrice: 26 },
+                dates: { price: 14, isMax: true, maxPrice: 14 },
+                wine: { price: 14, isMax: false, maxPrice: 16 },
+                grog: { price: 14, isMax: false, maxPrice: 16 },
+                beer: { price: 8, isMax: false, maxPrice: 9 },
+                salt: { price: 27, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'Charleston': {
+            region: 'sell_only',
+            type: 'city',
+            canBuy: false,
+            canSell: true,
+            sell: {
+                pineapples: { price: 14, isMax: false, maxPrice: 19 },
+                vanilla: { price: 27, isMax: false, maxPrice: 38 },
+                leather: { price: 25, isMax: false, maxPrice: 34 },
+                coffee: { price: 31, isMax: false, maxPrice: 43 },
+                oil: { price: 16, isMax: false, maxPrice: 22 },
+                nuts: { price: 11, isMax: false, maxPrice: 16 },
+                pepper: { price: 26, isMax: false, maxPrice: 36 },
+                sugar: { price: 37, isMax: false, maxPrice: 51 },
+                tobacco: { price: 39, isMax: false, maxPrice: 55 },
+                rugs: { price: 30, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 29, isMax: false, maxPrice: 39 },
+                saffron: { price: 46, isMax: false, maxPrice: 63 },
+                silk: { price: 46, isMax: false, maxPrice: 88 },
+                mango: { price: 14, isMax: false, maxPrice: 19 },
+                paprika: { price: 19, isMax: false, maxPrice: 26 },
+                dates: { price: 10, isMax: false, maxPrice: 14 },
+                wine: { price: 16, isMax: true, maxPrice: 16 },
+                grog: { price: 16, isMax: true, maxPrice: 16 },
+                beer: { price: 9, isMax: true, maxPrice: 9 },
+                salt: { price: 31, isMax: true, maxPrice: 31 }
+            }
+        },
+        
+        'Bridgetown': {
+            region: 'sell_only',
+            type: 'city',
+            canBuy: false,
+            canSell: true,
+            sell: {
+                pineapples: { price: 15, isMax: false, maxPrice: 19 },
+                vanilla: { price: 29, isMax: false, maxPrice: 38 },
+                leather: { price: 27, isMax: false, maxPrice: 34 },
+                coffee: { price: 33, isMax: false, maxPrice: 43 },
+                oil: { price: 18, isMax: false, maxPrice: 22 },
+                nuts: { price: 12, isMax: false, maxPrice: 16 },
+                pepper: { price: 28, isMax: false, maxPrice: 36 },
+                sugar: { price: 40, isMax: false, maxPrice: 51 },
+                tobacco: { price: 43, isMax: false, maxPrice: 55 },
+                rugs: { price: 28, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 27, isMax: false, maxPrice: 39 },
+                saffron: { price: 43, isMax: false, maxPrice: 63 },
+                silk: { price: 61, isMax: false, maxPrice: 88 },
+                mango: { price: 13, isMax: false, maxPrice: 19 },
+                paprika: { price: 18, isMax: false, maxPrice: 26 },
+                dates: { price: 10, isMax: false, maxPrice: 14 },
+                wine: { price: 14, isMax: false, maxPrice: 16 },
+                grog: { price: 14, isMax: false, maxPrice: 16 },
+                beer: { price: 8, isMax: false, maxPrice: 9 },
+                salt: { price: 28, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'Laguna Blanco': {
+            region: 'sell_only',
+            type: 'city',
+            canBuy: false,
+            canSell: true,
+            sell: {
+                pineapples: { price: 15, isMax: false, maxPrice: 19 },
+                vanilla: { price: 30, isMax: false, maxPrice: 38 },
+                leather: { price: 27, isMax: false, maxPrice: 34 },
+                coffee: { price: 34, isMax: false, maxPrice: 43 },
+                oil: { price: 18, isMax: false, maxPrice: 22 },
+                nuts: { price: 13, isMax: false, maxPrice: 16 },
+                pepper: { price: 29, isMax: false, maxPrice: 36 },
+                sugar: { price: 41, isMax: false, maxPrice: 51 },
+                tobacco: { price: 44, isMax: false, maxPrice: 55 },
+                rugs: { price: 35, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 33, isMax: false, maxPrice: 39 },
+                saffron: { price: 53, isMax: false, maxPrice: 63 },
+                silk: { price: 75, isMax: false, maxPrice: 88 },
+                mango: { price: 16, isMax: false, maxPrice: 19 },
+                paprika: { price: 22, isMax: false, maxPrice: 26 },
+                dates: { price: 12, isMax: false, maxPrice: 14 },
+                wine: { price: 15, isMax: false, maxPrice: 16 },
+                grog: { price: 15, isMax: false, maxPrice: 16 },
+                beer: { price: 8, isMax: false, maxPrice: 9 },
+                salt: { price: 29, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        'St. John': {
+            region: 'sell_only',
+            type: 'trading_port',
+            canBuy: false,
+            canSell: true,
+            sell: {
+                pineapples: { price: 17, isMax: false, maxPrice: 19 },
+                vanilla: { price: 33, isMax: false, maxPrice: 38 },
+                leather: { price: 30, isMax: false, maxPrice: 34 },
+                coffee: { price: 38, isMax: false, maxPrice: 43 },
+                oil: { price: 20, isMax: false, maxPrice: 22 },
+                nuts: { price: 14, isMax: false, maxPrice: 16 },
+                pepper: { price: 32, isMax: false, maxPrice: 36 },
+                sugar: { price: 45, isMax: false, maxPrice: 51 },
+                tobacco: { price: 48, isMax: false, maxPrice: 55 },
+                rugs: { price: 39, isMax: false, maxPrice: 41 },
+                cinnamon: { price: 37, isMax: false, maxPrice: 39 },
+                saffron: { price: 59, isMax: false, maxPrice: 63 },
+                silk: { price: 83, isMax: false, maxPrice: 88 },
+                mango: { price: 18, isMax: false, maxPrice: 19 },
+                paprika: { price: 24, isMax: false, maxPrice: 26 },
+                dates: { price: 13, isMax: false, maxPrice: 14 },
+                wine: { price: 13, isMax: false, maxPrice: 16 },
+                grog: { price: 13, isMax: false, maxPrice: 16 },
+                beer: { price: 7, isMax: false, maxPrice: 9 },
+                salt: { price: 25, isMax: false, maxPrice: 31 }
+            }
+        },
+        
+        // =========================================================================
+        // NO TRADE PORTS (Pirate Strongholds - excluded from trade calculator)
+        // =========================================================================
+        
+        'Tortuga': {
+            region: 'no_trade',
+            type: 'pirate_stronghold',
+            canBuy: false,
+            canSell: false,
+            peaceFlagAllowed: false
+        },
+        
+        'Pirate City': {
+            region: 'no_trade',
+            type: 'pirate_stronghold',
+            canBuy: false,
+            canSell: false,
+            peaceFlagAllowed: false
+        },
+        
+        'Corsa-Nois Bay': {
+            region: 'no_trade',
+            type: 'pirate_stronghold',
+            canBuy: false,
+            canSell: false,
+            peaceFlagAllowed: false
+        },
+        
+        'Naabad Stronghold': {
+            region: 'no_trade',
+            type: 'pirate_stronghold',
+            canBuy: false,
+            canSell: false,
+            peaceFlagAllowed: false
+        },
+        
+        'Freebooter Bay': {
+            region: 'no_trade',
+            type: 'pirate_stronghold',
+            canBuy: false,
+            canSell: false,
+            peaceFlagAllowed: false,
+            shallowWater: 'rates 6-7'
         }
     }
 };
