@@ -343,6 +343,9 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 .region-southern { background: #fff3cd; color: #856404; }
 .region-eastern { background: #d4edda; color: #155724; }
 .region-transitional { background: #e2d5f1; color: #563d7c; }
+.production { display: none; }
+.altar { display: none; }
+
 </style>
 </head>
 <body>
@@ -361,7 +364,7 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 
 <div id="canvas" style="background-image: url('mapa.png');; width: 1863px; height: 1551px;">
 <div id="circle" style="background-image: url('circle.png'); width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px;"></div>
-<div id="fast-travel" style="background-image: url('fast-travel.png'); width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px;"></div>
+<div id="fast-travel" style="background-image: url('fast-travel.png'); width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px; display: none;"></div>
 
 <div id="ports" style="width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px;"><img src="k.png" style="position: absolute; top: 1181px; left:67px;" title="Assab" alt="Assab" />
 <div class="label" style="position: absolute; top: 1241px; left:97px; text-indent: -2.5ch; z-index: 100;" >Assab</div>
@@ -489,7 +492,7 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 <div class="portxy" style="position: absolute; top: 1231px; left:1738px;"> </div><div class="portxylabel" style="position: absolute; top: 1242px; left:1739px; text-indent: -6.5ch; z-index: 100;" >Puerto Salada<br/>(1739,1232)</div>
 <div class="portxy" style="position: absolute; top: 834px; left:1762px;"> </div><div class="portxylabel" style="position: absolute; top: 845px; left:1763px; text-indent: -7ch; z-index: 100;" >Freebooter Bay<br/>(1763,835)</div>
 <div class="portxy" style="position: absolute; top: 507px; left:1768px;"> </div><div class="portxylabel" style="position: absolute; top: 518px; left:1769px; text-indent: -5.5ch; z-index: 100;" >Freedom Bay<br/>(1769,508)</div>
-</div><div id="lighthouses" style="width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px;"><img src="lh.png" style="position: absolute; top: 102px; left:1221px;" title="Lighthouse" alt="Lighthouse" />
+<div id="lighthouses" style="width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px; display: none;">
 <img src="lh.png" style="position: absolute; top: 116px; left:1309px;" title="Lighthouse" alt="Lighthouse" />
 <img src="lh.png" style="position: absolute; top: 121px; left:1391px;" title="Lighthouse" alt="Lighthouse" />
 <img src="lh.png" style="position: absolute; top: 125px; left:389px;" title="Lighthouse" alt="Lighthouse" />
@@ -928,14 +931,14 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 <h1>World of Sea Battle Map</h1>
 <p>
 <input type="checkbox" id="show-ports" checked="checked" /><label for="show-ports">Show ports</label>
-<input type="checkbox" id="show-lighthouses" checked="checked" /><label for="show-lighthouses">Show lighthouses</label>
-<input type="checkbox" id="show-fast-travel" checked="checked" /><label for="show-fast-travel">Show fast travel routes</label>
+<input type="checkbox" id="show-lighthouses" /><label for="show-lighthouses">Show lighthouses</label>
+<input type="checkbox" id="show-fast-travel" /><label for="show-fast-travel">Show fast travel routes</label>
 <input type="checkbox" id="show-island" checked="checked" /><label for="show-island">Show personal island spots</label>
-<input type="checkbox" id="show-production" checked="checked" /><label for="show-production">Show production spots</label>
+<input type="checkbox" id="show-production" /><label for="show-production">Show production spots</label>
 
-<input type="checkbox" id="show-altar" checked="checked" /><label for="show-altar">Show altars</label>
+<input type="checkbox" id="show-altar" /><label for="show-altar">Show altars</label>
 <input type="checkbox" id="show-fort" checked="checked" /><label for="show-fort">Show forts</label>
-<input type="checkbox" id="show-circle" checked="checked" /><label for="show-circle">Show pvp circle border</label><br/>
+<input type="checkbox" id="show-circle" checked="checked" /><label for="show-circle">Show pvp circle border</label>
 Production sites marked with the red outline are located outside the known map (in the endless sea), those locations are approximate.
 </p>
 <p>
