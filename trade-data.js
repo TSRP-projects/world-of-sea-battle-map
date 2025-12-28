@@ -455,8 +455,8 @@ var TRADE_DATA = {
         }
     },
 
-    // Ports that cannot be sold to (pirate strongholds)
-    noSellPorts: ['naabad_stronghold', 'tortuga'],
+    // Ports that cannot be sold to (pirate strongholds - no commodity markets)
+    noSellPorts: ['naabad_stronghold', 'tortuga', 'pirate_city', 'corsa_noir_bay', 'freebooter_bay'],
 
     // Get all sellable ports
     getSellablePorts: function() {
