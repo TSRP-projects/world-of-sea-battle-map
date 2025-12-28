@@ -1192,6 +1192,10 @@ $(document).ready(function() {
 		} else {
 			html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
 		}
+
+			        html += '</div>';
+        return html;
+    }
     
     function buildRecommendation(rec, priority) {
         var iconFile = TRADE_DATA.commodityIcons[rec.good] || 'default.png';
