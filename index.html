@@ -1156,30 +1156,42 @@ $(document).ready(function() {
 		html += '<p style="font-size: 12px; color: #666; margin-bottom: 10px;">' + sizeInfo.description + '</p>';
         
         // Outbound recommendations (what to buy at start)
-        html += '<h4>Buy at ' + TRADE_DATA.getDisplayName(startPort) + ':</h4>';
-        
-        if (startData.buy && startData.buy[size]) {
-            startData.buy[size].forEach(function(rec, index) {
-                html += buildRecommendation(rec, index + 1);
-            });
-        } else {
-            html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
-        }
+		html += '<h4>Buy at ' + TRADE_DATA.getDisplayName(startPort) + ':</h4>';
+
+		if (startData.buy && startData.buy[size]) {
+			var profitableRecs = startData.buy[size].filter(function(rec) {
+				return rec.profitPerWeight && rec.profitPerWeight > 0 && !rec.note;
+			});
+			
+			if (profitableRecs.length > 0) {
+				profitableRecs.forEach(function(rec, index) {
+					html += buildRecommendation(rec, index + 1);
+				});
+			} else {
+				html += '<div class="recommendation"><span style="color: #856404; font-style: italic;">⚠️ No profitable trades from this port at this hold size</span></div>';
+			}
+		} else {
+			html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
+		}
         
         // Return trip recommendations (what to buy at destination for return)
-        html += '<h4>Return Trip - Buy at ' + TRADE_DATA.getDisplayName(destPort) + ':</h4>';
-        
-        if (destData.buy && destData.buy[size]) {
-            destData.buy[size].forEach(function(rec, index) {
-                html += buildRecommendation(rec, index + 1);
-            });
-        } else {
-            html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
-        }
-        
-        html += '</div>';
-        return html;
-    }
+		html += '<h4>Return Trip - Buy at ' + TRADE_DATA.getDisplayName(destPort) + ':</h4>';
+
+		if (destData.buy && destData.buy[size]) {
+			var profitableReturnRecs = destData.buy[size].filter(function(rec) {
+				return rec.profitPerWeight && rec.profitPerWeight > 0 && !rec.note;
+			});
+			
+			if (profitableReturnRecs.length > 0) {
+				profitableReturnRecs.forEach(function(rec, index) {
+					html += buildRecommendation(rec, index + 1);
+				});
+			} else {
+				html += '<div class="recommendation"><span style="color: #856404; font-style: italic;">⚠️ No profitable trades from this port at this hold size</span></div>';
+			}
+		} else {
+			html += '<div class="recommendation"><span style="color: #666; font-style: italic;">No buy data available</span></div>';
+		}
     
     function buildRecommendation(rec, priority) {
         var iconFile = TRADE_DATA.commodityIcons[rec.good] || 'default.png';
