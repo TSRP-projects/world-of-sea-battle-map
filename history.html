@@ -129,6 +129,45 @@
             font-size: 64px; 
             margin-bottom: 20px; 
         }
+
+        .section-header {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(139, 105, 20, 0.3);
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .history-item.distribution {
+            border-left: 4px solid #8b6914;
+        }
+        
+        .history-item.contribution {
+            border-left: 4px solid #2d5a2d;
+        }
+        
+        .distribution-notes {
+            font-style: italic;
+            color: #5c4a3a;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .section-empty {
+            text-align: center;
+            padding: 20px;
+            color: #5c4a3a;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -146,13 +185,23 @@
     <div class="history-container">
         <div id="loading" class="loading">Loading your history...</div>
 
-        <div id="emptyState" class="empty-state" style="display: none;">
-            <div class="empty-state-icon">⚓</div>
-            <p>No contributions yet.</p>
-            <p style="margin-top: 10px;">Participate in fort raids and donate materials to earn points!</p>
+        <div id="historyContent" style="display: none;">
+            <div class="section">
+                <h2 class="section-header">📥 My Contributions</h2>
+                <div id="contributionsList"></div>
+                <div id="contributionsEmpty" class="section-empty" style="display: none;">
+                    No contributions yet. Participate in fort raids and donate materials to earn points!
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2 class="section-header">📤 Resources Received</h2>
+                <div id="distributionsList"></div>
+                <div id="distributionsEmpty" class="section-empty" style="display: none;">
+                    No resources received yet.
+                </div>
+            </div>
         </div>
-
-        <div id="historyList" style="display: none;"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -160,11 +209,15 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script>
+        let currentUserId = null;
+
         auth.onAuthStateChanged(async user => {
             if (!user) {
                 window.location.href = 'login.html';
             } else {
+                currentUserId = user.uid;
                 loadHistory(user.uid);
+                loadDistributions(user.uid);
                 
                 // Check if officer
                 const playerDoc = await db.collection('players').doc(user.uid).get();
@@ -181,29 +234,49 @@
                 .orderBy('createdAt', 'desc')
                 .onSnapshot(snapshot => {
                     document.getElementById('loading').style.display = 'none';
+                    document.getElementById('historyContent').style.display = 'block';
 
                     if (snapshot.empty) {
-                        document.getElementById('emptyState').style.display = 'block';
-                        document.getElementById('historyList').style.display = 'none';
+                        document.getElementById('contributionsEmpty').style.display = 'block';
+                        document.getElementById('contributionsList').innerHTML = '';
                     } else {
-                        document.getElementById('emptyState').style.display = 'none';
-                        document.getElementById('historyList').style.display = 'block';
-                        displayHistory(snapshot.docs);
+                        document.getElementById('contributionsEmpty').style.display = 'none';
+                        displayContributions(snapshot.docs);
                     }
                 }, err => {
                     console.error('Error loading history:', err);
-                    alert('Error: ' + err.message);
+                    alert('Error loading contributions: ' + err.message);
                 });
         }
 
-        function displayHistory(docs) {
-            const historyList = document.getElementById('historyList');
-            historyList.innerHTML = '';
+        function loadDistributions(userId) {
+            db.collection('distributions')
+                .where('playerId', '==', userId)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    if (snapshot.empty) {
+                        document.getElementById('distributionsEmpty').style.display = 'block';
+                        document.getElementById('distributionsList').innerHTML = '';
+                    } else {
+                        document.getElementById('distributionsEmpty').style.display = 'none';
+                        displayDistributions(snapshot.docs);
+                    }
+                }, err => {
+                    console.error('Error loading distributions:', err);
+                    // Don't alert, just show empty state
+                    document.getElementById('distributionsEmpty').style.display = 'block';
+                    document.getElementById('distributionsList').innerHTML = '';
+                });
+        }
+
+        function displayContributions(docs) {
+            const list = document.getElementById('contributionsList');
+            list.innerHTML = '';
 
             docs.forEach(doc => {
                 const contrib = doc.data();
                 const item = document.createElement('div');
-                item.className = 'history-item';
+                item.className = 'history-item contribution';
 
                 let details = '';
                 if (contrib.hoursParticipated) {
@@ -228,12 +301,44 @@
                         <div class="history-item-details">${details}</div>
                     </div>
                     <div class="history-item-right">
-                        <div class="history-item-points">+${contrib.pointsEarned.toLocaleString()}</div>
+                        <div class="history-item-points">+${contrib.pointsEarned.toLocaleString()} pts</div>
                         <div class="history-item-date">${dateStr}</div>
                     </div>
                 `;
 
-                historyList.appendChild(item);
+                list.appendChild(item);
+            });
+        }
+
+        function displayDistributions(docs) {
+            const list = document.getElementById('distributionsList');
+            list.innerHTML = '';
+
+            docs.forEach(doc => {
+                const dist = doc.data();
+                const item = document.createElement('div');
+                item.className = 'history-item distribution';
+
+                const resourceName = dist.resourceType.charAt(0).toUpperCase() + dist.resourceType.slice(1);
+
+                let dateStr = 'Just now';
+                if (dist.timestamp) {
+                    const date = dist.timestamp.toDate();
+                    dateStr = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                }
+
+                item.innerHTML = `
+                    <div class="history-item-left">
+                        <div class="history-item-title">${dist.quantity.toLocaleString()} ${resourceName}</div>
+                        ${dist.notes ? `<div class="distribution-notes">${dist.notes}</div>` : ''}
+                        <div class="history-item-details">From: ${dist.performedByName || 'Officer'}</div>
+                    </div>
+                    <div class="history-item-right">
+                        <div class="history-item-date">${dateStr}</div>
+                    </div>
+                `;
+
+                list.appendChild(item);
             });
         }
     </script>
