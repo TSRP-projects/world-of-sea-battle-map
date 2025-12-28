@@ -106,6 +106,7 @@ const TRADE_DATA = {
         'Los Catuano': {
             region: 'southern',
             type: 'city',
+            shallowWater: 'rates 6-7',
             buy: {
                 small: [
                     { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
@@ -134,6 +135,7 @@ const TRADE_DATA = {
         'Puerto Salada': {
             region: 'southern',
             type: 'city',
+            shallowWater: 'rates 6-7',
             buy: {
                 small: [
                     { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
@@ -162,6 +164,7 @@ const TRADE_DATA = {
         'Santa Maria': {
             region: 'southern',
             type: 'city',
+            shallowWater: 'rates 6-7',
             buy: {
                 small: [
                     { good: 'oil', price: 13, sellAt: 'Any Northern port', sellPrice: 22, profitPerWeight: 3.00 },
