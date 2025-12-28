@@ -406,6 +406,66 @@
             font-size: 12px;
             color: #5c4a3a;
         }
+
+        .details-row {
+            background: rgba(139, 105, 20, 0.08);
+        }
+        
+        .details-row td {
+            padding: 0;
+        }
+        
+        .details-content {
+            padding: 15px 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .details-section h4 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 14px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+        }
+        
+        .details-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .details-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.15);
+            font-size: 12px;
+        }
+        
+        .details-item:last-child {
+            border-bottom: none;
+        }
+        
+        .details-item-type {
+            font-weight: bold;
+            color: #2d5a2d;
+        }
+        
+        .details-item-type.distribution {
+            color: #8b6914;
+        }
+        
+        .details-item-meta {
+            color: #5c4a3a;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+        
+        .no-records {
+            color: #5c4a3a;
+            font-style: italic;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -492,6 +552,54 @@
             </div>
 
             <div class="card">
+                <h3>📤 Log Resource Distribution</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Record resources given to a player from guild storage.
+                </p>
+                
+                <div class="form-group">
+                    <label>Recipient:</label>
+                    <select id="distributionPlayer">
+                        <option value="">-- Select Player --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Resource Type:</label>
+                    <select id="distributionResource">
+                        <option value="">-- Select Resource --</option>
+                        <optgroup label="Crafted Resources">
+                            <option value="beams">Beams</option>
+                            <option value="bulkheads">Bulkheads</option>
+                            <option value="plates">Plates</option>
+                            <option value="canvas">Canvas</option>
+                        </optgroup>
+                        <optgroup label="Raw Materials">
+                            <option value="iron">Iron</option>
+                            <option value="coal">Coal</option>
+                            <option value="wood">Wood</option>
+                            <option value="resin">Resin</option>
+                            <option value="fabric">Fabric</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="distributionQuantity" min="1" placeholder="Enter amount">
+                </div>
+                
+                <div class="form-group">
+                    <label>Notes (optional):</label>
+                    <input type="text" id="distributionNotes" placeholder="e.g., For Constitution build">
+                </div>
+                
+                <button class="btn btn-success" onclick="logDistribution()" style="width: 100%;">
+                    Log Distribution
+                </button>
+            </div>
+
+            <div class="card">
                 <h3>👑 Manage Officers</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
                     Promote or demote players to officer status.
@@ -529,6 +637,7 @@
                             <th>Goal Ship</th>
                             <th>Forts</th>
                             <th>Last Activity</th>
+                            <th>Details</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -672,6 +781,11 @@
                     <td>${member.fortsDestroyed || 0}</td>
                     <td>${lastActivityText}</td>
                     <td>
+                        <button class="btn btn-small btn-primary" onclick="toggleMemberDetails('${doc.id}', this)">
+                            Expand
+                        </button>
+                    </td>
+                    <td>
                         <button class="btn btn-small btn-warning" onclick="openRemoveModal('${doc.id}')">
                             Manage
                         </button>
@@ -715,6 +829,13 @@
                 officerOption.value = doc.id;
                 officerOption.textContent = displayText + (member.isOfficer ? ' (Officer)' : '');
                 officerSelector.appendChild(officerOption);
+
+                // Distribution player option
+                const distributionSelector = document.getElementById('distributionPlayer');
+                const distOption = document.createElement('option');
+                distOption.value = doc.id;
+                distOption.textContent = displayText;
+                distributionSelector.appendChild(distOption);
             });
         }
 
@@ -1188,6 +1309,203 @@
             } catch (err) {
                 console.error('Error updating resources:', err);
                 alert('Error: ' + err.message);
+            }
+        }
+        // Add distribution player dropdown population inside updateParticipantLists()
+        // Find the end of that function and add this before the closing brace:
+
+        async function logDistribution() {
+            const playerId = document.getElementById('distributionPlayer').value;
+            const resourceType = document.getElementById('distributionResource').value;
+            const quantity = parseInt(document.getElementById('distributionQuantity').value);
+            const notes = document.getElementById('distributionNotes').value.trim();
+
+            if (!playerId) {
+                alert('Select a recipient');
+                return;
+            }
+            if (!resourceType) {
+                alert('Select a resource type');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('Enter a valid quantity');
+                return;
+            }
+
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            const playerName = playerData.gamertag || 'Unknown';
+            const squadronPrefix = playerData.squadron ? `[${playerData.squadron}] ` : '';
+
+            const officerName = currentOfficer.squadron 
+                ? `[${currentOfficer.squadron}] ${currentOfficer.gamertag}`
+                : currentOfficer.gamertag;
+
+            const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Create distribution record
+                const distRef = db.collection('distributions').doc();
+                batch.set(distRef, {
+                    playerId: playerId,
+                    playerName: squadronPrefix + playerName,
+                    resourceType: resourceType,
+                    quantity: quantity,
+                    performedBy: currentOfficer.id,
+                    performedByName: officerName,
+                    timestamp: timestamp,
+                    notes: notes || null
+                });
+
+                // Deduct from guild resources
+                const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'coal', 'resin', 'fabric'];
+                if (guildStorageResources.includes(resourceType)) {
+                    const resourceQuery = await db.collection('guildResources')
+                        .where('materialType', '==', resourceDisplay)
+                        .get();
+                    
+                    if (!resourceQuery.empty) {
+                        batch.update(resourceQuery.docs[0].ref, {
+                            currentStock: firebase.firestore.FieldValue.increment(-quantity),
+                            lastUpdated: timestamp,
+                            updatedBy: currentOfficer.id
+                        });
+                    }
+                }
+
+                // Log to Admiral's Ledger
+                const ledgerRef = db.collection('admiralLedger').doc();
+                batch.set(ledgerRef, {
+                    action: 'Resource Distribution',
+                    details: `${formatNumber(quantity)} ${resourceDisplay} given to ${squadronPrefix}${playerName}${notes ? ' - ' + notes : ''}`,
+                    performedBy: currentOfficer.id,
+                    performedByName: officerName,
+                    timestamp: timestamp
+                });
+
+                await batch.commit();
+
+                alert(`Distribution logged!\n${formatNumber(quantity)} ${resourceDisplay} given to ${playerName}`);
+
+                // Reset form
+                document.getElementById('distributionPlayer').value = '';
+                document.getElementById('distributionResource').value = '';
+                document.getElementById('distributionQuantity').value = '';
+                document.getElementById('distributionNotes').value = '';
+
+            } catch (err) {
+                console.error('Error logging distribution:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function toggleMemberDetails(playerId, button) {
+            const existingRow = document.getElementById(`details-${playerId}`);
+            
+            // If already expanded, collapse it
+            if (existingRow) {
+                existingRow.remove();
+                button.textContent = 'Expand';
+                return;
+            }
+            
+            button.textContent = 'Loading...';
+            
+            const parentRow = button.closest('tr');
+            const detailsRow = document.createElement('tr');
+            detailsRow.id = `details-${playerId}`;
+            detailsRow.className = 'details-row';
+            detailsRow.innerHTML = `
+                <td colspan="10">
+                    <div class="details-content">
+                        <div class="details-section">
+                            <h4>📥 Contributions Made</h4>
+                            <div class="details-list" id="contributions-${playerId}">
+                                <div class="no-records">Loading...</div>
+                            </div>
+                        </div>
+                        <div class="details-section">
+                            <h4>📤 Resources Received</h4>
+                            <div class="details-list" id="distributions-${playerId}">
+                                <div class="no-records">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            `;
+            
+            parentRow.after(detailsRow);
+            button.textContent = 'Collapse';
+            
+            // Load contributions
+            try {
+                const contributions = await db.collection('contributions')
+                    .where('playerId', '==', playerId)
+                    .orderBy('createdAt', 'desc')
+                    .limit(15)
+                    .get();
+                
+                const contContainer = document.getElementById(`contributions-${playerId}`);
+                if (contributions.empty) {
+                    contContainer.innerHTML = '<div class="no-records">No contributions recorded</div>';
+                } else {
+                    contContainer.innerHTML = contributions.docs.map(doc => {
+                        const c = doc.data();
+                        const date = c.createdAt ? c.createdAt.toDate().toLocaleDateString() : 'Unknown';
+                        const details = c.materialType 
+                            ? `${formatNumber(c.materialQuantity)} ${c.materialType}` 
+                            : c.activityType;
+                        return `
+                            <div class="details-item">
+                                <div class="details-item-type">${c.activityType}</div>
+                                <div class="details-item-meta">
+                                    ${c.materialType ? formatNumber(c.materialQuantity) + ' ' + c.materialType + ' • ' : ''}
+                                    +${c.pointsEarned} pts • ${date}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error('Error loading contributions:', err);
+                document.getElementById(`contributions-${playerId}`).innerHTML = 
+                    '<div class="no-records">Error loading contributions</div>';
+            }
+            
+            // Load distributions
+            try {
+                const distributions = await db.collection('distributions')
+                    .where('playerId', '==', playerId)
+                    .orderBy('timestamp', 'desc')
+                    .limit(15)
+                    .get();
+                
+                const distContainer = document.getElementById(`distributions-${playerId}`);
+                if (distributions.empty) {
+                    distContainer.innerHTML = '<div class="no-records">No distributions recorded</div>';
+                } else {
+                    distContainer.innerHTML = distributions.docs.map(doc => {
+                        const d = doc.data();
+                        const date = d.timestamp ? d.timestamp.toDate().toLocaleDateString() : 'Unknown';
+                        const resource = d.resourceType.charAt(0).toUpperCase() + d.resourceType.slice(1);
+                        return `
+                            <div class="details-item">
+                                <div class="details-item-type distribution">${formatNumber(d.quantity)} ${resource}</div>
+                                <div class="details-item-meta">
+                                    ${d.notes ? d.notes + ' • ' : ''}${date}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error('Error loading distributions:', err);
+                document.getElementById(`distributions-${playerId}`).innerHTML = 
+                    '<div class="no-records">Error loading distributions</div>';
             }
         }
     </script>
