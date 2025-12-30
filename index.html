@@ -415,11 +415,27 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 
 .commodity-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     background: #1a1510;
     padding: 10px;
     border-radius: 5px;
+}
+
+.commodity-name {
+    color: #f5f0e6;
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.commodity-price {
+    color: #c9a227;
+    font-size: 11px;
+}
+
+.commodity-check {
+    color: #c9a227;
 }
 
 .commodity-item {
@@ -1303,8 +1319,15 @@ If you spot any errors feel free to contact me.
     function initTradeCalculator() {
         buildCommodityGrid();
         
-        document.getElementById('clearSelection').addEventListener('click', clearCommoditySelection);
-        document.getElementById('calculateTrades').addEventListener('click', findBestPorts);
+        var clearBtn = document.getElementById('clearSelection');
+        var calcBtn = document.getElementById('calculateTrades');
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', clearCommoditySelection);
+        }
+        if (calcBtn) {
+            calcBtn.addEventListener('click', findBestPorts);
+        }
     }
 
     function buildCommodityGrid() {
