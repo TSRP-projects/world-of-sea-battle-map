@@ -1255,251 +1255,194 @@ If you spot any errors feel free to contact me.
 <div id="trade-calculator">
     <h2>Trade Route Calculator</h2>
     
-    <div class="port-select-group">
-            <label for="dest-port">Destination Port</label>
-            <select id="dest-port">
-                <option value="">-- Select Destination --</option>
-            </select>
-            <div class="port-note">Pirate Strongholds do not have commodity markets</div>
-        </div>
-    </div>
-    
-    <div id="trade-warnings" class="trade-warnings"></div>
-    
     <div class="commodity-section">
-        <div class="commodity-grid-header">Select Commodities Available for Purchase</div>
+        <div class="commodity-grid-header">Select Your Commodities</div>
         <div class="selection-counter"><span id="selectedCount">0</span> commodities selected</div>
         <div class="commodity-grid" id="commodityGrid"></div>
     </div>
     
     <div class="trade-actions">
         <button class="trade-btn trade-btn-secondary" id="clearSelection">Clear Selection</button>
-        <button class="trade-btn trade-btn-primary" id="calculateTrades">Calculate Best Trades</button>
+        <button class="trade-btn trade-btn-primary" id="calculateTrades">Find Best Ports</button>
     </div>
     
     <div class="trade-results" id="tradeResults">
-        <div class="results-header">Trade Recommendations</div>
-        <div class="results-route" id="resultsRoute"></div>
-        <div class="results-columns">
-            <div class="results-column" id="resultsSmall">
-                <div class="results-column-header">Small Hold<span class="hold-size">&lt; 7,000</span></div>
-                <div class="results-list"></div>
-            </div>
-            <div class="results-column" id="resultsMedium">
-                <div class="results-column-header">Medium Hold<span class="hold-size">7,000 - 25,000</span></div>
-                <div class="results-list"></div>
-            </div>
-            <div class="results-column" id="resultsLarge">
-                <div class="results-column-header">Large Hold<span class="hold-size">&gt; 25,000</span></div>
-                <div class="results-list"></div>
-            </div>
-        </div>
+        <div class="results-header">Best Ports to Sell</div>
+        <div class="port-results" id="portResults"></div>
     </div>
+    
+    <div class="port-note">Pirate Strongholds do not have commodity markets</div>
 </div>
-
 </body>
 
 <script type="text/javascript">
-$(document).ready(function() {
-    // Existing checkbox toggles
-    $('#show-ports').click(function() { $('#ports').toggle(); });
-    $('#show-lighthouses').click(function() { $('#lighthouses').toggle(); });
-    $('#show-portsxy').click(function() { $('#portsxy').toggle(); });  
-    $('#show-islandsxy').click(function() { $('#islandsxy').toggle(); });  
-    $('#show-productionsxy').click(function() { $('#productionsxy').toggle(); });  
-    $('#show-fast-travel').click(function() { $('#fast-travel').toggle(); });  
-    $('#show-circle').click(function() { $('#circle').toggle(); });   
-    $('#show-island').click(function() { $('.island').toggle(); });
-    $('#show-production').click(function() { $('.production').toggle(); });
-    $('#show-altar').click(function() { $('.altar').toggle(); });
-    $('#show-fort').click(function() { $('.fort').toggle(); });
-    $('#show-altarsxy').click(function() { $('#altarsxy').toggle(); });
-    $('#show-fortsxy').click(function() { $('#fortsxy').toggle(); });
+    $(document).ready(function() {
+        // Existing checkbox toggles
+        $('#show-ports').click(function() { $('#ports').toggle(); });
+        $('#show-lighthouses').click(function() { $('#lighthouses').toggle(); });
+        $('#show-portsxy').click(function() { $('#portsxy').toggle(); });  
+        $('#show-islandsxy').click(function() { $('#islandsxy').toggle(); });  
+        $('#show-productionsxy').click(function() { $('#productionsxy').toggle(); });  
+        $('#show-fast-travel').click(function() { $('#fast-travel').toggle(); });  
+        $('#show-circle').click(function() { $('#circle').toggle(); });   
+        $('#show-island').click(function() { $('.island').toggle(); });
+        $('#show-production').click(function() { $('.production').toggle(); });
+        $('#show-altar').click(function() { $('.altar').toggle(); });
+        $('#show-fort').click(function() { $('.fort').toggle(); });
+        $('#show-altarsxy').click(function() { $('#altarsxy').toggle(); });
+        $('#show-fortsxy').click(function() { $('#fortsxy').toggle(); });
 
-    // Trade Calculator Functions
+        // Initialize trade calculator
+        initTradeCalculator();
+    });
+
+    // ============================================
+    // TRADE CALCULATOR FUNCTIONS
+    // ============================================
+
     function initTradeCalculator() {
-        populatePortDropdown();
         buildCommodityGrid();
         
-        $('#dest-port').change(updatePortWarnings);
-        $('#clearSelection').click(clearCommoditySelection);
-        $('#calculateTrades').click(calculateTradeRecommendations);
+        document.getElementById('clearSelection').addEventListener('click', clearCommoditySelection);
+        document.getElementById('calculateTrades').addEventListener('click', findBestPorts);
     }
-    
-    function populatePortDropdown() {
-        var destSelect = $('#dest-port');
-        
-        var regionOrder = ['northern', 'southern', 'arabian', 'sell_only'];
-        var regionLabels = {
-            northern: 'Northern Region',
-            southern: 'Southern Region',
-            arabian: 'Arabian Region',
-            sell_only: 'Sell-Only Ports'
-        };
-        
-        regionOrder.forEach(function(region) {
-            var ports = TRADE_DATA.regions[region];
-            if (!ports || ports.length === 0) return;
-            
-            var optgroup = $('<optgroup>').attr('label', regionLabels[region]);
-            
-            ports.forEach(function(port) {
-                if (TRADE_DATA.noSellPorts.indexOf(port) === -1) {
-                    var option = $('<option>').val(port).text(TRADE_DATA.getDisplayName(port));
-                    optgroup.append(option);
-                }
-            });
-            
-            if (optgroup.children().length > 0) {
-                destSelect.append(optgroup);
-            }
-        });
-    }
-    
+
     function buildCommodityGrid() {
-        var grid = $('#commodityGrid');
-        grid.empty();
+        var grid = document.getElementById('commodityGrid');
+        if (!grid) return;
         
-        TRADE_DATA.commodityOrder.forEach(function(commodityKey) {
-            var commodity = TRADE_DATA.commodities[commodityKey];
+        grid.innerHTML = '';
+        
+        TRADE_DATA.commodityOrder.forEach(function(key) {
+            var commodity = TRADE_DATA.commodities[key];
             if (!commodity) return;
             
-            var iconFile = TRADE_DATA.commodityIcons[commodityKey] || 'default.png';
+            var item = document.createElement('div');
+            item.className = 'commodity-item';
+            item.dataset.commodity = key;
             
-            var item = $('<div>')
-                .addClass('commodity-item')
-                .attr('data-commodity', commodityKey)
-                .html(
-                    '<img src="commodities/' + iconFile + '" alt="' + commodity.name + '" onerror="this.style.opacity=0.3">' +
-                    '<div class="commodity-name">' + commodity.name + '</div>'
-                );
+            var iconFile = TRADE_DATA.commodityIcons[key] || key + '.png';
             
-            item.click(function() {
-                $(this).toggleClass('selected');
+            item.innerHTML = 
+                '<img src="commodities/' + iconFile + '" alt="' + commodity.name + '">' +
+                '<div class="commodity-info">' +
+                    '<div class="commodity-name">' + commodity.name + '</div>' +
+                    '<div class="commodity-price">' + commodity.min + ' - ' + commodity.max + ' gold</div>' +
+                '</div>' +
+                '<div class="commodity-check">✓</div>';
+            
+            item.addEventListener('click', function() {
+                this.classList.toggle('selected');
                 updateSelectionCount();
             });
             
-            grid.append(item);
+            grid.appendChild(item);
         });
     }
-    
+
     function updateSelectionCount() {
-        var count = $('.commodity-item.selected').length;
-        $('#selectedCount').text(count);
-    }
-    
-    function updatePortWarnings() {
-        var destPort = $('#dest-port').val();
-        var warningsDiv = $('#trade-warnings');
-        warningsDiv.empty();
-        
-        if (!destPort) return;
-        
-        var warnings = [];
-        var portMeta = TRADE_DATA.portMeta;
-        var destName = TRADE_DATA.getDisplayName(destPort);
-        
-        // Check shallow water
-        if (portMeta.shallowWater && portMeta.shallowWater[destPort]) {
-            warnings.push('<span class="trade-warning warning-shallow">⚓ ' + destName + ': Shallow water (' + portMeta.shallowWater[destPort] + ')</span>');
-        }
-        
-        // Check peace flag
-        if (portMeta.noPeaceFlag && portMeta.noPeaceFlag.indexOf(destPort) !== -1) {
-            warnings.push('<span class="trade-warning warning-no-peace">⚔️ ' + destName + ': No peace flag allowed</span>');
-        }
-        
-        if (warnings.length > 0) {
-            warningsDiv.html(warnings.join(''));
+        var selected = document.querySelectorAll('.commodity-item.selected');
+        var countEl = document.getElementById('selectedCount');
+        if (countEl) {
+            countEl.textContent = selected.length;
         }
     }
-    
+
     function clearCommoditySelection() {
-        $('.commodity-item.selected').removeClass('selected');
+        document.querySelectorAll('.commodity-item.selected').forEach(function(item) {
+            item.classList.remove('selected');
+        });
         updateSelectionCount();
-        $('#tradeResults').removeClass('active');
-        $('#trade-warnings').empty();
-        $('#dest-port').val('');
+        document.getElementById('tradeResults').classList.remove('visible');
+        document.getElementById('portResults').innerHTML = '';
     }
-    
-    function calculateTradeRecommendations() {
-        var destPort = $('#dest-port').val();
+
+    function findBestPorts() {
+        var selected = document.querySelectorAll('.commodity-item.selected');
+        var resultsContainer = document.getElementById('tradeResults');
+        var resultsDiv = document.getElementById('portResults');
         
-        if (!destPort) {
-            alert('Please select a destination port');
+        if (selected.length === 0) {
+            resultsContainer.classList.add('visible');
+            resultsDiv.innerHTML = '<div class="no-results">Select commodities from your hold to find the best ports to sell.</div>';
             return;
         }
         
         var selectedCommodities = [];
-        $('.commodity-item.selected').each(function() {
-            selectedCommodities.push($(this).attr('data-commodity'));
+        selected.forEach(function(item) {
+            selectedCommodities.push(item.dataset.commodity);
         });
         
-        if (selectedCommodities.length === 0) {
-            alert('Please select at least one commodity');
+        var bestPorts = TRADE_DATA.getBestPorts(selectedCommodities);
+        
+        if (bestPorts.length === 0) {
+            resultsContainer.classList.add('visible');
+            resultsDiv.innerHTML = '<div class="no-results">No profitable ports found for the selected commodities.</div>';
             return;
         }
         
-        var recommendations = TRADE_DATA.getRecommendations(selectedCommodities, destPort);
-        displayResults(recommendations, destPort);
-    }
-    
-    function displayResults(recommendations, destPort) {
-        var resultsDiv = $('#tradeResults');
-        resultsDiv.addClass('active');
+        resultsDiv.innerHTML = '';
         
-        $('#resultsRoute').html('Selling at: <strong>' + TRADE_DATA.getDisplayName(destPort) + '</strong>');
-        
-        $('#resultsSmall .results-list').empty();
-        $('#resultsMedium .results-list').empty();
-        $('#resultsLarge .results-list').empty();
-        
-        if (recommendations.length === 0) {
-            var noResults = '<div class="no-results">No profitable trades found for selected commodities</div>';
-            $('#resultsSmall .results-list').html(noResults);
-            $('#resultsMedium .results-list').html(noResults);
-            $('#resultsLarge .results-list').html(noResults);
-            return;
-        }
-        
-        // Small hold: top 3
-        recommendations.slice(0, 3).forEach(function(rec, i) {
-            $('#resultsSmall .results-list').append(createResultItem(rec, i + 1));
+        bestPorts.forEach(function(portData, index) {
+            var rank = index + 1;
+            var card = document.createElement('div');
+            card.className = 'port-card rank-' + rank;
+            
+            // Build warnings HTML
+            var warningsHtml = '';
+            if (portData.shallowWater || portData.noPeaceFlag) {
+                warningsHtml = '<div class="port-warnings">';
+                if (portData.shallowWater) {
+                    warningsHtml += '<span class="port-warning warning-shallow">' + portData.shallowWater + '</span>';
+                }
+                if (portData.noPeaceFlag) {
+                    warningsHtml += '<span class="port-warning warning-pvp">No Peace Flag</span>';
+                }
+                warningsHtml += '</div>';
+            }
+            
+            // Build commodity breakdown HTML
+            var breakdownHtml = '';
+            portData.commodities.forEach(function(comm) {
+                var maxClass = comm.isMax ? ' breakdown-max' : '';
+                var maxLabel = comm.isMax ? ' (MAX)' : '';
+                breakdownHtml += 
+                    '<div class="breakdown-item">' +
+                        '<span class="breakdown-name">' + comm.name + '</span>' +
+                        '<span class="breakdown-profit' + maxClass + '">+' + comm.profit + ' gold' + maxLabel + '</span>' +
+                    '</div>';
+            });
+            
+            card.innerHTML = 
+                '<div class="port-card-header">' +
+                    '<span class="port-rank">#' + rank + '</span>' +
+                    '<span class="port-name">' + portData.displayName + '</span>' +
+                    warningsHtml +
+                '</div>' +
+                '<div class="port-stats">' +
+                    '<div class="stat-row">' +
+                        '<span class="stat-label">Total Profit</span>' +
+                        '<span class="stat-value highlight">+' + portData.totalProfit + ' gold</span>' +
+                    '</div>' +
+                    '<div class="stat-row">' +
+                        '<span class="stat-label">Profit per Weight</span>' +
+                        '<span class="stat-value">' + portData.profitPerWeight + ' g/w</span>' +
+                    '</div>' +
+                    '<div class="stat-row">' +
+                        '<span class="stat-label">Total Weight</span>' +
+                        '<span class="stat-value">' + portData.totalWeight + ' units</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="commodity-breakdown">' +
+                    '<div class="breakdown-title">Commodity Breakdown</div>' +
+                    breakdownHtml +
+                '</div>';
+            
+            resultsDiv.appendChild(card);
         });
         
-        // Medium hold: top 4
-        recommendations.slice(0, 4).forEach(function(rec, i) {
-            $('#resultsMedium .results-list').append(createResultItem(rec, i + 1));
-        });
-        
-        // Large hold: top 5
-        recommendations.slice(0, 5).forEach(function(rec, i) {
-            $('#resultsLarge .results-list').append(createResultItem(rec, i + 1));
-        });
+        resultsContainer.classList.add('visible');
     }
-    
-    function createResultItem(rec, rank) {
-        var iconFile = TRADE_DATA.commodityIcons[rec.commodity] || 'default.png';
-        var maxBadge = rec.isMaxProfit ? '<span class="max-badge">MAX</span>' : '';
-        var itemClass = rec.isMaxProfit ? 'result-item max-profit' : 'result-item';
-        
-        return '<div class="' + itemClass + '">' +
-            '<img src="commodities/' + iconFile + '" alt="' + rec.name + '" onerror="this.style.opacity=0.3">' +
-            '<div class="result-item-details">' +
-                '<div class="result-item-name">#' + rank + ' ' + rec.name + '</div>' +
-                '<div class="result-item-prices">Buy: ' + rec.buyPrice + ' → Sell: ' + rec.sellPrice + ' (wt: ' + rec.weight + ')</div>' +
-            '</div>' +
-            '<div class="result-item-profit">' +
-                '<div class="profit-value">+' + rec.profit + maxBadge + '</div>' +
-                '<div class="profit-weight">' + rec.profitPerWeight.toFixed(2) + '/wt</div>' +
-            '</div>' +
-        '</div>';
-    }
-    
-    // Initialize trade calculator
-    initTradeCalculator();
-});
 </script>
-
 
 </html>

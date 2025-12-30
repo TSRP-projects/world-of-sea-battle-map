@@ -82,13 +82,15 @@ var TRADE_DATA = {
         silk: 'silk.png'
     },
 
-    // Grid display order (matches in-game layout)
+    // Grid display order (matches in-game layout - 3 columns)
     commodityOrder: [
-        'sugar', 'beer', 'saffron', 'paprika',
-        'cinnamon', 'salt', 'silk', 'rugs',
-        'dates', 'mango', 'tobacco', 'coffee',
-        'leather', 'pepper', 'vanilla', 'nuts',
-        'wine', 'pineapples', 'oil', 'grog'
+        'sugar', 'beer', 'saffron',
+        'paprika', 'cinnamon', 'salt',
+        'silk', 'rugs', 'dates',
+        'mango', 'tobacco', 'coffee',
+        'leather', 'pepper', 'vanilla',
+        'nuts', 'wine', 'pineapples',
+        'oil', 'grog'
     ],
 
     // Complete commodity pricing data
@@ -523,9 +525,63 @@ var TRADE_DATA = {
     },
 
     // Hold size configurations
+    // Hold size configurations
     holdSizes: {
         small: { min: 0, max: 7000, label: 'Small Hold', description: '< 7,000' },
         medium: { min: 7000, max: 25000, label: 'Medium Hold', description: '7,000 - 25,000' },
         large: { min: 25000, max: Infinity, label: 'Large Hold', description: '> 25,000' }
+    },
+
+    // Calculate best ports to sell selected commodities
+    getBestPorts: function(selectedCommodities) {
+        var self = this;
+        var allPorts = this.getSellablePorts();
+        var portResults = [];
+
+        allPorts.forEach(function(port) {
+            var totalProfit = 0;
+            var totalWeight = 0;
+            var commodityDetails = [];
+
+            selectedCommodities.forEach(function(commodityKey) {
+                var commodity = self.commodities[commodityKey];
+                if (commodity && commodity.prices[port]) {
+                    var buyPrice = commodity.min;
+                    var sellPrice = commodity.prices[port];
+                    var profit = sellPrice - buyPrice;
+                    
+                    if (profit > 0) {
+                        totalProfit += profit;
+                        totalWeight += commodity.weight;
+                        commodityDetails.push({
+                            name: commodity.name,
+                            profit: profit,
+                            sellPrice: sellPrice,
+                            isMax: sellPrice === commodity.max
+                        });
+                    }
+                }
+            });
+
+            if (totalProfit > 0) {
+                portResults.push({
+                    port: port,
+                    displayName: self.getDisplayName(port),
+                    totalProfit: totalProfit,
+                    totalWeight: totalWeight,
+                    profitPerWeight: parseFloat((totalProfit / totalWeight).toFixed(2)),
+                    commodities: commodityDetails,
+                    shallowWater: self.portMeta.shallowWater[port] || null,
+                    noPeaceFlag: self.portMeta.noPeaceFlag.indexOf(port) !== -1
+                });
+            }
+        });
+
+        // Sort by total profit descending
+        portResults.sort(function(a, b) {
+            return b.totalProfit - a.totalProfit;
+        });
+
+        return portResults.slice(0, 3);
     }
 };
