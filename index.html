@@ -162,14 +162,21 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
-    max-width: 500px;
+    max-width: 625px;
 }
 
 .commodity-grid-header {
     font-family: 'Cinzel', Georgia, serif;
     color: #c9a227;
     font-size: 14px;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
+}
+
+.commodity-instructions {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 10px;
+    line-height: 1.4;
 }
 
 .selection-counter {
@@ -253,7 +260,7 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-    max-width: 500px;
+    max-width: 625px;
 }
 
 .trade-btn {
@@ -1094,6 +1101,7 @@ If you spot any errors feel free to contact me.
     
     <div class="commodity-section">
         <div class="commodity-grid-header">Select Your Commodities</div>
+        <div class="commodity-instructions">Select the goods you have and the calculator will provide the best ports to sell your goods.</div>
         <div class="selection-counter"><span id="selectedCount">0</span> commodities selected</div>
         <div class="commodity-grid" id="commodityGrid"></div>
     </div>
@@ -1258,29 +1266,29 @@ If you spot any errors feel free to contact me.
             });
             
             card.innerHTML = 
-                '<div class="port-card-header">' +
-                    '<span class="port-rank">#' + rank + '</span>' +
-                    '<span class="port-name">' + portData.displayName + '</span>' +
-                    warningsHtml +
+            '<div class="port-card-header">' +
+                '<span class="port-rank">#' + rank + '</span>' +
+                '<span class="port-name">' + portData.displayName + '</span>' +
+                warningsHtml +
+            '</div>' +
+            '<div class="port-stats">' +
+                '<div class="stat-row">' +
+                    '<span class="stat-label">Total Profit (per unit each)</span>' +
+                    '<span class="stat-value highlight">+' + portData.totalProfit + ' gold</span>' +
                 '</div>' +
-                '<div class="port-stats">' +
-                    '<div class="stat-row">' +
-                        '<span class="stat-label">Total Profit</span>' +
-                        '<span class="stat-value highlight">+' + portData.totalProfit + ' gold</span>' +
-                    '</div>' +
-                    '<div class="stat-row">' +
-                        '<span class="stat-label">Profit per Weight</span>' +
-                        '<span class="stat-value">' + portData.profitPerWeight + ' g/w</span>' +
-                    '</div>' +
-                    '<div class="stat-row">' +
-                        '<span class="stat-label">Total Weight</span>' +
-                        '<span class="stat-value">' + portData.totalWeight + ' units</span>' +
-                    '</div>' +
+                '<div class="stat-row">' +
+                    '<span class="stat-label">Profit per Weight</span>' +
+                    '<span class="stat-value">' + portData.profitPerWeight + ' g/w</span>' +
                 '</div>' +
-                '<div class="commodity-breakdown">' +
-                    '<div class="breakdown-title">Commodity Breakdown</div>' +
-                    breakdownHtml +
-                '</div>';
+                '<div class="stat-row">' +
+                    '<span class="stat-label">Total Weight (per unit each)</span>' +
+                    '<span class="stat-value">' + portData.totalWeight + ' units</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="commodity-breakdown">' +
+                '<div class="breakdown-title">Per Unit Profit</div>' +
+                breakdownHtml +
+            '</div>';
             
             resultsDiv.appendChild(card);
         });
