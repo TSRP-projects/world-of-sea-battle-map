@@ -98,42 +98,42 @@ div.fortxy {background: violet; width: 3px; height: 3px;}
 div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
 
 #toolbar {
-	background: rgba(244, 236, 217, 0.95);
-	border-top: 3px solid #8b6914;
-	font-family: 'Libre Baskerville', Georgia, serif;
-	font-size: 14px;
-	color: #3d2b1f;
-	margin-top: 10px;
-	padding: 20px;
+    background: rgba(244, 236, 217, 0.95);
+    border-top: 3px solid #8b6914;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 14px;
+    color: #3d2b1f;
+    margin-top: 10px;
+    padding: 20px;
 }
 
 #toolbar h1 {
-	font-family: 'Cinzel', Georgia, serif;
-	color: #8b6914;
-	margin-top: 0;
-	margin-bottom: 15px;
-	font-size: 24px;
+    font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 24px;
 }
 
 #toolbar label {
-	margin-right: 2em;
-	color: #3d2b1f;
-	cursor: pointer;
+    margin-right: 2em;
+    color: #3d2b1f;
+    cursor: pointer;
 }
 
 #toolbar input[type="checkbox"] {
-	accent-color: #8b6914;
-	margin-right: 5px;
+    accent-color: #8b6914;
+    margin-right: 5px;
 }
 
 #toolbar p {
-	margin-bottom: 15px;
-	line-height: 1.8;
+    margin-bottom: 15px;
+    line-height: 1.8;
 }
 
 #toolbar strong {
-	color: #8b6914;
-	font-family: 'Cinzel', Georgia, serif;
+    color: #8b6914;
+    font-family: 'Cinzel', Georgia, serif;
 }
 
 /* Trade Calculator Styles */
@@ -155,237 +155,7 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     font-size: 22px;
 }
 
-.trade-controls {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.trade-controls label {
-    font-family: 'Cinzel', Georgia, serif;
-    font-weight: 600;
-    color: #8b6914;
-    margin-right: 8px;
-}
-
-.trade-controls select {
-    padding: 8px 12px;
-    font-family: 'Libre Baskerville', Georgia, serif;
-    font-size: 14px;
-    border: 2px solid #8b6914;
-    border-radius: 5px;
-    background: #f5f0e6;
-    color: #3d2b1f;
-    min-width: 180px;
-}
-
-.trade-controls select:focus {
-    outline: none;
-    box-shadow: 0 0 5px rgba(139, 105, 20, 0.5);
-}
-
-.trade-warnings {
-    margin-bottom: 15px;
-}
-
-.trade-warning {
-    display: inline-block;
-    padding: 6px 12px;
-    margin-right: 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.warning-shallow {
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    color: #856404;
-}
-
-.warning-no-peace {
-    background: #f8d7da;
-    border: 1px solid #dc3545;
-    color: #721c24;
-}
-
-.warning-low-profit {
-    background: #d1ecf1;
-    border: 1px solid #17a2b8;
-    color: #0c5460;
-}
-
-.warning-max-price {
-    background: #d4edda;
-    border: 1px solid #28a745;
-    color: #155724;
-}
-
-.trade-results {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-@media (max-width: 1200px) {
-    .trade-results {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 800px) {
-    .trade-results {
-        grid-template-columns: 1fr;
-    }
-}
-
-.hold-column {
-    background: rgba(255, 255, 255, 0.5);
-    border: 2px solid #8b6914;
-    border-radius: 8px;
-    padding: 15px;
-}
-
-.hold-column h3 {
-    font-family: 'Cinzel', Georgia, serif;
-    color: #8b6914;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 16px;
-    border-bottom: 1px solid #8b6914;
-    padding-bottom: 8px;
-}
-
-.hold-column h4 {
-    font-family: 'Cinzel', Georgia, serif;
-    color: #3d2b1f;
-    margin: 15px 0 8px 0;
-    font-size: 14px;
-}
-
-.recommendation {
-    display: flex;
-    align-items: center;
-    padding: 8px;
-    margin-bottom: 8px;
-    background: rgba(139, 105, 20, 0.1);
-    border-radius: 5px;
-}
-
-.recommendation img {
-    width: 36px;
-    height: 36px;
-    margin-right: 10px;
-    border-radius: 4px;
-}
-
-.recommendation-details {
-    flex: 1;
-}
-
-.recommendation-good {
-    font-weight: bold;
-    color: #3d2b1f;
-    text-transform: capitalize;
-}
-
-.recommendation-prices {
-    font-size: 12px;
-    color: #666;
-}
-
-.recommendation-profit {
-    font-size: 12px;
-    color: #28a745;
-    font-weight: bold;
-}
-
-.recommendation-note {
-    font-size: 11px;
-    color: #856404;
-    font-style: italic;
-}
-
-.no-selection {
-    color: #666;
-    font-style: italic;
-    text-align: center;
-    padding: 40px 20px;
-}
-
-.route-info {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: rgba(139, 105, 20, 0.15);
-    border-radius: 5px;
-}
-
-.route-info span {
-    font-family: 'Cinzel', Georgia, serif;
-    color: #8b6914;
-}
-
-.region-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 3px;
-    font-size: 11px;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-.region-northern { background: #cce5ff; color: #004085; }
-.region-southern { background: #fff3cd; color: #856404; }
-.region-eastern { background: #d4edda; color: #155724; }
-.region-transitional { background: #e2d5f1; color: #563d7c; }
-.region-arabian { background: #f8d7da; color: #721c24; }
-.region-sell_only { background: #e2e3e5; color: #383d41; }
-.region-no_trade { background: #d6d8d9; color: #1b1e21; }
-.production { display: none; }
-.altar { display: none; }
-
-/* NEW Trade Calculator Styles - Commodity Grid */
-.port-selection {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    margin-bottom: 20px;
-    max-width: 350px;
-}
-
-.port-note {
-    font-size: 12px;
-    color: #856404;
-    font-style: italic;
-    margin-top: 6px;
-}
-
-.port-select-group label {
-    display: block;
-    font-family: 'Cinzel', Georgia, serif;
-    font-weight: 600;
-    color: #8b6914;
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-.port-select-group select {
-    width: 100%;
-    padding: 10px 12px;
-    font-family: 'Libre Baskerville', Georgia, serif;
-    font-size: 14px;
-    border: 2px solid #8b6914;
-    border-radius: 5px;
-    background: #f5f0e6;
-    color: #3d2b1f;
-}
-
+/* Commodity Selection Section */
 .commodity-section {
     background: #3d3020;
     border: 2px solid #8b6914;
@@ -420,22 +190,6 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     background: #1a1510;
     padding: 10px;
     border-radius: 5px;
-}
-
-.commodity-name {
-    color: #f5f0e6;
-    font-family: 'Cinzel', Georgia, serif;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.commodity-price {
-    color: #c9a227;
-    font-size: 11px;
-}
-
-.commodity-check {
-    color: #c9a227;
 }
 
 .commodity-item {
@@ -484,6 +238,17 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     font-family: 'Libre Baskerville', Georgia, serif;
 }
 
+.commodity-item .commodity-price {
+    font-size: 10px;
+    color: #c9a227;
+    margin-top: 2px;
+}
+
+.commodity-item .commodity-check {
+    display: none;
+}
+
+/* Trade Action Buttons */
 .trade-actions {
     display: flex;
     gap: 10px;
@@ -521,141 +286,197 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     background: rgba(139, 105, 20, 0.2);
 }
 
+/* Trade Results Section */
 .trade-results {
     display: none;
 }
 
-.trade-results.active {
+.trade-results.visible {
     display: block;
 }
 
 .results-header {
     font-family: 'Cinzel', Georgia, serif;
     color: #8b6914;
-    font-size: 18px;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #8b6914;
 }
 
-.results-route {
-    margin-bottom: 15px;
-    padding: 10px;
-    background: rgba(139, 105, 20, 0.15);
-    border-radius: 5px;
-    font-family: 'Cinzel', Georgia, serif;
-    color: #8b6914;
-}
-
-.results-columns {
+/* Port Results Cards */
+.port-results {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 15px;
 }
 
-@media (max-width: 1200px) {
-    .results-columns { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 800px) {
-    .results-columns { grid-template-columns: 1fr; }
-    .commodity-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
-.results-column {
-    background: rgba(255, 255, 255, 0.5);
+.port-card {
+    background: rgba(244, 236, 217, 0.95);
     border: 2px solid #8b6914;
     border-radius: 8px;
     padding: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.results-column-header {
-    font-family: 'Cinzel', Georgia, serif;
-    color: #8b6914;
-    font-size: 16px;
-    text-align: center;
-    padding-bottom: 10px;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #8b6914;
+.port-card.rank-1 {
+    border-color: #c9a227;
+    box-shadow: 0 4px 12px rgba(201, 162, 39, 0.4);
 }
 
-.results-column-header .hold-size {
-    display: block;
-    font-size: 12px;
-    color: #666;
-    font-family: 'Libre Baskerville', Georgia, serif;
-    margin-top: 3px;
-}
-
-.result-item {
+.port-card-header {
     display: flex;
     align-items: center;
-    padding: 10px;
-    margin-bottom: 10px;
-    background: rgba(139, 105, 20, 0.1);
-    border-radius: 5px;
-    border-left: 4px solid #8b6914;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+    flex-wrap: wrap;
 }
 
-.result-item.max-profit {
-    border-left-color: #28a745;
-    background: rgba(40, 167, 69, 0.1);
+.port-rank {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 24px;
+    font-weight: bold;
+    color: #8b6914;
+    min-width: 35px;
 }
 
-.result-item img {
-    width: 40px;
-    height: 40px;
-    margin-right: 12px;
-    border-radius: 4px;
-}
+.port-card.rank-1 .port-rank { color: #c9a227; }
+.port-card.rank-2 .port-rank { color: #888; }
+.port-card.rank-3 .port-rank { color: #8b5a2b; }
 
-.result-item-details {
+.port-name {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 16px;
+    color: #3d2b1f;
+    font-weight: 600;
     flex: 1;
 }
 
-.result-item-name {
-    font-size: 14px;
-    font-weight: bold;
-    color: #3d2b1f;
-    margin-bottom: 3px;
+.port-warnings {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
 }
 
-.result-item-prices {
-    font-size: 12px;
-    color: #666;
-}
-
-.result-item-profit {
-    text-align: right;
-}
-
-.result-item-profit .profit-value {
-    font-size: 15px;
-    font-weight: bold;
-    color: #28a745;
-}
-
-.result-item-profit .profit-weight {
-    font-size: 11px;
-    color: #666;
-}
-
-.result-item-profit .max-badge {
-    display: inline-block;
-    background: #28a745;
-    color: #fff;
+.port-warning {
     font-size: 10px;
-    padding: 2px 5px;
+    padding: 3px 8px;
     border-radius: 3px;
-    margin-left: 5px;
+}
+
+.warning-shallow {
+    background: rgba(139, 105, 20, 0.2);
+    color: #8b6914;
+    border: 1px solid #8b6914;
+}
+
+.warning-pvp {
+    background: rgba(139, 58, 58, 0.2);
+    color: #8b3a3a;
+    border: 1px solid #8b3a3a;
+}
+
+.port-stats {
+    margin-bottom: 12px;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: #5c4a3a;
+    font-size: 13px;
+}
+
+.stat-value {
+    color: #8b6914;
     font-weight: bold;
+    font-size: 13px;
+}
+
+.stat-value.highlight {
+    color: #2d5a2d;
+    font-size: 15px;
+}
+
+.commodity-breakdown {
+    background: rgba(139, 105, 20, 0.1);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.breakdown-title {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 11px;
+    color: #5c4a3a;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+}
+
+.breakdown-name {
+    color: #3d2b1f;
+}
+
+.breakdown-profit {
+    color: #8b6914;
+    font-weight: bold;
+}
+
+.breakdown-max {
+    color: #2d5a2d;
 }
 
 .no-results {
+    grid-column: 1 / -1;
     text-align: center;
-    color: #666;
+    padding: 30px;
+    color: #5c4a3a;
     font-style: italic;
-    padding: 20px;
+}
+
+.port-note {
+    font-size: 12px;
+    color: #856404;
+    font-style: italic;
+    margin-top: 15px;
+}
+
+/* Hide production and altar by default */
+.production { display: none; }
+.altar { display: none; }
+
+/* Responsive Design */
+@media (max-width: 900px) {
+    .port-results {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .commodity-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .trade-actions {
+        flex-direction: column;
+    }
 }
 
 </style>
