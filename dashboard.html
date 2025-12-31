@@ -530,6 +530,57 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Admiral's Ledger Styles */
+        .ledger-container {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .ledger-entry {
+            padding: 10px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+        }
+
+        .ledger-entry:last-child {
+            border-bottom: none;
+        }
+
+        .ledger-entry:hover {
+            background: rgba(139, 105, 20, 0.05);
+        }
+
+        .ledger-action {
+            font-weight: bold;
+            color: #8b6914;
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 13px;
+        }
+
+        .ledger-action.action-add { color: #2d5a2d; }
+        .ledger-action.action-remove { color: #8b3a3a; }
+        .ledger-action.action-officer { color: #8b6914; }
+
+        .ledger-details {
+            font-size: 12px;
+            color: #3d2b1f;
+            margin-top: 4px;
+        }
+
+        .ledger-justification {
+            font-style: italic;
+            color: #5c4a3a;
+            font-size: 11px;
+            margin-top: 4px;
+            padding-left: 8px;
+            border-left: 2px solid #8b6914;
+        }
+
+        .ledger-meta {
+            font-size: 10px;
+            color: #5c4a3a;
+            margin-top: 4px;
+        }
     </style>
 </head>
 <body>
@@ -588,12 +639,9 @@
             </div>
 
             <div class="card">
-                <h3>🏆 Your Tier</h3>
-                <div style="text-align: center; padding: 20px 0;">
-                    <div id="tierBadge" class="tier-badge tier-deckhand">⚓ Deckhand</div>
-                    <p style="margin-top: 15px; color: #5c4a3a; font-size: 14px;" id="tierDescription">
-                        Earn 50 points to unlock Bosun tier
-                    </p>
+                <h3>📜 Admiral's Ledger</h3>
+                <div class="ledger-container" id="ledgerContainer">
+                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
                 </div>
             </div>
 
@@ -775,6 +823,14 @@
                         updateShipGoalProgress(currentPlayer, availablePoints);
                     }
                 });
+
+                // Real-time listener for Admiral's Ledger
+                db.collection('admiralLedger')
+                    .orderBy('timestamp', 'desc')
+                    .limit(15)
+                    .onSnapshot(snapshot => {
+                        displayLedger(snapshot.docs);
+                    });
 
                 loadLeaderboards();
 
@@ -1391,6 +1447,39 @@
         async function logout() {
             await auth.signOut();
             window.location.href = 'login.html';
+        }
+
+        function displayLedger(docs) {
+            const container = document.getElementById('ledgerContainer');
+            
+            if (docs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No entries yet</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            docs.forEach(doc => {
+                const entry = doc.data();
+                let actionClass = 'action-add';
+                if (entry.action.includes('Remove') || entry.action.includes('Demote')) {
+                    actionClass = 'action-remove';
+                } else if (entry.action.includes('Officer') || entry.action.includes('Promote')) {
+                    actionClass = 'action-officer';
+                }
+
+                const timestamp = entry.timestamp ? entry.timestamp.toDate().toLocaleString() : 'Unknown';
+
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'ledger-entry';
+                entryDiv.innerHTML = `
+                    <div class="ledger-action ${actionClass}">${entry.action}</div>
+                    <div class="ledger-details">${entry.details || ''}</div>
+                    ${entry.justification ? `<div class="ledger-justification">"${entry.justification}"</div>` : ''}
+                    <div class="ledger-meta">By ${entry.performedByName || 'Unknown'} • ${timestamp}</div>
+                `;
+                container.appendChild(entryDiv);
+            });
         }
     </script>
 </body>
