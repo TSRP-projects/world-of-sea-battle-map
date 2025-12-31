@@ -83,19 +83,6 @@ body {
 }
 
 div.label {color: goldenrod; font-size: 20px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
-div.poilabel {color: green; font-size: 10px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
-img.poi-icon {box-shadow: 1px 1px 4px #555;}
-div.portxy {background: yellow; width: 3px; height: 3px;}
-div.portxylabel {color: yellow; font-size: 14px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
-div.islandxy {background: greenyellow; width: 3px; height: 3px;}
-div.islandxylabel {color: greenyellow; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
-div.productionxy {background: cyan; width: 3px; height: 3px;}
-div.productionxylabel {color: cyan; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
-
-div.altarxy {background: magenta; width: 3px; height: 3px;}
-div.altarxylabel {color: magenta; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
-div.fortxy {background: violet; width: 3px; height: 3px;}
-div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
 
 #toolbar {
     background: rgba(244, 236, 217, 0.95);
@@ -153,6 +140,58 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 22px;
+}
+
+/* Ship Rate Selector */
+.ship-rate-section {
+    background: #3d3020;
+    border: 2px solid #8b6914;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    max-width: 625px;
+}
+
+.ship-rate-header {
+    font-family: 'Cinzel', Georgia, serif;
+    color: #c9a227;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.ship-rate-selector {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.ship-rate-selector label {
+    color: #f5f0e6;
+    font-size: 13px;
+}
+
+.ship-rate-selector select {
+    padding: 8px 12px;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    font-size: 13px;
+    background: #1a1510;
+    color: #f5f0e6;
+    border: 2px solid #5c4a3a;
+    border-radius: 5px;
+    cursor: pointer;
+    min-width: 200px;
+}
+
+.ship-rate-selector select:focus {
+    outline: none;
+    border-color: #c9a227;
+}
+
+.ship-rate-info {
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 8px;
+    line-height: 1.4;
 }
 
 /* Commodity Selection Section */
@@ -251,10 +290,6 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     margin-top: 2px;
 }
 
-.commodity-item .commodity-check {
-    display: none;
-}
-
 /* Trade Action Buttons */
 .trade-actions {
     display: flex;
@@ -305,153 +340,226 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 .results-header {
     font-family: 'Cinzel', Georgia, serif;
     color: #8b6914;
-    font-size: 16px;
+    font-size: 18px;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #8b6914;
 }
 
-/* Port Results Cards */
-.port-results {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
+.results-summary {
+    background: rgba(139, 105, 20, 0.1);
+    border: 1px solid #8b6914;
+    border-radius: 5px;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    font-size: 13px;
 }
 
-.port-card {
+.results-summary strong {
+    color: #8b6914;
+}
+
+/* Route Cards */
+.route-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.route-card {
     background: rgba(244, 236, 217, 0.95);
     border: 2px solid #8b6914;
     border-radius: 8px;
-    padding: 15px;
+    overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.port-card.rank-1 {
-    border-color: #c9a227;
-    box-shadow: 0 4px 12px rgba(201, 162, 39, 0.4);
+.route-card.suboptimal {
+    border-color: #856404;
+    opacity: 0.9;
 }
 
-.port-card-header {
+.route-header {
+    background: #3d3020;
+    padding: 15px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+    gap: 15px;
     flex-wrap: wrap;
 }
 
-.port-rank {
+.route-number {
     font-family: 'Cinzel', Georgia, serif;
-    font-size: 24px;
+    font-size: 14px;
     font-weight: bold;
-    color: #8b6914;
-    min-width: 35px;
+    color: #1a1510;
+    background: #c9a227;
+    padding: 5px 12px;
+    border-radius: 4px;
 }
 
-.port-card.rank-1 .port-rank { color: #c9a227; }
-.port-card.rank-2 .port-rank { color: #888; }
-.port-card.rank-3 .port-rank { color: #8b5a2b; }
-
-.port-name {
+.route-port-name {
     font-family: 'Cinzel', Georgia, serif;
-    font-size: 16px;
-    color: #3d2b1f;
+    font-size: 18px;
+    color: #f5f0e6;
     font-weight: 600;
     flex: 1;
 }
 
-.port-warnings {
+.route-badges {
     display: flex;
-    gap: 5px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
-.port-warning {
+.route-badge {
     font-size: 10px;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 3px;
+    font-weight: 600;
 }
 
-.warning-shallow {
-    background: rgba(139, 105, 20, 0.2);
-    color: #8b6914;
-    border: 1px solid #8b6914;
+.badge-shallow {
+    background: rgba(201, 162, 39, 0.2);
+    color: #c9a227;
+    border: 1px solid #c9a227;
 }
 
-.warning-pvp {
-    background: rgba(139, 58, 58, 0.2);
-    color: #8b3a3a;
-    border: 1px solid #8b3a3a;
+.badge-max {
+    background: rgba(45, 90, 45, 0.3);
+    color: #4ade80;
+    border: 1px solid #4ade80;
 }
 
-.port-stats {
-    margin-bottom: 12px;
+.badge-suboptimal {
+    background: rgba(133, 100, 4, 0.3);
+    color: #856404;
+    border: 1px solid #856404;
 }
 
-.stat-row {
+.route-stats {
     display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(139, 105, 20, 0.2);
-}
-
-.stat-row:last-child {
-    border-bottom: none;
-}
-
-.stat-label {
-    color: #5c4a3a;
-    font-size: 13px;
-}
-
-.stat-value {
-    color: #8b6914;
-    font-weight: bold;
-    font-size: 13px;
-}
-
-.stat-value.highlight {
-    color: #2d5a2d;
-    font-size: 15px;
-}
-
-.commodity-breakdown {
+    gap: 20px;
+    padding: 15px;
     background: rgba(139, 105, 20, 0.1);
-    border-radius: 5px;
-    padding: 10px;
+    border-bottom: 1px solid rgba(139, 105, 20, 0.3);
 }
 
-.breakdown-title {
+.route-stat {
+    text-align: center;
+}
+
+.route-stat-value {
     font-family: 'Cinzel', Georgia, serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: #2d5a2d;
+}
+
+.route-stat-label {
     font-size: 11px;
     color: #5c4a3a;
     text-transform: uppercase;
-    margin-bottom: 8px;
+    letter-spacing: 0.5px;
 }
 
-.breakdown-item {
-    display: flex;
-    justify-content: space-between;
+.route-commodities {
+    padding: 15px;
+}
+
+.route-commodities-title {
+    font-family: 'Cinzel', Georgia, serif;
     font-size: 12px;
-    padding: 4px 0;
+    color: #5c4a3a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
 }
 
-.breakdown-name {
+.route-commodity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.route-commodity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: rgba(139, 105, 20, 0.08);
+    border-radius: 5px;
+}
+
+.route-commodity-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+}
+
+.route-commodity-name {
+    flex: 1;
+    font-size: 14px;
     color: #3d2b1f;
+    font-weight: 600;
 }
 
-.breakdown-profit {
-    color: #8b6914;
+.route-commodity-price {
+    font-size: 14px;
+    color: #2d5a2d;
     font-weight: bold;
 }
 
-.breakdown-max {
-    color: #2d5a2d;
+.route-commodity-price.max-price::after {
+    content: ' MAX';
+    font-size: 10px;
+    color: #4ade80;
+    font-weight: bold;
+}
+
+.route-commodity-profit {
+    font-size: 12px;
+    color: #8b6914;
+}
+
+/* Alternative Ports Section */
+.route-alternatives {
+    padding: 12px 15px;
+    background: rgba(139, 105, 20, 0.05);
+    border-top: 1px solid rgba(139, 105, 20, 0.2);
+}
+
+.alternatives-title {
+    font-size: 11px;
+    color: #5c4a3a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.alternatives-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.alternative-port {
+    font-size: 12px;
+    padding: 4px 10px;
+    background: rgba(139, 105, 20, 0.15);
+    border-radius: 3px;
+    color: #3d2b1f;
+}
+
+.alternative-port .shallow-note {
+    font-size: 10px;
+    color: #856404;
+    margin-left: 5px;
 }
 
 .no-results {
-    grid-column: 1 / -1;
     text-align: center;
     padding: 30px;
     color: #5c4a3a;
@@ -469,23 +577,30 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 .production { display: none; }
 .altar { display: none; }
 
-/* Responsive Design */
+div.poilabel {color: green; font-size: 10px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
+img.poi-icon {box-shadow: 1px 1px 4px #555;}
+div.portxy {background: yellow; width: 3px; height: 3px;}
+div.portxylabel {color: yellow; font-size: 14px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
+div.islandxy {background: greenyellow; width: 3px; height: 3px;}
+div.islandxylabel {color: greenyellow; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
+div.productionxy {background: cyan; width: 3px; height: 3px;}
+div.productionxylabel {color: cyan; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
+div.altarxy {background: magenta; width: 3px; height: 3px;}
+div.altarxylabel {color: magenta; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
+div.fortxy {background: violet; width: 3px; height: 3px;}
+div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow: 0px 0px .5em #000;}
+
 @media (max-width: 900px) {
-    .port-results {
-        grid-template-columns: 1fr;
-    }
+    .route-stats { flex-wrap: wrap; }
 }
 
 @media (max-width: 600px) {
-    .commodity-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .trade-actions {
-        flex-direction: column;
-    }
+    .commodity-grid { grid-template-columns: repeat(2, 1fr); }
+    .trade-actions { flex-direction: column; }
+    .route-header { flex-direction: column; align-items: flex-start; }
+    .route-stats { flex-direction: column; gap: 10px; }
+    .route-stat { text-align: left; }
 }
-
 </style>
 </head>
 <body>
@@ -502,10 +617,9 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 	</div>
 </nav>
 
-<div id="canvas" style="background-image: url('mapa.png');; width: 1863px; height: 1551px;">
+<div id="canvas" style="background-image: url('mapa.png'); width: 1863px; height: 1551px;">
 <div id="circle" style="background-image: url('circle.png'); width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px;"></div>
 <div id="fast-travel" style="background-image: url('fast-travel.png'); width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px; display: none;"></div>
-
 <div id="ports" style="width: 1863px; height: 1551px; position: absolute; top: 73px; left: 0px;"><img src="k.png" style="position: absolute; top: 1181px; left:67px;" title="Assab" alt="Assab" />
 <div class="label" style="position: absolute; top: 1241px; left:97px; text-indent: -2.5ch; z-index: 100;" >Assab</div>
 <img src="n.png" style="position: absolute; top: 606px; left:71px;" title="Cursed City" alt="Cursed City" />
@@ -1078,30 +1192,35 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 <input type="checkbox" id="show-fast-travel" /><label for="show-fast-travel">Show fast travel routes</label>
 <input type="checkbox" id="show-island" checked="checked" /><label for="show-island">Show personal island spots</label>
 <input type="checkbox" id="show-production" /><label for="show-production">Show production spots</label>
-
 <input type="checkbox" id="show-altar" /><label for="show-altar">Show altars</label>
 <input type="checkbox" id="show-fort" checked="checked" /><label for="show-fort">Show forts</label>
 <input type="checkbox" id="show-circle" checked="checked" /><label for="show-circle">Show pvp circle border</label>
-Production sites marked with the red outline are located outside the known map (in the endless sea), those locations are approximate.
-</p>
-<p>
-<strong>For helpers:</strong><br/>
-<input type="checkbox" id="show-portsxy"  /><label for="show-portsxy">Show ports coordinates</label>
-<input type="checkbox" id="show-islandsxy"  /><label for="show-islandsxy">Show islands coordinates</label>
-<input type="checkbox" id="show-productionsxy"  /><label for="show-productionsxy">Show production sites coordinates</label>
-
-<input type="checkbox" id="show-altarsxy"  /><label for="show-altarsxy">Show altars coordinates</label>
-<input type="checkbox" id="show-fortsxy"  /><label for="show-fortsxy">Show fort coordinates</label><br/>
-If you spot any errors feel free to contact me.
 </p>
 </div>
 
 <div id="trade-calculator">
     <h2>Trade Route Calculator</h2>
     
+    <div class="ship-rate-section">
+        <div class="ship-rate-header">Your Ship</div>
+        <div class="ship-rate-selector">
+            <label for="ship-rate">Ship Rate:</label>
+            <select id="ship-rate">
+                <option value="7">Rate 7 (Smallest - All Ports)</option>
+                <option value="6">Rate 6</option>
+                <option value="5">Rate 5</option>
+                <option value="4">Rate 4</option>
+                <option value="3">Rate 3</option>
+                <option value="2">Rate 2</option>
+                <option value="1">Rate 1 (Largest - Most Restricted)</option>
+            </select>
+        </div>
+        <div class="ship-rate-info">Larger ships (lower rates) cannot enter shallow water ports. Select your ship rate to filter results.</div>
+    </div>
+    
     <div class="commodity-section">
         <div class="commodity-grid-header">Select Your Commodities</div>
-        <div class="commodity-instructions">Select the goods you have and the calculator will provide the best ports to sell your goods.</div>
+        <div class="commodity-instructions">Select the goods in your hold. The calculator will find the best ports to sell each commodity at maximum profit.</div>
         <div class="selection-counter"><span id="selectedCount">0</span> commodities selected</div>
         <div class="commodity-grid" id="commodityGrid"></div>
     </div>
@@ -1112,8 +1231,9 @@ If you spot any errors feel free to contact me.
     </div>
     
     <div class="trade-results" id="tradeResults">
-        <div class="results-header">Best Ports to Sell</div>
-        <div class="port-results" id="portResults"></div>
+        <div class="results-header">Optimized Trade Routes</div>
+        <div class="results-summary" id="resultsSummary"></div>
+        <div class="route-cards" id="routeCards"></div>
     </div>
     
     <div class="port-note">Pirate Strongholds do not have commodity markets</div>
@@ -1122,47 +1242,26 @@ If you spot any errors feel free to contact me.
 
 <script type="text/javascript">
     $(document).ready(function() {
-        // Existing checkbox toggles
         $('#show-ports').click(function() { $('#ports').toggle(); });
         $('#show-lighthouses').click(function() { $('#lighthouses').toggle(); });
-        $('#show-portsxy').click(function() { $('#portsxy').toggle(); });  
-        $('#show-islandsxy').click(function() { $('#islandsxy').toggle(); });  
-        $('#show-productionsxy').click(function() { $('#productionsxy').toggle(); });  
         $('#show-fast-travel').click(function() { $('#fast-travel').toggle(); });  
         $('#show-circle').click(function() { $('#circle').toggle(); });   
         $('#show-island').click(function() { $('.island').toggle(); });
         $('#show-production').click(function() { $('.production').toggle(); });
         $('#show-altar').click(function() { $('.altar').toggle(); });
         $('#show-fort').click(function() { $('.fort').toggle(); });
-        $('#show-altarsxy').click(function() { $('#altarsxy').toggle(); });
-        $('#show-fortsxy').click(function() { $('#fortsxy').toggle(); });
-
-        // Initialize trade calculator
         initTradeCalculator();
     });
 
-    // ============================================
-    // TRADE CALCULATOR FUNCTIONS
-    // ============================================
-
     function initTradeCalculator() {
         buildCommodityGrid();
-        
-        var clearBtn = document.getElementById('clearSelection');
-        var calcBtn = document.getElementById('calculateTrades');
-
-        if (clearBtn) {
-            clearBtn.addEventListener('click', clearCommoditySelection);
-        }
-        if (calcBtn) {
-            calcBtn.addEventListener('click', findBestPorts);
-        }
+        document.getElementById('clearSelection').addEventListener('click', clearCommoditySelection);
+        document.getElementById('calculateTrades').addEventListener('click', findBestPorts);
     }
 
     function buildCommodityGrid() {
         var grid = document.getElementById('commodityGrid');
         if (!grid) return;
-        
         grid.innerHTML = '';
         
         TRADE_DATA.commodityOrder.forEach(function(key) {
@@ -1180,8 +1279,7 @@ If you spot any errors feel free to contact me.
                 '<div class="commodity-info">' +
                     '<div class="commodity-name">' + commodity.name + '</div>' +
                     '<div class="commodity-price">' + commodity.min + ' - ' + commodity.max + ' gold</div>' +
-                '</div>' +
-                '<div class="commodity-check">✓</div>';
+                '</div>';
             
             item.addEventListener('click', function() {
                 this.classList.toggle('selected');
@@ -1194,10 +1292,7 @@ If you spot any errors feel free to contact me.
 
     function updateSelectionCount() {
         var selected = document.querySelectorAll('.commodity-item.selected');
-        var countEl = document.getElementById('selectedCount');
-        if (countEl) {
-            countEl.textContent = selected.length;
-        }
+        document.getElementById('selectedCount').textContent = selected.length;
     }
 
     function clearCommoditySelection() {
@@ -1206,17 +1301,24 @@ If you spot any errors feel free to contact me.
         });
         updateSelectionCount();
         document.getElementById('tradeResults').classList.remove('visible');
-        document.getElementById('portResults').innerHTML = '';
+        document.getElementById('routeCards').innerHTML = '';
+        document.getElementById('resultsSummary').innerHTML = '';
+    }
+
+    function getSelectedShipRate() {
+        return parseInt(document.getElementById('ship-rate').value, 10);
     }
 
     function findBestPorts() {
         var selected = document.querySelectorAll('.commodity-item.selected');
         var resultsContainer = document.getElementById('tradeResults');
-        var resultsDiv = document.getElementById('portResults');
+        var routeCardsDiv = document.getElementById('routeCards');
+        var summaryDiv = document.getElementById('resultsSummary');
         
         if (selected.length === 0) {
             resultsContainer.classList.add('visible');
-            resultsDiv.innerHTML = '<div class="no-results">Select commodities from your hold to find the best ports to sell.</div>';
+            summaryDiv.innerHTML = '';
+            routeCardsDiv.innerHTML = '<div class="no-results">Select commodities from your hold to find the best ports to sell.</div>';
             return;
         }
         
@@ -1225,72 +1327,96 @@ If you spot any errors feel free to contact me.
             selectedCommodities.push(item.dataset.commodity);
         });
         
-        var bestPorts = TRADE_DATA.getBestPorts(selectedCommodities);
+        var shipRate = getSelectedShipRate();
+        var routes = TRADE_DATA.getOptimizedRoutes(selectedCommodities, shipRate);
         
-        if (bestPorts.length === 0) {
+        if (routes.length === 0) {
             resultsContainer.classList.add('visible');
-            resultsDiv.innerHTML = '<div class="no-results">No profitable ports found for the selected commodities.</div>';
+            summaryDiv.innerHTML = '<strong>No accessible ports found.</strong> Your ship rate may be too low to access ports where these commodities sell at max price.';
+            routeCardsDiv.innerHTML = '';
             return;
         }
         
-        resultsDiv.innerHTML = '';
+        var totalProfit = routes.reduce(function(sum, r) { return sum + r.totalProfit; }, 0);
+        var totalCommodities = selectedCommodities.length;
         
-        bestPorts.forEach(function(portData, index) {
-            var rank = index + 1;
+        summaryDiv.innerHTML = 
+            '<strong>' + routes.length + ' trip' + (routes.length > 1 ? 's' : '') + '</strong> to sell ' +
+            '<strong>' + totalCommodities + ' commodit' + (totalCommodities > 1 ? 'ies' : 'y') + '</strong> for ' +
+            '<strong>+' + totalProfit + ' gold</strong> total profit (per unit each)';
+        
+        routeCardsDiv.innerHTML = '';
+        
+        routes.forEach(function(route, index) {
             var card = document.createElement('div');
-            card.className = 'port-card rank-' + rank;
+            card.className = 'route-card' + (route.isSuboptimal ? ' suboptimal' : '');
             
-            // Build warnings HTML
-            var warningsHtml = '';
-            if (portData.shallowWater || portData.noPeaceFlag) {
-                warningsHtml = '<div class="port-warnings">';
-                if (portData.shallowWater) {
-                    warningsHtml += '<span class="port-warning warning-shallow">' + portData.shallowWater + '</span>';
-                }
-                if (portData.noPeaceFlag) {
-                    warningsHtml += '<span class="port-warning warning-pvp">No Peace Flag</span>';
-                }
-                warningsHtml += '</div>';
+            var badgesHtml = '';
+            if (route.shallowWater) {
+                badgesHtml += '<span class="route-badge badge-shallow">' + route.shallowWater + '</span>';
+            }
+            if (!route.isSuboptimal) {
+                badgesHtml += '<span class="route-badge badge-max">MAX PRICE</span>';
+            }
+            if (route.isSuboptimal) {
+                badgesHtml += '<span class="route-badge badge-suboptimal">Best Available</span>';
             }
             
-            // Build commodity breakdown HTML
-            var breakdownHtml = '';
-            portData.commodities.forEach(function(comm) {
-                var maxClass = comm.isMax ? ' breakdown-max' : '';
-                var maxLabel = comm.isMax ? ' (MAX)' : '';
-                breakdownHtml += 
-                    '<div class="breakdown-item">' +
-                        '<span class="breakdown-name">' + comm.name + '</span>' +
-                        '<span class="breakdown-profit' + maxClass + '">+' + comm.profit + ' gold' + maxLabel + '</span>' +
+            var commoditiesHtml = '';
+            route.commodities.forEach(function(comm) {
+                var iconFile = TRADE_DATA.commodityIcons[comm.key] || comm.key + '.png';
+                var priceClass = comm.isNotMax ? '' : ' max-price';
+                
+                commoditiesHtml += 
+                    '<div class="route-commodity-item">' +
+                        '<img class="route-commodity-icon" src="commodities/' + iconFile + '" alt="' + comm.name + '">' +
+                        '<span class="route-commodity-name">' + comm.name + '</span>' +
+                        '<span class="route-commodity-price' + priceClass + '">' + comm.sellPrice + ' gold</span>' +
+                        '<span class="route-commodity-profit">+' + comm.profit + '</span>' +
                     '</div>';
             });
             
-            card.innerHTML = 
-            '<div class="port-card-header">' +
-                '<span class="port-rank">#' + rank + '</span>' +
-                '<span class="port-name">' + portData.displayName + '</span>' +
-                warningsHtml +
-            '</div>' +
-            '<div class="port-stats">' +
-                '<div class="stat-row">' +
-                    '<span class="stat-label">Total Profit (per unit each)</span>' +
-                    '<span class="stat-value highlight">+' + portData.totalProfit + ' gold</span>' +
-                '</div>' +
-                '<div class="stat-row">' +
-                    '<span class="stat-label">Profit per Weight</span>' +
-                    '<span class="stat-value">' + portData.profitPerWeight + ' g/w</span>' +
-                '</div>' +
-                '<div class="stat-row">' +
-                    '<span class="stat-label">Total Weight (per unit each)</span>' +
-                    '<span class="stat-value">' + portData.totalWeight + ' units</span>' +
-                '</div>' +
-            '</div>' +
-            '<div class="commodity-breakdown">' +
-                '<div class="breakdown-title">Per Unit Profit</div>' +
-                breakdownHtml +
-            '</div>';
+            var alternativesHtml = '';
+            if (route.alternativePorts && route.alternativePorts.length > 0) {
+                var altPortsHtml = route.alternativePorts.map(function(alt) {
+                    var shallowNote = alt.shallowWater ? '<span class="shallow-note">(' + alt.shallowWater + ')</span>' : '';
+                    return '<span class="alternative-port">' + alt.displayName + shallowNote + '</span>';
+                }).join('');
+                
+                alternativesHtml = 
+                    '<div class="route-alternatives">' +
+                        '<div class="alternatives-title">Also sells at max price:</div>' +
+                        '<div class="alternatives-list">' + altPortsHtml + '</div>' +
+                    '</div>';
+            }
             
-            resultsDiv.appendChild(card);
+            card.innerHTML = 
+                '<div class="route-header">' +
+                    '<span class="route-number">Trip ' + (index + 1) + '</span>' +
+                    '<span class="route-port-name">' + route.displayName + '</span>' +
+                    '<div class="route-badges">' + badgesHtml + '</div>' +
+                '</div>' +
+                '<div class="route-stats">' +
+                    '<div class="route-stat">' +
+                        '<div class="route-stat-value">+' + route.totalProfit + '</div>' +
+                        '<div class="route-stat-label">Total Profit</div>' +
+                    '</div>' +
+                    '<div class="route-stat">' +
+                        '<div class="route-stat-value">' + route.profitPerWeight + '</div>' +
+                        '<div class="route-stat-label">Profit/Weight</div>' +
+                    '</div>' +
+                    '<div class="route-stat">' +
+                        '<div class="route-stat-value">' + route.commodities.length + '</div>' +
+                        '<div class="route-stat-label">Commodities</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="route-commodities">' +
+                    '<div class="route-commodities-title">Sell These Items</div>' +
+                    '<div class="route-commodity-list">' + commoditiesHtml + '</div>' +
+                '</div>' +
+                alternativesHtml;
+            
+            routeCardsDiv.appendChild(card);
         });
         
         resultsContainer.classList.add('visible');

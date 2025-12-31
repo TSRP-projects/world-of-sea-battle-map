@@ -28,34 +28,51 @@ var TRADE_DATA = {
     },
 
     // Port metadata for warnings (shallow water = ship rate restrictions)
+    // Lower number = bigger ship. Rate 1 is largest, Rate 7 is smallest.
     portMeta: {
+        // Minimum rate required to enter (lower number = bigger ship)
+        // Rate 7 can go anywhere, Rate 1 is most restricted
         shallowWater: {
-            // Rate 2-7 only (Rate 1 cannot enter)
-            'oneg': 'Rates 2-7 only',
-            'everston': 'Rates 2-7 only',
-            'aruba': 'Rates 2-7 only',
-            // Rate 3-7 only (Rate 1-2 cannot enter)
-            'gelbion': 'Rates 3-7 only',
-            'nisogora': 'Rates 3-7 only',
-            'cursed_city': 'Rates 3-7 only',
-            'el_tigre': 'Rates 3-7 only',
-            // Rate 4-7 only (Rate 1-3 cannot enter)
-            'aldansk': 'Rates 4-7 only',
-            'severoangelsk': 'Rates 4-7 only',
-            'north_bastion': 'Rates 4-7 only',
-            'san_cristobel': 'Rates 4-7 only',
-            // Rate 5-7 only (Rate 1-4 cannot enter)
-            'northside': 'Rates 5-7 only',
-            'south_bastion': 'Rates 5-7 only',
-            // Rate 6-7 only (Rate 1-5 cannot enter)
-            'fiji': 'Rates 6-7 only',
-            'los_catuano': 'Rates 6-7 only',
-            'puerto_salada': 'Rates 6-7 only',
-            'santa_marta': 'Rates 6-7 only',
-            'freebooter_bay': 'Rates 6-7 only'
+            // Rate 2+ only (Rate 1 cannot enter)
+            'oneg': { minRate: 2, label: 'Rates 2-7 only' },
+            'everston': { minRate: 2, label: 'Rates 2-7 only' },
+            'aruba': { minRate: 2, label: 'Rates 2-7 only' },
+            // Rate 3+ only (Rate 1-2 cannot enter)
+            'gelbion': { minRate: 3, label: 'Rates 3-7 only' },
+            'nisogora': { minRate: 3, label: 'Rates 3-7 only' },
+            'cursed_city': { minRate: 3, label: 'Rates 3-7 only' },
+            'el_tigre': { minRate: 3, label: 'Rates 3-7 only' },
+            // Rate 4+ only (Rate 1-3 cannot enter)
+            'aldansk': { minRate: 4, label: 'Rates 4-7 only' },
+            'severoangelsk': { minRate: 4, label: 'Rates 4-7 only' },
+            'north_bastion': { minRate: 4, label: 'Rates 4-7 only' },
+            'san_cristobel': { minRate: 4, label: 'Rates 4-7 only' },
+            // Rate 5+ only (Rate 1-4 cannot enter)
+            'northside': { minRate: 5, label: 'Rates 5-7 only' },
+            'south_bastion': { minRate: 5, label: 'Rates 5-7 only' },
+            // Rate 6+ only (Rate 1-5 cannot enter)
+            'fiji': { minRate: 6, label: 'Rates 6-7 only' },
+            'los_catuano': { minRate: 6, label: 'Rates 6-7 only' },
+            'puerto_salada': { minRate: 6, label: 'Rates 6-7 only' },
+            'santa_marta': { minRate: 6, label: 'Rates 6-7 only' },
+            'freebooter_bay': { minRate: 6, label: 'Rates 6-7 only' }
         },
         // Ports where peace flag is not allowed (pirate strongholds)
         noPeaceFlag: ['pirate_city', 'tortuga', 'naabad_stronghold', 'freebooter_bay', 'corsa_noir_bay']
+    },
+
+    // Check if a ship rate can access a port
+    // shipRate: 1-7 (1 = largest, 7 = smallest)
+    canAccessPort: function(port, shipRate) {
+        var restriction = this.portMeta.shallowWater[port];
+        if (!restriction) return true; // No restriction, all ships can enter
+        return shipRate >= restriction.minRate;
+    },
+
+    // Get shallow water label for a port
+    getShallowWaterLabel: function(port) {
+        var restriction = this.portMeta.shallowWater[port];
+        return restriction ? restriction.label : null;
     },
 
     // Commodity icons mapping
@@ -476,112 +493,206 @@ var TRADE_DATA = {
         return allPorts;
     },
 
-    // Calculate profit for a commodity to a destination
-    calculateProfit: function(commodityKey, destPort) {
+    // Get sellable ports filtered by ship rate
+    getSellablePortsForShipRate: function(shipRate) {
+        var self = this;
+        return this.getSellablePorts().filter(function(port) {
+            return self.canAccessPort(port, shipRate);
+        });
+    },
+
+    // Find all ports where a commodity sells for max price
+    getMaxPricePorts: function(commodityKey, shipRate) {
+        var self = this;
         var commodity = this.commodities[commodityKey];
-        if (!commodity) return null;
+        if (!commodity) return [];
 
-        var buyPrice = commodity.min; // Always buy at minimum (home region) price
-        var sellPrice = commodity.prices[destPort];
+        var maxPrice = commodity.max;
+        var ports = this.getSellablePortsForShipRate(shipRate);
         
-        if (!sellPrice) return null;
-
-        var profit = sellPrice - buyPrice;
-        var profitPerWeight = profit / commodity.weight;
-        var maxProfit = commodity.max - commodity.min;
-
-        return {
-            commodity: commodityKey,
-            name: commodity.name,
-            buyPrice: buyPrice,
-            sellPrice: sellPrice,
-            profit: profit,
-            profitPerWeight: parseFloat(profitPerWeight.toFixed(2)),
-            weight: commodity.weight,
-            maxProfit: maxProfit,
-            isMaxProfit: sellPrice === commodity.max,
-            profitPercent: maxProfit > 0 ? Math.round((profit / maxProfit) * 100) : 0
-        };
+        return ports.filter(function(port) {
+            return commodity.prices[port] === maxPrice;
+        }).map(function(port) {
+            return {
+                port: port,
+                displayName: self.getDisplayName(port),
+                price: maxPrice,
+                shallowWater: self.getShallowWaterLabel(port)
+            };
+        });
     },
 
-    // Get ranked recommendations for selected commodities
-    getRecommendations: function(selectedCommodities, destPort) {
+    // Get optimized routes - groups commodities by their max-price ports
+    getOptimizedRoutes: function(selectedCommodities, shipRate) {
         var self = this;
-        var results = [];
-
+        
+        // For each commodity, find all max-price ports accessible by ship rate
+        var commodityMaxPorts = {};
         selectedCommodities.forEach(function(commodityKey) {
-            var calc = self.calculateProfit(commodityKey, destPort);
-            if (calc && calc.profit > 0) {
-                results.push(calc);
-            }
+            var maxPorts = self.getMaxPricePorts(commodityKey, shipRate);
+            commodityMaxPorts[commodityKey] = maxPorts.map(function(p) { return p.port; });
         });
 
-        // Sort by profit per weight (descending)
-        results.sort(function(a, b) {
-            return b.profitPerWeight - a.profitPerWeight;
+        // Find the optimal grouping: ports that serve the most commodities at max price
+        var portCommodityMap = {}; // port -> list of commodities at max price there
+        
+        selectedCommodities.forEach(function(commodityKey) {
+            commodityMaxPorts[commodityKey].forEach(function(port) {
+                if (!portCommodityMap[port]) {
+                    portCommodityMap[port] = [];
+                }
+                portCommodityMap[port].push(commodityKey);
+            });
         });
 
-        return results;
-    },
+        // Greedy algorithm: repeatedly pick the port that covers the most uncovered commodities
+        var uncoveredCommodities = selectedCommodities.slice();
+        var routes = [];
 
-    // Hold size configurations
-    // Hold size configurations
-    holdSizes: {
-        small: { min: 0, max: 7000, label: 'Small Hold', description: '< 7,000' },
-        medium: { min: 7000, max: 25000, label: 'Medium Hold', description: '7,000 - 25,000' },
-        large: { min: 25000, max: Infinity, label: 'Large Hold', description: '> 25,000' }
-    },
+        while (uncoveredCommodities.length > 0) {
+            var bestPort = null;
+            var bestCoverage = [];
+            var bestCount = 0;
 
-    // Calculate best ports to sell selected commodities
-    getBestPorts: function(selectedCommodities) {
-        var self = this;
-        var allPorts = this.getSellablePorts();
-        var portResults = [];
-
-        allPorts.forEach(function(port) {
-            var totalProfit = 0;
-            var totalWeight = 0;
-            var commodityDetails = [];
-
-            selectedCommodities.forEach(function(commodityKey) {
-                var commodity = self.commodities[commodityKey];
-                if (commodity && commodity.prices[port]) {
-                    var buyPrice = commodity.min;
-                    var sellPrice = commodity.prices[port];
-                    var profit = sellPrice - buyPrice;
-                    
-                    if (profit > 0) {
-                        totalProfit += profit;
-                        totalWeight += commodity.weight;
-                        commodityDetails.push({
-                            name: commodity.name,
-                            profit: profit,
-                            sellPrice: sellPrice,
-                            isMax: sellPrice === commodity.max
-                        });
-                    }
+            Object.keys(portCommodityMap).forEach(function(port) {
+                var coverage = portCommodityMap[port].filter(function(c) {
+                    return uncoveredCommodities.indexOf(c) !== -1;
+                });
+                if (coverage.length > bestCount) {
+                    bestCount = coverage.length;
+                    bestPort = port;
+                    bestCoverage = coverage;
                 }
             });
 
-            if (totalProfit > 0) {
-                portResults.push({
-                    port: port,
-                    displayName: self.getDisplayName(port),
+            if (bestPort && bestCount > 0) {
+                // Build route info
+                var routeCommodities = bestCoverage.map(function(commodityKey) {
+                    var commodity = self.commodities[commodityKey];
+                    return {
+                        key: commodityKey,
+                        name: commodity.name,
+                        sellPrice: commodity.max,
+                        profit: commodity.max - commodity.min,
+                        weight: commodity.weight
+                    };
+                });
+
+                // Sort commodities by profit descending
+                routeCommodities.sort(function(a, b) {
+                    return b.profit - a.profit;
+                });
+
+                var totalProfit = routeCommodities.reduce(function(sum, c) { return sum + c.profit; }, 0);
+                var totalWeight = routeCommodities.reduce(function(sum, c) { return sum + c.weight; }, 0);
+
+                // Get all alternative ports for these commodities
+                var alternativePorts = self.getAlternativeMaxPorts(bestCoverage, shipRate, bestPort);
+
+                routes.push({
+                    port: bestPort,
+                    displayName: self.getDisplayName(bestPort),
+                    shallowWater: self.getShallowWaterLabel(bestPort),
+                    commodities: routeCommodities,
                     totalProfit: totalProfit,
                     totalWeight: totalWeight,
                     profitPerWeight: parseFloat((totalProfit / totalWeight).toFixed(2)),
-                    commodities: commodityDetails,
-                    shallowWater: self.portMeta.shallowWater[port] || null,
-                    noPeaceFlag: self.portMeta.noPeaceFlag.indexOf(port) !== -1
+                    alternativePorts: alternativePorts
                 });
-            }
-        });
 
-        // Sort by total profit descending
-        portResults.sort(function(a, b) {
+                // Remove covered commodities
+                bestCoverage.forEach(function(c) {
+                    var idx = uncoveredCommodities.indexOf(c);
+                    if (idx !== -1) {
+                        uncoveredCommodities.splice(idx, 1);
+                    }
+                });
+            } else {
+                // No port covers remaining commodities at max - find best non-max port
+                uncoveredCommodities.forEach(function(commodityKey) {
+                    var bestNonMaxResult = self.getBestNonMaxPort(commodityKey, shipRate);
+                    if (bestNonMaxResult) {
+                        var commodity = self.commodities[commodityKey];
+                        routes.push({
+                            port: bestNonMaxResult.port,
+                            displayName: self.getDisplayName(bestNonMaxResult.port),
+                            shallowWater: self.getShallowWaterLabel(bestNonMaxResult.port),
+                            commodities: [{
+                                key: commodityKey,
+                                name: commodity.name,
+                                sellPrice: bestNonMaxResult.price,
+                                profit: bestNonMaxResult.price - commodity.min,
+                                weight: commodity.weight,
+                                isNotMax: true,
+                                maxPrice: commodity.max
+                            }],
+                            totalProfit: bestNonMaxResult.price - commodity.min,
+                            totalWeight: commodity.weight,
+                            profitPerWeight: parseFloat(((bestNonMaxResult.price - commodity.min) / commodity.weight).toFixed(2)),
+                            alternativePorts: [],
+                            isSuboptimal: true
+                        });
+                    }
+                });
+                break;
+            }
+        }
+
+        // Sort routes by total profit descending
+        routes.sort(function(a, b) {
             return b.totalProfit - a.totalProfit;
         });
 
-        return portResults.slice(0, 3);
+        return routes;
+    },
+
+    // Get alternative ports that also give max price for all the commodities in a group
+    getAlternativeMaxPorts: function(commodityKeys, shipRate, excludePort) {
+        var self = this;
+        var accessiblePorts = this.getSellablePortsForShipRate(shipRate);
+        
+        var alternatives = accessiblePorts.filter(function(port) {
+            if (port === excludePort) return false;
+            
+            // Check if this port gives max price for ALL commodities in the group
+            return commodityKeys.every(function(commodityKey) {
+                var commodity = self.commodities[commodityKey];
+                return commodity.prices[port] === commodity.max;
+            });
+        });
+
+        return alternatives.map(function(port) {
+            return {
+                port: port,
+                displayName: self.getDisplayName(port),
+                shallowWater: self.getShallowWaterLabel(port)
+            };
+        });
+    },
+
+    // Find best non-max port for a commodity (fallback when no max-price port is accessible)
+    getBestNonMaxPort: function(commodityKey, shipRate) {
+        var self = this;
+        var commodity = this.commodities[commodityKey];
+        if (!commodity) return null;
+
+        var ports = this.getSellablePortsForShipRate(shipRate);
+        var bestPort = null;
+        var bestPrice = 0;
+
+        ports.forEach(function(port) {
+            var price = commodity.prices[port];
+            if (price > bestPrice) {
+                bestPrice = price;
+                bestPort = port;
+            }
+        });
+
+        return bestPort ? { port: bestPort, price: bestPrice } : null;
+    },
+
+    // Legacy function - kept for backwards compatibility
+    getBestPorts: function(selectedCommodities) {
+        return this.getOptimizedRoutes(selectedCommodities, 7);
     }
 };
