@@ -882,10 +882,6 @@
             const tier = getTierFromPoints(availablePoints);
             document.getElementById('userTier').textContent = `${tier.emoji} ${tier.name}`;
             document.getElementById('tierSupport').textContent = `(${Math.round(tier.support * 100)}% guild support)`;
-            
-            const tierBadge = document.getElementById('tierBadge');
-            tierBadge.textContent = `${tier.emoji} ${tier.name}`;
-            tierBadge.className = `tier-badge tier-${tier.name.toLowerCase()}`;
 
             // Update tier progress bar
             const nextTier = getNextTier(tier);
@@ -900,8 +896,7 @@
                 document.getElementById('tierProgressFill').style.width = progressPercent + '%';
                 document.getElementById('tierProgressText').textContent = `${availablePoints}/${nextTier.min}`;
                 
-                document.getElementById('tierDescription').textContent = 
-                    `${nextTier.min - availablePoints} more points for ${nextTier.name} (${Math.round(nextTier.support * 100)}% guild support)`;
+
             } else {
                 tierProgressContainer.style.display = 'none';
                 document.getElementById('tierDescription').textContent = 
