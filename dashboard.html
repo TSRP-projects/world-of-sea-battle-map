@@ -617,6 +617,54 @@
             font-weight: bold;
             margin-left: 5px;
         }
+
+        /* Donation Breakdown Styles */
+        .donation-breakdown {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(139, 105, 20, 0.3);
+        }
+
+        .donation-header {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 14px;
+            color: #8b6914;
+            margin-bottom: 10px;
+        }
+
+        .donation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .donation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .donation-material {
+            color: #3d2b1f;
+        }
+
+        .donation-amount {
+            color: #8b6914;
+            font-weight: bold;
+        }
+
+        .donation-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #5c4a3a;
+            font-size: 13px;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
@@ -695,6 +743,11 @@
                 <div class="stat-row">
                     <span class="stat-label">Status:</span>
                     <span class="stat-value" id="activityStatus">Unknown</span>
+                </div>
+                <div class="donation-breakdown">
+                    <div class="donation-header">My Donations (All-Time)</div>
+                    <div id="donationBreakdown" class="donation-grid">
+                        <div class="donation-empty">Loading...</div>
                 </div>
             </div>
         </div>
@@ -886,6 +939,7 @@
                     });
 
                 loadLeaderboards();
+                loadDonationBreakdown(userId);
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
@@ -1533,6 +1587,89 @@
             window.location.href = 'login.html';
         }
 
+        async function loadDonationBreakdown(playerId) {
+            const breakdownDiv = document.getElementById('donationBreakdown');
+            
+            try {
+                const snapshot = await db.collection('contributions')
+                    .where('playerId', '==', playerId)
+                    .where('activityType', '==', 'Material Donation')
+                    .get();
+                
+                if (snapshot.empty) {
+                    breakdownDiv.innerHTML = '<div class="donation-empty">No donations yet</div>';
+                    return;
+                }
+                
+                const totals = {};
+                snapshot.docs.forEach(doc => {
+                    const contrib = doc.data();
+                    const material = contrib.materialType;
+                    const quantity = contrib.materialQuantity || 0;
+                    
+                    if (material && quantity > 0) {
+                        if (!totals[material]) {
+                            totals[material] = 0;
+                        }
+                        totals[material] += quantity;
+                    }
+                });
+                
+                const displayOrder = [
+                    'beams', 'bulkheads', 'plates', 'canvas',
+                    'iron', 'coal', 'wood', 'resin', 'fabric'
+                ];
+                
+                const materialNames = {
+                    beams: 'Beams',
+                    bulkheads: 'Bulkheads',
+                    plates: 'Plates',
+                    canvas: 'Canvas',
+                    iron: 'Iron',
+                    coal: 'Coal',
+                    wood: 'Wood',
+                    resin: 'Resin',
+                    fabric: 'Fabric'
+                };
+                
+                breakdownDiv.innerHTML = '';
+                let hasData = false;
+                
+                displayOrder.forEach(material => {
+                    if (totals[material] && totals[material] > 0) {
+                        hasData = true;
+                        const item = document.createElement('div');
+                        item.className = 'donation-item';
+                        item.innerHTML = `
+                            <span class="donation-material">${materialNames[material] || material}</span>
+                            <span class="donation-amount">${formatNumber(totals[material])}</span>
+                        `;
+                        breakdownDiv.appendChild(item);
+                    }
+                });
+                
+                Object.keys(totals).forEach(material => {
+                    if (!displayOrder.includes(material) && totals[material] > 0) {
+                        hasData = true;
+                        const item = document.createElement('div');
+                        item.className = 'donation-item';
+                        item.innerHTML = `
+                            <span class="donation-material">${materialNames[material] || material}</span>
+                            <span class="donation-amount">${formatNumber(totals[material])}</span>
+                        `;
+                        breakdownDiv.appendChild(item);
+                    }
+                });
+                
+                if (!hasData) {
+                    breakdownDiv.innerHTML = '<div class="donation-empty">No donations yet</div>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading donation breakdown:', error);
+                breakdownDiv.innerHTML = '<div class="donation-empty">Error loading data</div>';
+            }
+        }
         function displayLedger(docs) {
             const container = document.getElementById('ledgerContainer');
             
