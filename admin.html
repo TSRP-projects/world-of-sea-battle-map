@@ -467,6 +467,39 @@
             font-style: italic;
             padding: 10px;
         }
+
+        .crafting-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #f5f0e6;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            padding: 15px;
+        }
+
+        .crafting-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .crafting-label {
+            min-width: 50px;
+            font-size: 13px;
+            color: #3d2b1f;
+        }
+
+        .crafting-input-row input {
+            flex: 1;
+            padding: 8px;
+            background: #fff;
+            border: 1px solid #8b6914;
+            border-radius: 3px;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 14px;
+            color: #3d2b1f;
+        }
     </style>
 </head>
 <body>
@@ -597,6 +630,59 @@
                 
                 <button class="btn btn-success" onclick="logDistribution()" style="width: 100%;">
                     Log Distribution
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>🔨 Log Crafting</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Record crafting of materials. Raw materials consumed will be deducted and crafted materials added to guild storage.
+                </p>
+                
+                <div class="form-group">
+                    <label>Crafted Material:</label>
+                    <select id="craftedMaterial">
+                        <option value="">-- Select Material --</option>
+                        <option value="beams">Beams</option>
+                        <option value="bulkheads">Bulkheads</option>
+                        <option value="plates">Plates</option>
+                        <option value="canvas">Canvas</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity Produced:</label>
+                    <input type="number" id="craftedQuantity" min="1" placeholder="Enter amount crafted">
+                </div>
+                
+                <div class="form-group">
+                    <label>Raw Materials Consumed:</label>
+                    <div class="crafting-inputs">
+                        <div class="crafting-input-row">
+                            <span class="crafting-label">Wood:</span>
+                            <input type="number" id="craftWood" min="0" placeholder="0">
+                        </div>
+                        <div class="crafting-input-row">
+                            <span class="crafting-label">Iron:</span>
+                            <input type="number" id="craftIron" min="0" placeholder="0">
+                        </div>
+                        <div class="crafting-input-row">
+                            <span class="crafting-label">Coal:</span>
+                            <input type="number" id="craftCoal" min="0" placeholder="0">
+                        </div>
+                        <div class="crafting-input-row">
+                            <span class="crafting-label">Resin:</span>
+                            <input type="number" id="craftResin" min="0" placeholder="0">
+                        </div>
+                        <div class="crafting-input-row">
+                            <span class="crafting-label">Fabric:</span>
+                            <input type="number" id="craftFabric" min="0" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" onclick="logCrafting()" style="width: 100%;">
+                    Log Crafting
                 </button>
             </div>
 
@@ -1404,6 +1490,115 @@
             }
         }
 
+        async function logCrafting() {
+            const craftedMaterial = document.getElementById('craftedMaterial').value;
+            const craftedQuantity = parseInt(document.getElementById('craftedQuantity').value);
+            
+            const woodUsed = parseInt(document.getElementById('craftWood').value) || 0;
+            const ironUsed = parseInt(document.getElementById('craftIron').value) || 0;
+            const coalUsed = parseInt(document.getElementById('craftCoal').value) || 0;
+            const resinUsed = parseInt(document.getElementById('craftResin').value) || 0;
+            const fabricUsed = parseInt(document.getElementById('craftFabric').value) || 0;
+
+            if (!craftedMaterial) {
+                alert('Select a crafted material');
+                return;
+            }
+            if (!craftedQuantity || craftedQuantity < 1) {
+                alert('Enter the quantity produced');
+                return;
+            }
+            
+            const totalRawUsed = woodUsed + ironUsed + coalUsed + resinUsed + fabricUsed;
+            if (totalRawUsed === 0) {
+                alert('Enter at least one raw material consumed');
+                return;
+            }
+
+            const craftedDisplay = craftedMaterial.charAt(0).toUpperCase() + craftedMaterial.slice(1);
+            const officerName = currentOfficer.squadron 
+                ? `[${currentOfficer.squadron}] ${currentOfficer.gamertag}`
+                : currentOfficer.gamertag || 'Unknown';
+
+            // Build consumed materials string for ledger
+            const consumedParts = [];
+            if (woodUsed > 0) consumedParts.push(`${formatNumber(woodUsed)} Wood`);
+            if (ironUsed > 0) consumedParts.push(`${formatNumber(ironUsed)} Iron`);
+            if (coalUsed > 0) consumedParts.push(`${formatNumber(coalUsed)} Coal`);
+            if (resinUsed > 0) consumedParts.push(`${formatNumber(resinUsed)} Resin`);
+            if (fabricUsed > 0) consumedParts.push(`${formatNumber(fabricUsed)} Fabric`);
+            const consumedString = consumedParts.join(', ');
+
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Deduct raw materials from guild resources
+                const rawMaterials = [
+                    { name: 'Wood', amount: woodUsed },
+                    { name: 'Iron', amount: ironUsed },
+                    { name: 'Coal', amount: coalUsed },
+                    { name: 'Resin', amount: resinUsed },
+                    { name: 'Fabric', amount: fabricUsed }
+                ];
+
+                for (const material of rawMaterials) {
+                    if (material.amount > 0) {
+                        const resourceQuery = await db.collection('guildResources')
+                            .where('materialType', '==', material.name)
+                            .get();
+                        
+                        if (!resourceQuery.empty) {
+                            batch.update(resourceQuery.docs[0].ref, {
+                                currentStock: firebase.firestore.FieldValue.increment(-material.amount),
+                                lastUpdated: timestamp,
+                                updatedBy: currentOfficer.id
+                            });
+                        }
+                    }
+                }
+
+                // Add crafted material to guild resources
+                const resourceQuery = await db.collection('guildResources')
+                    .where('materialType', '==', craftedDisplay)
+                    .get();
+                
+                if (!resourceQuery.empty) {
+                    batch.update(resourceQuery.docs[0].ref, {
+                        currentStock: firebase.firestore.FieldValue.increment(craftedQuantity),
+                        lastUpdated: timestamp,
+                        updatedBy: currentOfficer.id
+                    });
+                }
+
+                // Log to Admiral's Ledger
+                const ledgerRef = db.collection('admiralLedger').doc();
+                batch.set(ledgerRef, {
+                    action: 'Crafting Logged',
+                    details: `${officerName} crafted ${formatNumber(craftedQuantity)} ${craftedDisplay} using ${consumedString}`,
+                    performedBy: currentOfficer.id,
+                    performedByName: officerName,
+                    timestamp: timestamp
+                });
+
+                await batch.commit();
+
+                alert(`Crafting logged!\n${formatNumber(craftedQuantity)} ${craftedDisplay} added to guild storage\n\nConsumed: ${consumedString}`);
+
+                // Reset form
+                document.getElementById('craftedMaterial').value = '';
+                document.getElementById('craftedQuantity').value = '';
+                document.getElementById('craftWood').value = '';
+                document.getElementById('craftIron').value = '';
+                document.getElementById('craftCoal').value = '';
+                document.getElementById('craftResin').value = '';
+                document.getElementById('craftFabric').value = '';
+
+            } catch (err) {
+                console.error('Error logging crafting:', err);
+                alert('Error: ' + err.message);
+            }
+        }
         async function toggleMemberDetails(playerId, button) {
             const existingRow = document.getElementById(`details-${playerId}`);
             
