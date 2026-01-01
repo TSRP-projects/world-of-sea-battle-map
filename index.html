@@ -1192,9 +1192,21 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
 <input type="checkbox" id="show-fast-travel" /><label for="show-fast-travel">Show fast travel routes</label>
 <input type="checkbox" id="show-island" checked="checked" /><label for="show-island">Show personal island spots</label>
 <input type="checkbox" id="show-production" /><label for="show-production">Show production spots</label>
+
 <input type="checkbox" id="show-altar" /><label for="show-altar">Show altars</label>
 <input type="checkbox" id="show-fort" checked="checked" /><label for="show-fort">Show forts</label>
 <input type="checkbox" id="show-circle" checked="checked" /><label for="show-circle">Show pvp circle border</label>
+Production sites marked with the red outline are located outside the known map (in the endless sea), those locations are approximate.
+</p>
+<p>
+<strong>For helpers:</strong><br/>
+<input type="checkbox" id="show-portsxy"  /><label for="show-portsxy">Show ports coordinates</label>
+<input type="checkbox" id="show-islandsxy"  /><label for="show-islandsxy">Show islands coordinates</label>
+<input type="checkbox" id="show-productionsxy"  /><label for="show-productionsxy">Show production sites coordinates</label>
+
+<input type="checkbox" id="show-altarsxy"  /><label for="show-altarsxy">Show altars coordinates</label>
+<input type="checkbox" id="show-fortsxy"  /><label for="show-fortsxy">Show fort coordinates</label><br/>
+If you spot any errors feel free to contact me.
 </p>
 </div>
 
@@ -1244,14 +1256,18 @@ div.fortxylabel {color: violet; font-size: 12px; font-weight: bold; text-shadow:
     $(document).ready(function() {
         $('#show-ports').click(function() { $('#ports').toggle(); });
         $('#show-lighthouses').click(function() { $('#lighthouses').toggle(); });
+        $('#show-portsxy').click(function() { $('#portsxy').toggle(); });  
+        $('#show-islandsxy').click(function() { $('#islandsxy').toggle(); });  
+        $('#show-productionsxy').click(function() { $('#productionsxy').toggle(); });  
         $('#show-fast-travel').click(function() { $('#fast-travel').toggle(); });  
         $('#show-circle').click(function() { $('#circle').toggle(); });   
         $('#show-island').click(function() { $('.island').toggle(); });
         $('#show-production').click(function() { $('.production').toggle(); });
         $('#show-altar').click(function() { $('.altar').toggle(); });
         $('#show-fort').click(function() { $('.fort').toggle(); });
+        $('#show-altarsxy').click(function() { $('#altarsxy').toggle(); });
+        $('#show-fortsxy').click(function() { $('#fortsxy').toggle(); });
         initTradeCalculator();
-    });
 
     function initTradeCalculator() {
         buildCommodityGrid();
