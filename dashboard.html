@@ -581,6 +581,42 @@
             color: #5c4a3a;
             margin-top: 4px;
         }
+
+        .discount-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .discount-input-row input {
+            width: 80px;
+            padding: 8px;
+            background: #f5f0e6;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 14px;
+            color: #3d2b1f;
+            text-align: center;
+        }
+
+        .discount-input-row input:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+
+        .discount-symbol {
+            font-weight: bold;
+            color: #8b6914;
+        }
+
+        .discounted-label {
+            font-size: 11px;
+            color: #2d5a2d;
+            font-weight: bold;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -673,6 +709,19 @@
                         <select id="goalShipSelector" class="ship-goal-selector" onchange="setGoalShip()">
                             <option value="">-- Choose Goal Ship --</option>
                         </select>
+
+                        <div id="discountSection" style="display: none; margin-top: 15px;">
+                            <label style="color: #5c4a3a; font-size: 14px;">Workshop Discount (%):</label>
+                            <div class="discount-input-row">
+                                <input type="number" id="discountPercent" min="0" max="100" value="0" placeholder="0">
+                                <span class="discount-symbol">%</span>
+                                <button class="btn btn-small btn-primary" onclick="applyDiscount()">Apply</button>
+                                <button class="btn btn-small btn-secondary" onclick="clearDiscount()">Clear</button>
+                            </div>
+                            <p id="discountNote" style="font-size: 11px; color: #5c4a3a; margin-top: 5px;">
+                                Applies to materials only (Beams, Bulkheads, Plates, Canvas). Does not affect Battle Marks, Escudo, Licenses, or Blueprints.
+                            </p>
+                        </div>
                         
                         <div id="goalStats" style="margin-top: 20px; display: none;">
                             <div class="stat-row">
@@ -775,6 +824,7 @@
         let currentPlayer = null;
         let allShips = [];
         let guildResources = {};
+        let currentDiscount = 0;
 
         const resourceIcons = {
             beams: 'beams.png',
@@ -1021,8 +1071,11 @@
                 goalStats.style.display = 'none';
                 progressContainer.style.display = 'none';
                 resourceBreakdown.style.display = 'none';
+                document.getElementById('discountSection').style.display = 'none';
                 return;
             }
+
+            document.getElementById('discountSection').style.display = 'block';
 
             const goalShip = allShips.find(s => s.id === player.goalShipId);
             if (!goalShip) {
@@ -1053,13 +1106,14 @@
             let guildTotalNeeded = 0;
             let guildTotalHave = 0;
 
-            // Calculate player's share of guild-supported resources
+            // Calculate player's share of guild-supported resources (with discount)
             guildSupportedResources.forEach(key => {
                 const shipTotal = goalShip[key] || 0;
                 if (shipTotal === 0) return;
 
-                const playerNeeds = Math.ceil(shipTotal * playerSharePercent);
-                const guildNeeds = Math.floor(shipTotal * guildSupportPercent);
+                const discountedTotal = Math.ceil(shipTotal * (1 - currentDiscount));
+                const playerNeeds = Math.ceil(discountedTotal * playerSharePercent);
+                const guildNeeds = Math.floor(discountedTotal * guildSupportPercent);
                 
                 const playerHas = Math.min(playerInventory[key] || 0, playerNeeds);
                 const guildHas = Math.min(guildResources[key] || 0, guildNeeds);
@@ -1117,14 +1171,14 @@
             const playerInventory = currentPlayer.inventory || {};
 
             const resources = [
-                { name: 'Beams', key: 'beams', icon: resourceIcons.beams, guildSupported: true },
-                { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads, guildSupported: true },
-                { name: 'Plates', key: 'plates', icon: resourceIcons.plates, guildSupported: true },
-                { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas, guildSupported: true },
-                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks, guildSupported: false },
-                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense, guildSupported: false },
-                { name: 'Escudo', key: 'escudo', icon: resourceIcons.escudo, guildSupported: false },
-                { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint, guildSupported: false }
+                { name: 'Beams', key: 'beams', icon: resourceIcons.beams, guildSupported: true, discountable: true },
+                { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads, guildSupported: true, discountable: true },
+                { name: 'Plates', key: 'plates', icon: resourceIcons.plates, guildSupported: true, discountable: true },
+                { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas, guildSupported: true, discountable: true },
+                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks, guildSupported: false, discountable: false },
+                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense, guildSupported: false, discountable: false },
+                { name: 'Escudo', key: 'escudo', icon: resourceIcons.escudo, guildSupported: false, discountable: false },
+                { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint, guildSupported: false, discountable: false }
             ];
 
             let allPlayerResourcesMet = true;
@@ -1134,13 +1188,21 @@
                 const total = ship[resource.key] || 0;
                 if (total === 0) return;
 
+                let effectiveTotal = total;
+                let discountedLabel = '';
+                
+                if (resource.discountable && currentDiscount > 0) {
+                    effectiveTotal = Math.ceil(total * (1 - currentDiscount));
+                    discountedLabel = `<span class="discounted-label">(${Math.round(currentDiscount * 100)}% off)</span>`;
+                }
+
                 let playerAmount, guildAmount;
                 
                 if (resource.guildSupported) {
-                    playerAmount = Math.ceil(total * playerPercent);
-                    guildAmount = Math.floor(total * guildPercent);
+                    playerAmount = Math.ceil(effectiveTotal * playerPercent);
+                    guildAmount = Math.floor(effectiveTotal * guildPercent);
                 } else {
-                    playerAmount = total;
+                    playerAmount = effectiveTotal;
                     guildAmount = 0;
                 }
 
@@ -1162,7 +1224,7 @@
                 item.innerHTML = `
                     <img src="${resource.icon}" alt="${resource.name}" class="resource-icon">
                     <div class="resource-details">
-                        <div class="resource-name">${resource.name} (${formatNumber(total)} total)</div>
+                        <div class="resource-name">${resource.name} (${formatNumber(effectiveTotal)} total)${discountedLabel}</div>
                         <div class="resource-amounts">
                             <span class="resource-have-need ${playerSufficient ? 'resource-sufficient' : 'resource-insufficient'}">
                                 You: ${formatNumber(playerHas)}/${formatNumber(playerAmount)}
@@ -1174,7 +1236,6 @@
                 grid.appendChild(item);
             });
 
-            // Update build button state - both player AND guild must have resources
             updateBuildButtonState(allPlayerResourcesMet && allGuildResourcesMet, ship);
         }
 
@@ -1307,6 +1368,32 @@
             } catch (err) {
                 console.error('Error setting goal ship:', err);
                 alert('Error: ' + err.message);
+            }
+        }
+
+        function applyDiscount() {
+            const discountInput = document.getElementById('discountPercent');
+            let discount = parseFloat(discountInput.value) || 0;
+            
+            if (discount < 0) discount = 0;
+            if (discount > 100) discount = 100;
+            
+            discountInput.value = discount;
+            currentDiscount = discount / 100;
+            
+            if (currentPlayer) {
+                const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                updateShipGoalProgress(currentPlayer, availablePoints);
+            }
+        }
+
+        function clearDiscount() {
+            document.getElementById('discountPercent').value = 0;
+            currentDiscount = 0;
+            
+            if (currentPlayer) {
+                const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                updateShipGoalProgress(currentPlayer, availablePoints);
             }
         }
 
