@@ -944,7 +944,7 @@
                 populateShipSelector();
 
                 // THEN set up player listener
-                db.collection('players').doc(user.uid).onSnapshot(async doc => {
+                db.collection('players').doc(userId).onSnapshot(async doc => {
                     if (doc.exists) {
                         currentPlayer = { id: doc.id, ...doc.data() };
                         
