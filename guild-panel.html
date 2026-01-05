@@ -482,10 +482,8 @@
                         guildMembers = snapshot.docs;
                         displayMembers(snapshot.docs);
                         updateGuildStats(snapshot.docs);
+                        loadGuildContributions();
                     });
-
-                // Load guild contributions
-                loadGuildContributions();
 
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('panelContent').style.display = 'block';
