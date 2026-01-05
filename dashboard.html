@@ -977,7 +977,7 @@
         function updatePlayerUI(player) {
             // Load guild admirals
             loadGuildAdmirals(player.squadron);
-            
+
             // Display gamertag
             const gamertagDisplay = document.getElementById('gamertag-display');
             if (player.gamertag) {
@@ -1008,10 +1008,6 @@
             }
 
             const availablePoints = player.totalPoints - player.sharesRedeemed;
-
-            document.getElementById('totalPoints').textContent = formatNumber(player.totalPoints);
-            document.getElementById('sharesRedeemed').textContent = formatNumber(player.sharesRedeemed);
-            document.getElementById('availablePoints').textContent = formatNumber(availablePoints);
 
             const tier = getTierFromPoints(availablePoints);
             document.getElementById('userTier').textContent = `${tier.emoji} ${tier.name}`;
