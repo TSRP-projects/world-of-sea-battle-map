@@ -708,6 +708,54 @@
                     </button>
                 </div>
             </div>
+
+            <div class="card">
+                <h3>🚢 Manage Admirals</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Promote or demote players to guild admiral status.
+                </p>
+                
+                <div class="form-group">
+                    <label>Select Player:</label>
+                    <select id="admiralPlayer">
+                        <option value="">-- Select Player --</option>
+                    </select>
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="promoteToAdmiral()" style="flex: 1;">
+                        Promote to Admiral
+                    </button>
+                    <button class="btn btn-danger" onclick="demoteAdmiral()" style="flex: 1;">
+                        Remove Admiral
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>⚓ Change Player Guild</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Reassign a player to a different guild.
+                </p>
+                
+                <div class="form-group">
+                    <label>Select Player:</label>
+                    <select id="guildChangePlayer">
+                        <option value="">-- Select Player --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>New Guild:</label>
+                    <select id="newGuildSelect">
+                        <option value="">-- Select Guild --</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" onclick="changePlayerGuild()" style="width: 100%;">
+                    Change Guild
+                </button>
+            </div>
         </div>
 
         <div class="card">
@@ -777,6 +825,7 @@
     <script>
         let allShips = {};
         let allMembers = [];
+        let allGuilds = [];
         let currentOfficer = null;
         let selectedPlayerId = null;
         let selectedContributionId = null;
@@ -802,6 +851,11 @@
                 shipsSnapshot.docs.forEach(doc => {
                     allShips[doc.id] = doc.data();
                 });
+
+                // Load guilds
+                const guildsSnapshot = await db.collection('guilds').orderBy('name').get();
+                allGuilds = guildsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                populateGuildSelector();
 
                 db.collection('players')
                     .orderBy('totalPoints', 'desc')
@@ -831,6 +885,18 @@
                 console.error('Error loading admin data:', err);
                 alert('Error: ' + err.message);
             }
+        }
+
+        function populateGuildSelector() {
+            const selector = document.getElementById('newGuildSelect');
+            selector.innerHTML = '<option value="">-- Select Guild --</option>';
+            
+            allGuilds.forEach(guild => {
+                const option = document.createElement('option');
+                option.value = guild.code;
+                option.textContent = guild.name;
+                selector.appendChild(option);
+            });
         }
 
         function displayMembers(docs) {
@@ -916,6 +982,20 @@
                 officerOption.value = doc.id;
                 officerOption.textContent = displayText + (member.isOfficer ? ' (Officer)' : '');
                 officerSelector.appendChild(officerOption);
+
+                // Admiral player option
+                const admiralSelector = document.getElementById('admiralPlayer');
+                const admiralOption = document.createElement('option');
+                admiralOption.value = doc.id;
+                admiralOption.textContent = displayText + (member.isAdmiral ? ' (Admiral)' : '');
+                admiralSelector.appendChild(admiralOption);
+
+                // Guild change player option
+                const guildChangeSelector = document.getElementById('guildChangePlayer');
+                const guildChangeOption = document.createElement('option');
+                guildChangeOption.value = doc.id;
+                guildChangeOption.textContent = displayText;
+                guildChangeSelector.appendChild(guildChangeOption);
 
                 // Distribution player option
                 const distributionSelector = document.getElementById('distributionPlayer');
@@ -1702,6 +1782,130 @@
                 console.error('Error loading distributions:', err);
                 document.getElementById(`distributions-${playerId}`).innerHTML = 
                     '<div class="no-records">Error loading distributions</div>';
+            }
+        }
+
+        async function promoteToAdmiral() {
+            const playerId = document.getElementById('admiralPlayer').value;
+            if (!playerId) {
+                alert('Select a player');
+                return;
+            }
+
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            
+            if (playerData.isAdmiral) {
+                alert('This player is already an admiral');
+                return;
+            }
+
+            const playerName = playerData.gamertag || 'Unknown';
+
+            if (!confirm(`Promote ${playerName} to Admiral?`)) return;
+
+            try {
+                await db.collection('players').doc(playerId).update({
+                    isAdmiral: true
+                });
+
+                await logToLedger(
+                    'Admiral Promoted',
+                    `${playerName} was promoted to Admiral`
+                );
+
+                alert(`${playerName} is now an Admiral!`);
+                document.getElementById('admiralPlayer').value = '';
+
+            } catch (err) {
+                console.error('Error promoting admiral:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function demoteAdmiral() {
+            const playerId = document.getElementById('admiralPlayer').value;
+            if (!playerId) {
+                alert('Select a player');
+                return;
+            }
+
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            
+            if (!playerData.isAdmiral) {
+                alert('This player is not an admiral');
+                return;
+            }
+
+            const playerName = playerData.gamertag || 'Unknown';
+
+            if (!confirm(`Remove Admiral status from ${playerName}?`)) return;
+
+            try {
+                await db.collection('players').doc(playerId).update({
+                    isAdmiral: false
+                });
+
+                await logToLedger(
+                    'Admiral Demoted',
+                    `${playerName} was removed as Admiral`
+                );
+
+                alert(`${playerName} is no longer an Admiral`);
+                document.getElementById('admiralPlayer').value = '';
+
+            } catch (err) {
+                console.error('Error demoting admiral:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function changePlayerGuild() {
+            const playerId = document.getElementById('guildChangePlayer').value;
+            const newGuild = document.getElementById('newGuildSelect').value;
+            
+            if (!playerId) {
+                alert('Select a player');
+                return;
+            }
+            if (!newGuild) {
+                alert('Select a guild');
+                return;
+            }
+
+            const playerDoc = allMembers.find(m => m.id === playerId);
+            const playerData = playerDoc ? playerDoc.data() : {};
+            const playerName = playerData.gamertag || 'Unknown';
+            const oldGuild = playerData.squadron || 'None';
+            
+            const guildData = allGuilds.find(g => g.code === newGuild);
+            const newGuildName = guildData ? guildData.name : newGuild;
+
+            if (oldGuild === newGuild) {
+                alert('Player is already in this guild');
+                return;
+            }
+
+            if (!confirm(`Move ${playerName} from ${oldGuild} to ${newGuildName}?`)) return;
+
+            try {
+                await db.collection('players').doc(playerId).update({
+                    squadron: newGuild // squadron = guild
+                });
+
+                await logToLedger(
+                    'Guild Change',
+                    `${playerName} moved from ${oldGuild} to ${newGuildName}`
+                );
+
+                alert(`${playerName} is now in ${newGuildName}`);
+                document.getElementById('guildChangePlayer').value = '';
+                document.getElementById('newGuildSelect').value = '';
+
+            } catch (err) {
+                console.error('Error changing guild:', err);
+                alert('Error: ' + err.message);
             }
         }
     </script>

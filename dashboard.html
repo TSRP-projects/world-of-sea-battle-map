@@ -700,6 +700,7 @@
         <a href="dashboard.html" class="nav-btn active">Dashboard</a>
         <a href="history.html" class="nav-btn">My History</a>
         <a href="admin.html" class="nav-btn" id="adminNav" style="display: none;">Officer Panel</a>
+        <a href="guild-panel.html" class="nav-btn" id="guildNav" style="display: none;">Guild Panel</a>
         <a href="ships.html" class="nav-btn" id="shipsLink" style="display: none;">Ship Database</a>
     </div>
 
@@ -1031,6 +1032,11 @@
             if (player.isOfficer) {
                 document.getElementById('adminNav').style.display = 'inline-block';
                 document.getElementById('shipsLink').style.display = 'inline-block';
+            }
+
+            // Show Guild Panel for admirals (squadron = guild)
+            if (player.isAdmiral) {
+                document.getElementById('guildNav').style.display = 'inline-block';
             }
         }
 

@@ -27,7 +27,7 @@
             border: 3px solid #8b6914;
             border-radius: 8px;
             padding: 40px;
-            max-width: 700px;
+            max-width: 900px;
             width: 90%;
             text-align: center;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -89,7 +89,8 @@
         .squadron-selection {
             display: flex;
             justify-content: center;
-            gap: 40px;
+            flex-wrap: wrap;
+            gap: 30px;
             margin-bottom: 30px;
         }
         
@@ -100,6 +101,7 @@
             border-radius: 10px;
             transition: all 0.3s ease;
             background: rgba(139, 105, 20, 0.05);
+            min-width: 180px;
         }
         
         .squadron-option:hover {
@@ -162,6 +164,7 @@
         .loading {
             color: #8b6914;
             font-family: 'Cinzel', Georgia, serif;
+            padding: 40px;
         }
     </style>
 </head>
@@ -175,18 +178,10 @@
             <input type="text" id="gamertag" placeholder="Enter your gamertag" maxlength="30">
         </div>
         
-        <div class="squadron-label">For which squadron do you sail?</div>
+        <div class="squadron-label">For which guild do you sail?</div>
         
-        <div class="squadron-selection">
-            <div class="squadron-option" data-squadron="BWC" title="Blackwolf Chapter" onclick="selectSquadron('BWC')">
-                <img src="Blackwolf Chapter Medallion.png" alt="Blackwolf Chapter" class="squadron-logo">
-                <div class="squadron-name">Blackwolf Chapter</div>
-            </div>
-            
-            <div class="squadron-option" data-squadron="BWH" title="Blackwolf Holdings" onclick="selectSquadron('BWH')">
-                <img src="Blackwolf Holdings Medallion.png" alt="Blackwolf Holdings" class="squadron-logo">
-                <div class="squadron-name">Blackwolf Holdings</div>
-            </div>
+        <div class="squadron-selection" id="squadronSelection">
+            <div class="loading">Loading guilds...</div>
         </div>
         
         <div class="error-message" id="errorMessage"></div>
@@ -199,8 +194,12 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script>
+        // Note: "squadron" field on players = guild
+        // We use "squadron" for backwards compatibility with existing player documents
+        
         let selectedSquadron = null;
         let currentUser = null;
+        let allGuilds = [];
 
         auth.onAuthStateChanged(async user => {
             if (!user) {
@@ -215,8 +214,40 @@
             if (playerDoc.exists && playerDoc.data().gamertag && playerDoc.data().squadron) {
                 // Already onboarded, go to dashboard
                 window.location.href = 'dashboard.html';
+                return;
             }
+            
+            // Load available guilds
+            loadGuilds();
         });
+
+        async function loadGuilds() {
+            try {
+                const snapshot = await db.collection('guilds').orderBy('name').get();
+                allGuilds = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                displayGuilds();
+            } catch (err) {
+                console.error('Error loading guilds:', err);
+                document.getElementById('squadronSelection').innerHTML = 
+                    '<div class="loading">Error loading guilds. Please refresh.</div>';
+            }
+        }
+
+        function displayGuilds() {
+            const container = document.getElementById('squadronSelection');
+            
+            if (allGuilds.length === 0) {
+                container.innerHTML = '<div class="loading">No guilds available</div>';
+                return;
+            }
+            
+            container.innerHTML = allGuilds.map(guild => `
+                <div class="squadron-option" data-squadron="${guild.code}" title="${guild.name}" onclick="selectSquadron('${guild.code}')">
+                    <img src="${guild.logo}" alt="${guild.name}" class="squadron-logo">
+                    <div class="squadron-name">${guild.name}</div>
+                </div>
+            `).join('');
+        }
 
         function selectSquadron(code) {
             selectedSquadron = code;
@@ -249,7 +280,7 @@
             }
             
             if (!selectedSquadron) {
-                showError('Please select your squadron');
+                showError('Please select your guild');
                 return;
             }
             
@@ -259,11 +290,12 @@
                     email: currentUser.email,
                     photoURL: currentUser.photoURL || null,
                     gamertag: gamertag,
-                    squadron: selectedSquadron,
+                    squadron: selectedSquadron, // squadron = guild
                     totalPoints: 0,
                     sharesRedeemed: 0,
                     fortsDestroyed: 0,
                     isOfficer: false,
+                    isAdmiral: false,
                     goalShipId: null,
                     inventory: {
                         beams: 0,
