@@ -176,11 +176,12 @@
     </div>
 
     <div class="navigation">
-    <a href="dashboard.html" class="nav-btn">Dashboard</a>
-    <a href="history.html" class="nav-btn active">My History</a>
-    <a href="admin.html" class="nav-btn" id="adminNav" style="display: none;">Officer Panel</a>
-    <a href="ships.html" class="nav-btn" id="shipsLink" style="display: none;">Ship Database</a>
-</div>
+        <a href="dashboard.html" class="nav-btn" id="dashboardNav">Dashboard</a>
+        <a href="history.html" class="nav-btn" id="historyNav">My History</a>
+        <a href="admin.html" class="nav-btn" id="adminNav" style="display: none;">Officer Panel</a>
+        <a href="guild-panel.html" class="nav-btn" id="guildNav" style="display: none;">Guild Panel</a>
+        <a href="ships.html" class="nav-btn" id="shipsLink" style="display: none;">Ship Database</a>
+    </div>
 
     <div class="history-container">
         <div id="loading" class="loading">Loading your history...</div>
@@ -219,11 +220,17 @@
                 loadHistory(user.uid);
                 loadDistributions(user.uid);
                 
-                // Check if officer
+                // Check player roles
                 const playerDoc = await db.collection('players').doc(user.uid).get();
-                if (playerDoc.exists && playerDoc.data().isOfficer) {
-                    document.getElementById('adminNav').style.display = 'inline-block';
-                    document.getElementById('shipsLink').style.display = 'inline-block';
+                if (playerDoc.exists) {
+                    const playerData = playerDoc.data();
+                    if (playerData.isOfficer) {
+                        document.getElementById('adminNav').style.display = 'inline-block';
+                        document.getElementById('shipsLink').style.display = 'inline-block';
+                    }
+                    if (playerData.isAdmiral) {
+                        document.getElementById('guildNav').style.display = 'inline-block';
+                    }
                 }
             }
         });
