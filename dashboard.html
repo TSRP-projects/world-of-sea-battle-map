@@ -696,6 +696,18 @@
             padding: 15px;
             font-style: italic;
         }
+
+        .ally-indicator {
+            background: linear-gradient(135deg, #2d5a2d, #3d7a3d);
+            color: #f5f0e6;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-family: 'Cinzel', Georgia, serif;
+            margin-left: 12px;
+            border: 1px solid #4a8a4a;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -704,7 +716,8 @@
             <img id="squadronBadge" class="squadron-badge" src="" alt="Squadron" title="" style="display: none;">
             <div class="user-info">
                 <div id="gamertag-container">
-                    <span id="gamertag-display" class="gamertag"></span>
+                    <span id="gamertag-display">Loading...</span>
+                    <span id="allyIndicator" class="ally-indicator" style="display: none;">Allied with Blackwolf Holdings</span>
                     <span id="edit-gamertag" class="edit-gamertag" onclick="showGametagInput()" title="Edit gamertag">✏️</span>
                     <span id="gamertag-edit" style="display: none;">
                         <input type="text" id="gamertag-input" class="gamertag-input" placeholder="Enter gamertag" maxlength="30">
@@ -931,9 +944,24 @@
                 populateShipSelector();
 
                 // THEN set up player listener
-                db.collection('players').doc(userId).onSnapshot(doc => {
+                db.collection('players').doc(user.uid).onSnapshot(async doc => {
                     if (doc.exists) {
                         currentPlayer = { id: doc.id, ...doc.data() };
+                        
+                        // Load guild alliance status
+                        let isAlly = true; // Default to allied
+                        if (currentPlayer.squadron) {
+                            try {
+                                const guildDoc = await db.collection('guilds').doc(currentPlayer.squadron).get();
+                                if (guildDoc.exists) {
+                                    isAlly = guildDoc.data().isAlly === true;
+                                }
+                            } catch (err) {
+                                console.error('Error loading guild:', err);
+                            }
+                        }
+                        currentPlayer.isAlly = isAlly;
+                        
                         updatePlayerUI(currentPlayer);
                     }
                 });
@@ -989,6 +1017,14 @@
                 gamertagDisplay.style.color = '#999';
             }
 
+            // Display ally indicator
+            const allyIndicator = document.getElementById('allyIndicator');
+            if (player.isAlly && player.squadron !== 'BWH') {
+                allyIndicator.style.display = 'inline-block';
+            } else {
+                allyIndicator.style.display = 'none';
+            }
+
             // Display squadron badge
             const squadronBadge = document.getElementById('squadronBadge');
             if (player.squadron) {
@@ -1009,7 +1045,7 @@
 
             const availablePoints = player.totalPoints - player.sharesRedeemed;
 
-            const tier = getTierFromPoints(availablePoints);
+            const tier = getTierFromPoints(availablePoints, player.isAlly);
             document.getElementById('userTier').textContent = `${tier.emoji} ${tier.name}`;
             document.getElementById('tierSupport').textContent = `(${Math.round(tier.support * 100)}% guild support)`;
 

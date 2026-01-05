@@ -509,6 +509,63 @@
             font-size: 10px;
             margin-left: 5px;
         }
+
+        .guild-alliance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .guild-alliance-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .guild-alliance-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .guild-alliance-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid #8b6914;
+        }
+
+        .guild-alliance-name {
+            font-weight: bold;
+            color: #8b6914;
+        }
+
+        .guild-alliance-meta {
+            font-size: 12px;
+            color: #5c4a3a;
+        }
+
+        .ally-badge {
+            background: #2d5a2d;
+            color: #f5f0e6;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .non-ally-badge {
+            background: #5c4a3a;
+            color: #f5f0e6;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -766,6 +823,16 @@
                     Change Guild
                 </button>
             </div>
+
+            <div class="card">
+                <h3>🏴 Manage Guild Alliances</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Allied guilds receive up to 50% support. Non-allied guilds cap at 30%.
+                </p>
+                <div id="guildAllianceList">
+                    <div style="text-align: center; color: #5c4a3a;">Loading guilds...</div>
+                </div>
+            </div>
         </div>
 
         <div class="card">
@@ -879,6 +946,7 @@
                         allMembers = snapshot.docs;
                         displayMembers(snapshot.docs);
                         updateParticipantLists(snapshot.docs);
+                        displayGuildAlliances();
                     });
 
                 db.collection('guildResources')
@@ -1922,6 +1990,82 @@
 
             } catch (err) {
                 console.error('Error changing guild:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function displayGuildAlliances() {
+            const container = document.getElementById('guildAllianceList');
+            
+            if (allGuilds.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No guilds found</div>';
+                return;
+            }
+            
+            // Count members per guild
+            const memberCounts = {};
+            allMembers.forEach(doc => {
+                const squadron = doc.data().squadron;
+                if (squadron) {
+                    memberCounts[squadron] = (memberCounts[squadron] || 0) + 1;
+                }
+            });
+            
+            container.innerHTML = allGuilds.map(guild => {
+                const memberCount = memberCounts[guild.code] || 0;
+                const isAlly = guild.isAlly === true;
+                const badge = isAlly 
+                    ? '<span class="ally-badge">ALLIED</span>' 
+                    : '<span class="non-ally-badge">NON-ALLIED</span>';
+                const buttonText = isAlly ? 'Remove Ally' : 'Mark as Ally';
+                const buttonClass = isAlly ? 'btn-danger' : 'btn-success';
+                
+                return `
+                    <div class="guild-alliance-item">
+                        <div class="guild-alliance-info">
+                            <img src="${guild.logo}" alt="${guild.name}" class="guild-alliance-logo">
+                            <div>
+                                <div class="guild-alliance-name">${guild.name}${badge}</div>
+                                <div class="guild-alliance-meta">${memberCount} member${memberCount !== 1 ? 's' : ''} • Max support: ${isAlly ? '50%' : '30%'}</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-small ${buttonClass}" onclick="toggleGuildAlliance('${guild.code}', ${isAlly})">
+                            ${buttonText}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function toggleGuildAlliance(guildCode, currentlyAlly) {
+            const guild = allGuilds.find(g => g.code === guildCode);
+            const guildName = guild ? guild.name : guildCode;
+            const newStatus = !currentlyAlly;
+            
+            const action = newStatus ? 'mark as allied' : 'remove allied status from';
+            if (!confirm(`Are you sure you want to ${action} ${guildName}?`)) return;
+            
+            try {
+                await db.collection('guilds').doc(guildCode).update({
+                    isAlly: newStatus
+                });
+                
+                // Update local cache
+                const guildIndex = allGuilds.findIndex(g => g.code === guildCode);
+                if (guildIndex >= 0) {
+                    allGuilds[guildIndex].isAlly = newStatus;
+                }
+                
+                await logToLedger(
+                    newStatus ? 'Guild Allied' : 'Guild Alliance Removed',
+                    `${guildName} ${newStatus ? 'marked as allied (50% max support)' : 'removed from alliance (30% max support)'}`
+                );
+                
+                displayGuildAlliances();
+                alert(`${guildName} is now ${newStatus ? 'an allied guild' : 'a non-allied guild'}`);
+                
+            } catch (err) {
+                console.error('Error updating guild alliance:', err);
                 alert('Error: ' + err.message);
             }
         }

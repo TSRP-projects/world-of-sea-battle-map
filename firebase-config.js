@@ -38,20 +38,35 @@ const DEFAULT_PLAYER_INVENTORY = {
     imperialBlueprint:0
 };
 
-// Tier configuration
+// Tier configuration - thresholds doubled, separate support for allied/non-allied
 const TIERS = {
-    DECKHAND: { name: 'Deckhand', min: 0, support: 0.10, emoji: '🪢' },
-    BOSUN: { name: 'Bosun', min: 25, support: 0.25, emoji: '⚓' },
-    QUARTERMASTER: { name: 'Quartermaster', min: 60, support: 0.35, emoji: '🧭' },
-    CAPTAIN: { name: 'Captain', min: 120, support: 0.50, emoji: '🏴‍☠️' }
+    DECKHAND: { name: 'Deckhand', min: 0, alliedSupport: 0.10, nonAlliedSupport: 0.10, emoji: '🪢' },
+    BOSUN: { name: 'Bosun', min: 50, alliedSupport: 0.25, nonAlliedSupport: 0.20, emoji: '⚓' },
+    QUARTERMASTER: { name: 'Quartermaster', min: 120, alliedSupport: 0.35, nonAlliedSupport: 0.25, emoji: '🧭' },
+    CAPTAIN: { name: 'Captain', min: 240, alliedSupport: 0.50, nonAlliedSupport: 0.30, emoji: '🏴‍☠️' }
 };
 
 // Get tier from available points
-function getTierFromPoints(points) {
-    if (points >= TIERS.CAPTAIN.min) return TIERS.CAPTAIN;
-    if (points >= TIERS.QUARTERMASTER.min) return TIERS.QUARTERMASTER;
-    if (points >= TIERS.BOSUN.min) return TIERS.BOSUN;
-    return TIERS.DECKHAND;
+// Returns tier object with calculated support based on alliance status
+function getTierFromPoints(points, isAlly = true) {
+    let tier;
+    if (points >= TIERS.CAPTAIN.min) {
+        tier = TIERS.CAPTAIN;
+    } else if (points >= TIERS.QUARTERMASTER.min) {
+        tier = TIERS.QUARTERMASTER;
+    } else if (points >= TIERS.BOSUN.min) {
+        tier = TIERS.BOSUN;
+    } else {
+        tier = TIERS.DECKHAND;
+    }
+    
+    // Return tier with appropriate support value
+    return {
+        name: tier.name,
+        min: tier.min,
+        emoji: tier.emoji,
+        support: isAlly ? tier.alliedSupport : tier.nonAlliedSupport
+    };
 }
 
 // Calculate points for contribution
