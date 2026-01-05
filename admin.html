@@ -517,11 +517,11 @@
     </div>
 
     <div class="navigation">
-        <a href="dashboard.html" class="nav-btn" id="dashboardNav">Dashboard</a>
-        <a href="history.html" class="nav-btn" id="historyNav">My History</a>
-        <a href="admin.html" class="nav-btn" id="adminNav" style="display: none;">Officer Panel</a>
+        <a href="dashboard.html" class="nav-btn">Dashboard</a>
+        <a href="history.html" class="nav-btn">My History</a>
+        <a href="admin.html" class="nav-btn active">Officer Panel</a>
         <a href="guild-panel.html" class="nav-btn" id="guildNav" style="display: none;">Guild Panel</a>
-        <a href="ships.html" class="nav-btn" id="shipsLink" style="display: none;">Ship Database</a>
+        <a href="ships.html" class="nav-btn">Ship Database</a>
     </div>
 
     <div id="loading" class="loading">Loading officer panel...</div>
@@ -851,6 +851,12 @@
                     return;
                 }
                 currentOfficer = { id: user.uid, ...playerDoc.data() };
+
+                // Show Guild Panel if also an admiral
+                if (currentOfficer.isAdmiral) {
+                    document.getElementById('guildNav').style.display = 'inline-block';
+                }
+
                 loadAdminData();
             }
         });
