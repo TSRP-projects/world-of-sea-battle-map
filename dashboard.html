@@ -665,6 +665,37 @@
             font-size: 13px;
             padding: 10px;
         }
+
+        .admiral-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .admiral-list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .admiral-icon {
+            font-size: 20px;
+        }
+
+        .admiral-name {
+            font-weight: bold;
+            color: #8b6914;
+        }
+
+        .admiral-empty {
+            text-align: center;
+            color: #5c4a3a;
+            padding: 15px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -709,18 +740,9 @@
     <div id="dashboard" style="display: none;">
         <div class="dashboard-grid">
             <div class="card">
-                <h3>⚓ Your Points</h3>
-                <div class="stat-row">
-                    <span class="stat-label">Total Earned:</span>
-                    <span class="stat-value" id="totalPoints">0</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Shares Redeemed:</span>
-                    <span class="stat-value" id="sharesRedeemed">0</span>
-                </div>
-                <div class="stat-row">
-                    <span class="stat-label">Available:</span>
-                    <span class="stat-value" id="availablePoints">0</span>
+                <h3>⚓ Guild Admirals</h3>
+                <div id="guildAdmiralsList">
+                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
                 </div>
             </div>
 
@@ -953,6 +975,9 @@
         }
 
         function updatePlayerUI(player) {
+            // Load guild admirals
+            loadGuildAdmirals(player.squadron);
+            
             // Display gamertag
             const gamertagDisplay = document.getElementById('gamertag-display');
             if (player.gamertag) {
@@ -1708,6 +1733,43 @@
                 `;
                 container.appendChild(entryDiv);
             });
+        }
+
+        async function loadGuildAdmirals(squadron) {
+            const container = document.getElementById('guildAdmiralsList');
+            
+            if (!squadron) {
+                container.innerHTML = '<div class="admiral-empty">No guild assigned</div>';
+                return;
+            }
+            
+            try {
+                const snapshot = await db.collection('players')
+                    .where('squadron', '==', squadron)
+                    .where('isAdmiral', '==', true)
+                    .get();
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="admiral-empty">No admirals in your guild</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                snapshot.docs.forEach(doc => {
+                    const admiral = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'admiral-list-item';
+                    item.innerHTML = `
+                        <span class="admiral-icon">⚓</span>
+                        <span class="admiral-name">${admiral.gamertag || 'Unknown'}</span>
+                    `;
+                    container.appendChild(item);
+                });
+                
+            } catch (err) {
+                console.error('Error loading guild admirals:', err);
+                container.innerHTML = '<div class="admiral-empty">Error loading admirals</div>';
+            }
         }
     </script>
 </body>
