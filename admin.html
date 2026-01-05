@@ -500,6 +500,15 @@
             font-size: 14px;
             color: #3d2b1f;
         }
+
+        .admiral-badge {
+            background: #2d5a2d;
+            color: #f5f0e6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -922,10 +931,11 @@
 
                 const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
                 const officerBadge = member.isOfficer ? '<span class="officer-badge">OFFICER</span>' : '';
+                const admiralBadge = member.isAdmiral ? '<span class="admiral-badge">ADMIRAL</span>' : '';
 
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td><span class="gamertag">${member.gamertag ? squadronPrefix + member.gamertag : '-'}</span>${officerBadge}</td>
+                    <td><span class="gamertag">${member.gamertag ? squadronPrefix + member.gamertag : '-'}</span>${officerBadge}${admiralBadge}</td>
                     <td>${formatNumber(member.totalPoints)}</td>
                     <td>${formatNumber(member.sharesRedeemed)}</td>
                     <td>${formatNumber(availablePoints)}</td>
