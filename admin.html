@@ -691,52 +691,64 @@
             </div>
 
             <div class="card">
-                <h3>📦 Log Resource Donation</h3>
+                <h3>📤 Log Resource Distribution</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
-                    Record a player's material contribution to the guild.
+                    Record resources given to a player from guild storage.
                 </p>
                 
                 <div class="form-group">
-                    <label>Select Player:</label>
-                    <select id="donationPlayer">
-                        <option value="">-- Select Player --</option>
+                    <label>Resource Type:</label>
+                    <select id="distributionResource" onchange="updateDistributionSources()">
+                        <option value="">-- Select Resource --</option>
+                        <optgroup label="Crafted Resources">
+                            <option value="beams">Beams</option>
+                            <option value="bulkheads">Bulkheads</option>
+                            <option value="plates">Plates</option>
+                            <option value="canvas">Canvas</option>
+                        </optgroup>
+                        <optgroup label="Raw Materials">
+                            <option value="iron">Iron</option>
+                            <option value="coal">Coal</option>
+                            <option value="wood">Wood</option>
+                            <option value="resin">Resin</option>
+                            <option value="fabric">Fabric</option>
+                        </optgroup>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label>Resource Type:</label>
-                    <select id="donationResource">
-                        <option value="">-- Select Resource --</option>
-                        <optgroup label="Crafted Resources">
-                            <option value="beams">Beams (1 pt each)</option>
-                            <option value="bulkheads">Bulkheads (2 pts each)</option>
-                            <option value="plates">Plates (1 pt each)</option>
-                            <option value="canvas">Canvas (1 pt per 2)</option>
-                        </optgroup>
-                        <optgroup label="Raw Materials">
-                            <option value="iron">Iron (1 pt per 100)</option>
-                            <option value="wood">Wood (1 pt per 1000)</option>
-                            <option value="coal">Coal (1 pt per 100)</option>
-                            <option value="resin">Resin (1 pt per 200)</option>
-                            <option value="fabric">Fabric (1 pt per 2000)</option>
-                        </optgroup>
+                    <label>From Location:</label>
+                    <select id="distributionLocation" onchange="updateDistributionSources()">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>From Officer's Inventory:</label>
+                    <select id="distributionFromOfficer">
+                        <option value="">-- Select resource and location first --</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label>Quantity:</label>
-                    <input type="number" id="donationQuantity" min="1" placeholder="Enter amount">
+                    <input type="number" id="distributionQuantity" min="1" placeholder="Enter amount">
                 </div>
                 
                 <div class="form-group">
-                    <label>Storage Location:</label>
-                    <select id="donationLocation">
-                        <option value="">-- Select Location --</option>
+                    <label>Recipient:</label>
+                    <select id="distributionPlayer">
+                        <option value="">-- Select Player --</option>
                     </select>
                 </div>
                 
-                <button class="btn btn-success" onclick="logResourceDonation()" style="width: 100%;">
-                    Log Donation
+                <div class="form-group">
+                    <label>Notes (optional):</label>
+                    <input type="text" id="distributionNotes" placeholder="e.g., For Constitution build">
+                </div>
+                
+                <button class="btn btn-success" onclick="logDistribution()" style="width: 100%;">
+                    Log Distribution
                 </button>
             </div>
 
@@ -1889,47 +1901,56 @@
         }
 
         async function logDistribution() {
-            const playerId = document.getElementById('distributionPlayer').value;
             const resourceType = document.getElementById('distributionResource').value;
-            const quantity = parseInt(document.getElementById('distributionQuantity').value);
             const location = document.getElementById('distributionLocation').value;
+            const fromOfficerId = document.getElementById('distributionFromOfficer').value;
+            const quantity = parseInt(document.getElementById('distributionQuantity').value);
+            const playerId = document.getElementById('distributionPlayer').value;
             const notes = document.getElementById('distributionNotes').value.trim();
 
-            if (!playerId) {
-                alert('Select a recipient');
-                return;
-            }
             if (!resourceType) {
                 alert('Select a resource type');
-                return;
-            }
-            if (!quantity || quantity < 1) {
-                alert('Enter a valid quantity');
                 return;
             }
             if (!location) {
                 alert('Select a location');
                 return;
             }
+            if (!fromOfficerId) {
+                alert('Select which officer inventory to draw from');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('Enter a valid quantity');
+                return;
+            }
+            if (!playerId) {
+                alert('Select a recipient');
+                return;
+            }
 
-            // Check if current officer has enough inventory at this location
-            const inventoryId = `${currentOfficer.id}_${resourceType}_${location}`;
+            // Verify inventory still has enough (in case it changed)
+            const inventoryId = `${fromOfficerId}_${resourceType}_${location}`;
             const inventoryDoc = await db.collection('officerInventory').doc(inventoryId).get();
             
             if (!inventoryDoc.exists || inventoryDoc.data().quantity < quantity) {
                 const available = inventoryDoc.exists ? inventoryDoc.data().quantity : 0;
-                const locationData = allLocations.find(l => l.code === location);
-                const locationName = locationData ? locationData.name : location;
-                alert(`Insufficient inventory.\nYou have ${formatNumber(available)} ${resourceType} at ${locationName}.`);
+                alert(`Insufficient inventory. Only ${formatNumber(available)} available.`);
+                updateDistributionSources(); // Refresh the dropdown
                 return;
             }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
             const playerName = playerData.gamertag || 'Unknown';
-            const squadronPrefix = playerData.squadron ? `[${playerData.squadron}] ` : '';
+            const playerSquadronPrefix = playerData.squadron ? `[${playerData.squadron}] ` : '';
 
-            const officerName = currentOfficer.squadron 
+            const fromOfficerDoc = allMembers.find(m => m.id === fromOfficerId);
+            const fromOfficerData = fromOfficerDoc ? fromOfficerDoc.data() : {};
+            const fromOfficerName = fromOfficerData.gamertag || 'Unknown';
+            const fromOfficerSquadron = fromOfficerData.squadron ? `[${fromOfficerData.squadron}] ` : '';
+
+            const performingOfficerName = currentOfficer.squadron 
                 ? `[${currentOfficer.squadron}] ${currentOfficer.gamertag}`
                 : currentOfficer.gamertag;
 
@@ -1945,12 +1966,14 @@
                 const distRef = db.collection('distributions').doc();
                 batch.set(distRef, {
                     playerId: playerId,
-                    playerName: squadronPrefix + playerName,
+                    playerName: playerSquadronPrefix + playerName,
                     resourceType: resourceType,
                     quantity: quantity,
                     location: location,
+                    fromOfficerId: fromOfficerId,
+                    fromOfficerName: fromOfficerSquadron + fromOfficerName,
                     performedBy: currentOfficer.id,
-                    performedByName: officerName,
+                    performedByName: performingOfficerName,
                     timestamp: timestamp,
                     notes: notes || null
                 });
@@ -1971,7 +1994,7 @@
                     }
                 }
 
-                // Deduct from officer inventory
+                // Deduct from the source officer's inventory
                 const inventoryRef = db.collection('officerInventory').doc(inventoryId);
                 batch.update(inventoryRef, {
                     quantity: firebase.firestore.FieldValue.increment(-quantity),
@@ -1982,21 +2005,22 @@
                 const ledgerRef = db.collection('admiralLedger').doc();
                 batch.set(ledgerRef, {
                     action: 'Resource Distribution',
-                    details: `${formatNumber(quantity)} ${resourceDisplay} given to ${squadronPrefix}${playerName} from ${locationName}${notes ? ' - ' + notes : ''}`,
+                    details: `${formatNumber(quantity)} ${resourceDisplay} given to ${playerSquadronPrefix}${playerName} from ${fromOfficerSquadron}${fromOfficerName}'s inventory at ${locationName}${notes ? ' - ' + notes : ''}`,
                     performedBy: currentOfficer.id,
-                    performedByName: officerName,
+                    performedByName: performingOfficerName,
                     timestamp: timestamp
                 });
 
                 await batch.commit();
 
-                alert(`Distribution logged!\n${formatNumber(quantity)} ${resourceDisplay} given to ${playerName}\nFrom: ${locationName}`);
+                alert(`Distribution logged!\n${formatNumber(quantity)} ${resourceDisplay} given to ${playerName}\nFrom: ${fromOfficerName}'s inventory at ${locationName}`);
 
                 // Reset form
-                document.getElementById('distributionPlayer').value = '';
                 document.getElementById('distributionResource').value = '';
-                document.getElementById('distributionQuantity').value = '';
                 document.getElementById('distributionLocation').value = '';
+                document.getElementById('distributionFromOfficer').innerHTML = '<option value="">-- Select resource and location first --</option>';
+                document.getElementById('distributionQuantity').value = '';
+                document.getElementById('distributionPlayer').value = '';
                 document.getElementById('distributionNotes').value = '';
 
             } catch (err) {
@@ -2919,6 +2943,68 @@
             } catch (err) {
                 console.error('Error transferring location:', err);
                 alert('Error: ' + err.message);
+            }
+        }
+
+        async function updateDistributionSources() {
+            const resourceType = document.getElementById('distributionResource').value;
+            const location = document.getElementById('distributionLocation').value;
+            const fromOfficerSelect = document.getElementById('distributionFromOfficer');
+            
+            // Reset dropdown
+            fromOfficerSelect.innerHTML = '<option value="">-- Select resource and location first --</option>';
+            
+            if (!resourceType || !location) {
+                return;
+            }
+            
+            try {
+                // Query all inventory records for this resource at this location
+                const inventorySnapshot = await db.collection('officerInventory')
+                    .where('resourceType', '==', resourceType)
+                    .where('location', '==', location)
+                    .get();
+                
+                const sources = [];
+                
+                inventorySnapshot.docs.forEach(doc => {
+                    const inv = doc.data();
+                    if (inv.quantity > 0) {
+                        sources.push({
+                            odfficerId: inv.officerId,
+                            quantity: inv.quantity,
+                            docId: doc.id
+                        });
+                    }
+                });
+                
+                if (sources.length === 0) {
+                    const locationData = allLocations.find(l => l.code === location);
+                    const locationName = locationData ? locationData.name : location;
+                    fromOfficerSelect.innerHTML = `<option value="">No ${resourceType} at ${locationName}</option>`;
+                    return;
+                }
+                
+                // Get officer names
+                fromOfficerSelect.innerHTML = '<option value="">-- Select source --</option>';
+                
+                sources.forEach(source => {
+                    const memberDoc = allMembers.find(m => m.id === source.odfficerId);
+                    const memberData = memberDoc ? memberDoc.data() : {};
+                    const prefix = memberData.squadron ? `[${memberData.squadron}] ` : '';
+                    const name = memberData.gamertag || 'Unknown';
+                    const isOfficer = memberData.isOfficer ? '' : ' (former officer)';
+                    
+                    const option = document.createElement('option');
+                    option.value = source.odfficerId;
+                    option.textContent = `${prefix}${name}${isOfficer} - ${formatNumber(source.quantity)} available`;
+                    option.dataset.available = source.quantity;
+                    fromOfficerSelect.appendChild(option);
+                });
+                
+            } catch (err) {
+                console.error('Error loading distribution sources:', err);
+                fromOfficerSelect.innerHTML = '<option value="">Error loading sources</option>';
             }
         }
     </script>
