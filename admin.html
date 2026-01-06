@@ -647,8 +647,70 @@
                     <input type="number" id="donationQuantity" min="1" placeholder="Enter amount">
                 </div>
                 
+                <div class="form-group">
+                    <label>Storage Location:</label>
+                    <select id="donationLocation">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
                 <button class="btn btn-success" onclick="logResourceDonation()" style="width: 100%;">
                     Log Donation
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>📋 Initialize Inventory</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Record existing officer holdings. Use for initial setup only. Does not affect points.
+                </p>
+                
+                <div class="form-group">
+                    <label>Officer Holding Resources:</label>
+                    <select id="initInventoryOfficer">
+                        <option value="">-- Select Officer --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Resource Type:</label>
+                    <select id="initInventoryResource">
+                        <option value="">-- Select Resource --</option>
+                        <optgroup label="Crafted Resources">
+                            <option value="beams">Beams</option>
+                            <option value="bulkheads">Bulkheads</option>
+                            <option value="plates">Plates</option>
+                            <option value="canvas">Canvas</option>
+                        </optgroup>
+                        <optgroup label="Raw Materials">
+                            <option value="iron">Iron</option>
+                            <option value="wood">Wood</option>
+                            <option value="coal">Coal</option>
+                            <option value="resin">Resin</option>
+                            <option value="fabric">Fabric</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="initInventoryQuantity" min="1" placeholder="Enter amount">
+                </div>
+                
+                <div class="form-group">
+                    <label>Storage Location:</label>
+                    <select id="initInventoryLocation">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Note (required):</label>
+                    <input type="text" id="initInventoryNote" placeholder="e.g., Initial inventory count">
+                </div>
+                
+                <button class="btn btn-success" onclick="initializeInventory()" style="width: 100%;">
+                    Add to Inventory
                 </button>
             </div>
 
@@ -903,6 +965,7 @@
         let allShips = {};
         let allMembers = [];
         let allGuilds = [];
+        let allLocations = [];
         let currentOfficer = null;
         let selectedPlayerId = null;
         let selectedContributionId = null;
@@ -939,6 +1002,12 @@
                 const guildsSnapshot = await db.collection('guilds').orderBy('name').get();
                 allGuilds = guildsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 populateGuildSelector();
+
+                // Load locations
+                const locationsSnapshot = await db.collection('locations').where('isActive', '==', true).get();
+                allLocations = locationsSnapshot.docs.map(doc => ({ code: doc.id, ...doc.data() }));
+                allLocations.sort((a, b) => a.name.localeCompare(b.name));
+                populateLocationSelectors();
 
                 db.collection('players')
                     .orderBy('totalPoints', 'desc')
@@ -980,6 +1049,30 @@
                 option.value = guild.code;
                 option.textContent = guild.name;
                 selector.appendChild(option);
+            });
+        }
+
+        function populateLocationSelectors() {
+            const selectors = [
+                'donationLocation',
+                'initInventoryLocation',
+                'transferFromLocation',
+                'transferToLocation',
+                'locationTransferFrom',
+                'locationTransferTo'
+            ];
+            
+            selectors.forEach(selectorId => {
+                const selector = document.getElementById(selectorId);
+                if (!selector) return;
+                
+                selector.innerHTML = '<option value="">-- Select Location --</option>';
+                allLocations.forEach(loc => {
+                    const option = document.createElement('option');
+                    option.value = loc.code;
+                    option.textContent = loc.name;
+                    selector.appendChild(option);
+                });
             });
         }
 
@@ -1042,6 +1135,9 @@
             const officerSelector = document.getElementById('officerPlayer');
             officerSelector.innerHTML = '<option value="">-- Select Player --</option>';
 
+            const initOfficerSelector = document.getElementById('initInventoryOfficer');
+            initOfficerSelector.innerHTML = '<option value="">-- Select Officer --</option>';
+
             docs.forEach(doc => {
                 const member = doc.data();
                 const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
@@ -1088,6 +1184,14 @@
                 distOption.value = doc.id;
                 distOption.textContent = displayText;
                 distributionSelector.appendChild(distOption);
+
+                // Initialize inventory officer option (officers only)
+                if (member.isOfficer) {
+                    const initOfficerOption = document.createElement('option');
+                    initOfficerOption.value = doc.id;
+                    initOfficerOption.textContent = displayText;
+                    initOfficerSelector.appendChild(initOfficerOption);
+                }
             });
         }
 
@@ -1225,10 +1329,11 @@
             }
         }
 
-       async function logResourceDonation() {
+        async function logResourceDonation() {
             const playerId = document.getElementById('donationPlayer').value;
             const resourceType = document.getElementById('donationResource').value;
             const quantity = parseInt(document.getElementById('donationQuantity').value);
+            const location = document.getElementById('donationLocation').value;
 
             if (!playerId) {
                 alert('Select a player');
@@ -1242,6 +1347,10 @@
                 alert('Enter a valid quantity');
                 return;
             }
+            if (!location) {
+                alert('Select a storage location');
+                return;
+            }
 
             const pointValue = POINT_VALUES[resourceType.toUpperCase()] || 0;
             if (pointValue === 0) {
@@ -1253,28 +1362,32 @@
             
             if (pointsEarned < 0.01) {
                 alert(`Quantity too low. Minimum for ${resourceType}:\n` +
-                      `- Iron: 100\n- Wood: 1000\n- Resin: 200\n- Fabric: 2000\n- Canvas: 2`);
+                    `- Iron: 100\n- Wood: 1000\n- Resin: 200\n- Fabric: 2000\n- Canvas: 2`);
                 return;
             }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
             const playerName = playerData.gamertag || 'Unknown';
+            
+            const locationData = allLocations.find(l => l.code === location);
+            const locationName = locationData ? locationData.name : location;
 
-            // Determine if this is a crafted resource that goes to guild storage
-            const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'resin', 'fabric', 'coal'];
-            const isGuildStorageResource = guildStorageResources.includes(resourceType);
+            const officerName = currentOfficer.gamertag || 'Unknown';
+            const officerSquadron = currentOfficer.squadron ? `[${currentOfficer.squadron}] ` : '';
 
             try {
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
+                // Update player points
                 const playerRef = db.collection('players').doc(playerId);
                 batch.update(playerRef, {
                     totalPoints: firebase.firestore.FieldValue.increment(pointsEarned),
                     lastActivity: timestamp
                 });
 
+                // Create contribution record
                 const contribRef = db.collection('contributions').doc();
                 batch.set(contribRef, {
                     playerId: playerId,
@@ -1283,14 +1396,16 @@
                     pointsEarned: pointsEarned,
                     materialType: resourceType,
                     materialQuantity: quantity,
-                    notes: `Donated ${formatNumber(quantity)} ${resourceType}`,
+                    location: location,
+                    notes: `Donated ${formatNumber(quantity)} ${resourceType} at ${locationName}`,
                     loggedBy: currentOfficer.id,
-                    loggedByName: currentOfficer.gamertag || currentOfficer.displayName,
+                    loggedByName: officerSquadron + officerName,
                     createdAt: timestamp
                 });
 
-                // Only update guild storage for crafted resources
-                if (isGuildStorageResource) {
+                // Update guild resources total
+                const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'coal', 'resin', 'fabric'];
+                if (guildStorageResources.includes(resourceType)) {
                     const resourceName = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
                     const resourceQuery = await db.collection('guildResources')
                         .where('materialType', '==', resourceName)
@@ -1301,29 +1416,52 @@
                         batch.update(resourceRef, {
                             currentStock: firebase.firestore.FieldValue.increment(quantity),
                             lastUpdated: timestamp,
-                            updatedBy: auth.currentUser.uid
+                            updatedBy: currentOfficer.id
                         });
                     }
+                }
+
+                // Update officer inventory
+                const inventoryId = `${currentOfficer.id}_${resourceType}_${location}`;
+                const inventoryRef = db.collection('officerInventory').doc(inventoryId);
+                const existingInventory = await inventoryRef.get();
+                
+                if (existingInventory.exists) {
+                    batch.update(inventoryRef, {
+                        quantity: firebase.firestore.FieldValue.increment(quantity),
+                        lastUpdated: timestamp
+                    });
+                } else {
+                    batch.set(inventoryRef, {
+                        officerId: currentOfficer.id,
+                        resourceType: resourceType,
+                        location: location,
+                        quantity: quantity,
+                        lastUpdated: timestamp
+                    });
                 }
 
                 await batch.commit();
 
                 await logToLedger(
                     'Resource Donation Logged',
-                    `${playerName} donated ${formatNumber(quantity)} ${resourceType} (+${pointsEarned} pts)${isGuildStorageResource ? ' [Added to guild storage]' : ''}`
+                    `${playerName} donated ${formatNumber(quantity)} ${resourceType}. Stored by ${officerSquadron}${officerName} at ${locationName}. (+${pointsEarned} pts)`
                 );
 
-                alert(`Donation logged!\n${formatNumber(quantity)} ${resourceType} = ${pointsEarned} points${isGuildStorageResource ? '\nAdded to guild storage' : ''}`);
+                alert(`Donation logged!\n${formatNumber(quantity)} ${resourceType} = ${pointsEarned} points\nStored at ${locationName}`);
 
+                // Reset form
                 document.getElementById('donationPlayer').value = '';
                 document.getElementById('donationResource').value = '';
                 document.getElementById('donationQuantity').value = '';
+                document.getElementById('donationLocation').value = '';
 
             } catch (err) {
                 console.error('Error logging donation:', err);
                 alert('Error: ' + err.message);
             }
         }
+
         async function promoteToOfficer() {
             const playerId = document.getElementById('officerPlayer').value;
             if (!playerId) {
@@ -1564,8 +1702,7 @@
             }
         }
         // Add distribution player dropdown population inside updateParticipantLists()
-        // Find the end of that function and add this before the closing brace:
-
+  
         async function logDistribution() {
             const playerId = document.getElementById('distributionPlayer').value;
             const resourceType = document.getElementById('distributionResource').value;
@@ -2066,6 +2203,108 @@
                 
             } catch (err) {
                 console.error('Error updating guild alliance:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function initializeInventory() {
+            const officerId = document.getElementById('initInventoryOfficer').value;
+            const resourceType = document.getElementById('initInventoryResource').value;
+            const quantity = parseInt(document.getElementById('initInventoryQuantity').value);
+            const location = document.getElementById('initInventoryLocation').value;
+            const note = document.getElementById('initInventoryNote').value.trim();
+
+            if (!officerId) {
+                alert('Select an officer');
+                return;
+            }
+            if (!resourceType) {
+                alert('Select a resource type');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('Enter a valid quantity');
+                return;
+            }
+            if (!location) {
+                alert('Select a storage location');
+                return;
+            }
+            if (!note) {
+                alert('Note is required');
+                return;
+            }
+
+            const officerDoc = allMembers.find(m => m.id === officerId);
+            const officerData = officerDoc ? officerDoc.data() : {};
+            const officerName = officerData.gamertag || 'Unknown';
+            const officerSquadron = officerData.squadron ? `[${officerData.squadron}] ` : '';
+            
+            const locationData = allLocations.find(l => l.code === location);
+            const locationName = locationData ? locationData.name : location;
+            
+            const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+
+            if (!confirm(`Initialize inventory:\n${formatNumber(quantity)} ${resourceDisplay}\nHeld by: ${officerSquadron}${officerName}\nLocation: ${locationName}\n\nThis does not affect points. Continue?`)) {
+                return;
+            }
+
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Update officer inventory
+                const inventoryId = `${officerId}_${resourceType}_${location}`;
+                const inventoryRef = db.collection('officerInventory').doc(inventoryId);
+                const existingInventory = await inventoryRef.get();
+                
+                if (existingInventory.exists) {
+                    batch.update(inventoryRef, {
+                        quantity: firebase.firestore.FieldValue.increment(quantity),
+                        lastUpdated: timestamp
+                    });
+                } else {
+                    batch.set(inventoryRef, {
+                        officerId: officerId,
+                        resourceType: resourceType,
+                        location: location,
+                        quantity: quantity,
+                        lastUpdated: timestamp
+                    });
+                }
+
+                // Update guild resources total
+                const resourceQuery = await db.collection('guildResources')
+                    .where('materialType', '==', resourceDisplay)
+                    .get();
+                
+                if (!resourceQuery.empty) {
+                    batch.update(resourceQuery.docs[0].ref, {
+                        currentStock: firebase.firestore.FieldValue.increment(quantity),
+                        lastUpdated: timestamp,
+                        updatedBy: currentOfficer.id
+                    });
+                }
+
+                await batch.commit();
+
+                await logToLedger(
+                    'Inventory Initialized',
+                    `${formatNumber(quantity)} ${resourceDisplay} assigned to ${officerSquadron}${officerName} at ${locationName}`,
+                    note
+                );
+
+                alert(`Inventory initialized!\n${formatNumber(quantity)} ${resourceDisplay}\nAssigned to ${officerName} at ${locationName}`);
+
+                // Reset form
+                document.getElementById('initInventoryOfficer').value = '';
+                document.getElementById('initInventoryResource').value = '';
+                document.getElementById('initInventoryQuantity').value = '';
+                document.getElementById('initInventoryLocation').value = '';
+                document.getElementById('initInventoryNote').value = '';
+
+            } catch (err) {
+                console.error('Error initializing inventory:', err);
                 alert('Error: ' + err.message);
             }
         }
