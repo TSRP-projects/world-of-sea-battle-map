@@ -283,17 +283,6 @@
         .resource-player { color: #2d5a2d; font-weight: bold; }
         .resource-guild { color: #8b6914; font-weight: bold; }
         
-        .resources-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .resources-grid .resource-item {
-            flex-direction: column;
-            text-align: center;
-        }
         
         .resource-amount { font-size: 16px; color: #8b6914; font-weight: bold; }
         
@@ -708,6 +697,86 @@
             border: 1px solid #4a8a4a;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
+
+        .resource-group {
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .resource-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .resource-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+        }
+
+        .resource-group-name {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .resource-group-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d5a2d;
+        }
+
+        .resource-location {
+            margin-left: 10px;
+            padding: 8px 12px;
+            background: rgba(139, 105, 20, 0.05);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .resource-location:last-child {
+            margin-bottom: 0;
+        }
+
+        .resource-location-header {
+            font-weight: bold;
+            color: #5c4a3a;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .resource-officer-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .resource-officer-item {
+            background: rgba(139, 105, 20, 0.15);
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #3d2b1f;
+        }
+
+        .resource-officer-name {
+            color: #8b6914;
+            font-weight: bold;
+        }
+
+        .resource-no-data {
+            color: #5c4a3a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -902,7 +971,7 @@
 
             <div class="card">
                 <h3>🏦 Guild Resources</h3>
-                <div class="resources-grid" id="resourcesGrid"></div>
+                <div id="resourcesDisplay"></div>
             </div>
         </div>
     </div>
@@ -914,6 +983,8 @@
     <script>
         let currentPlayer = null;
         let allShips = [];
+        let allLocations = [];
+        let allMembers = [];
         let guildResources = {};
         let currentDiscount = 0;
 
@@ -943,6 +1014,18 @@
                 allShips = shipsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 populateShipSelector();
 
+                // Load locations
+                const locationsSnapshot = await db.collection('locations').where('isActive', '==', true).get();
+                allLocations = locationsSnapshot.docs.map(doc => ({ code: doc.id, ...doc.data() }));
+                allLocations.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Load members (for officer names in resource display)
+                db.collection('players')
+                    .orderBy('totalPoints', 'desc')
+                    .onSnapshot(snapshot => {
+                        allMembers = snapshot.docs;
+                    });
+
                 // THEN set up player listener
                 db.collection('players').doc(userId).onSnapshot(async doc => {
                     if (doc.exists) {
@@ -966,20 +1049,24 @@
                     }
                 });
                 
+                // Listen to guildResources for totals (used in ship goal calculations)
                 db.collection('guildResources').onSnapshot(snapshot => {
                     guildResources = {};
                     snapshot.docs.forEach(doc => {
                         const data = doc.data();
                         guildResources[data.materialType.toLowerCase()] = data.currentStock || 0;
                     });
-                    const resources = snapshot.docs.map(doc => doc.data());
-                    displayResources(resources);
                     
                     // Refresh ship goal progress when guild resources update
                     if (currentPlayer) {
                         const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
                         updateShipGoalProgress(currentPlayer, availablePoints);
                     }
+                });
+
+                // Listen to officerInventory for detailed resource display
+                db.collection('officerInventory').onSnapshot(snapshot => {
+                    displayResourcesWithOfficers(snapshot.docs);
                 });
 
                 // Real-time listener for Admiral's Ledger
@@ -1624,20 +1711,118 @@
             }
         }
 
-        function displayResources(resources) {
-            const grid = document.getElementById('resourcesGrid');
-            grid.innerHTML = '';
-
-            resources.forEach(resource => {
-                const available = resource.currentStock - resource.reservedStock;
-                const item = document.createElement('div');
-                item.className = 'resource-item';
-                item.innerHTML = `
-                    <div class="resource-name">${resource.materialType}</div>
-                    <div class="resource-amount">${formatNumber(available)}</div>
-                `;
-                grid.appendChild(item);
+        function displayResourcesWithOfficers(inventoryDocs) {
+            const container = document.getElementById('resourcesDisplay');
+            
+            if (inventoryDocs.length === 0) {
+                container.innerHTML = '<div class="resource-no-data">No guild resources tracked yet.</div>';
+                return;
+            }
+            
+            // Build nested structure: resourceType -> location -> officer -> quantity
+            const resourceMap = {};
+            
+            inventoryDocs.forEach(doc => {
+                const inv = doc.data();
+                if (inv.quantity <= 0) return;
+                
+                const resource = inv.resourceType;
+                const location = inv.location;
+                const officerId = inv.officerId;
+                
+                if (!resourceMap[resource]) {
+                    resourceMap[resource] = { total: 0, locations: {} };
+                }
+                
+                if (!resourceMap[resource].locations[location]) {
+                    resourceMap[resource].locations[location] = { total: 0, officers: {} };
+                }
+                
+                resourceMap[resource].total += inv.quantity;
+                resourceMap[resource].locations[location].total += inv.quantity;
+                
+                if (!resourceMap[resource].locations[location].officers[officerId]) {
+                    resourceMap[resource].locations[location].officers[officerId] = 0;
+                }
+                resourceMap[resource].locations[location].officers[officerId] += inv.quantity;
             });
+            
+            // Get officer names
+            const officerNames = {};
+            allMembers.forEach(doc => {
+                const data = doc.data();
+                const prefix = data.squadron ? `[${data.squadron}] ` : '';
+                officerNames[doc.id] = prefix + (data.gamertag || 'Unknown');
+            });
+            
+            // Get location names
+            const locationNames = {};
+            allLocations.forEach(loc => {
+                locationNames[loc.code] = loc.name;
+            });
+            
+            // Sort resources alphabetically
+            const sortedResources = Object.keys(resourceMap).sort();
+            
+            if (sortedResources.length === 0) {
+                container.innerHTML = '<div class="resource-no-data">No guild resources tracked yet.</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            sortedResources.forEach(resource => {
+                const resourceData = resourceMap[resource];
+                const resourceDisplay = resource.charAt(0).toUpperCase() + resource.slice(1);
+                
+                html += `
+                    <div class="resource-group">
+                        <div class="resource-group-header">
+                            <span class="resource-group-name">${resourceDisplay}</span>
+                            <span class="resource-group-total">${formatNumber(resourceData.total)} total</span>
+                        </div>
+                `;
+                
+                // Sort locations alphabetically
+                const sortedLocations = Object.keys(resourceData.locations).sort((a, b) => {
+                    const nameA = locationNames[a] || a;
+                    const nameB = locationNames[b] || b;
+                    return nameA.localeCompare(nameB);
+                });
+                
+                sortedLocations.forEach(location => {
+                    const locationData = resourceData.locations[location];
+                    const locationDisplay = locationNames[location] || location;
+                    
+                    html += `
+                        <div class="resource-location">
+                            <div class="resource-location-header">${locationDisplay} (${formatNumber(locationData.total)})</div>
+                            <div class="resource-officer-list">
+                    `;
+                    
+                    // Sort officers by quantity descending
+                    const sortedOfficers = Object.entries(locationData.officers)
+                        .sort((a, b) => b[1] - a[1]);
+                    
+                    sortedOfficers.forEach(([officerId, quantity]) => {
+                        const officerName = officerNames[officerId] || 'Unknown';
+                        html += `
+                            <div class="resource-officer-item">
+                                <span class="resource-officer-name">${officerName}:</span> ${formatNumber(quantity)}
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+            
+            container.innerHTML = html;
         }
 
         function getNextTier(currentTier) {
