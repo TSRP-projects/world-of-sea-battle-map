@@ -691,64 +691,52 @@
             </div>
 
             <div class="card">
-                <h3>📤 Log Resource Distribution</h3>
+                <h3>📦 Log Resource Donation</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
-                    Record resources given to a player from guild storage.
+                    Record a player's material contribution to the guild.
                 </p>
                 
                 <div class="form-group">
-                    <label>Resource Type:</label>
-                    <select id="distributionResource" onchange="updateDistributionSources()">
-                        <option value="">-- Select Resource --</option>
-                        <optgroup label="Crafted Resources">
-                            <option value="beams">Beams</option>
-                            <option value="bulkheads">Bulkheads</option>
-                            <option value="plates">Plates</option>
-                            <option value="canvas">Canvas</option>
-                        </optgroup>
-                        <optgroup label="Raw Materials">
-                            <option value="iron">Iron</option>
-                            <option value="coal">Coal</option>
-                            <option value="wood">Wood</option>
-                            <option value="resin">Resin</option>
-                            <option value="fabric">Fabric</option>
-                        </optgroup>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>From Location:</label>
-                    <select id="distributionLocation" onchange="updateDistributionSources()">
-                        <option value="">-- Select Location --</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>From Officer's Inventory:</label>
-                    <select id="distributionFromOfficer">
-                        <option value="">-- Select resource and location first --</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Quantity:</label>
-                    <input type="number" id="distributionQuantity" min="1" placeholder="Enter amount">
-                </div>
-                
-                <div class="form-group">
-                    <label>Recipient:</label>
-                    <select id="distributionPlayer">
+                    <label>Select Player:</label>
+                    <select id="donationPlayer">
                         <option value="">-- Select Player --</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label>Notes (optional):</label>
-                    <input type="text" id="distributionNotes" placeholder="e.g., For Constitution build">
+                    <label>Resource Type:</label>
+                    <select id="donationResource">
+                        <option value="">-- Select Resource --</option>
+                        <optgroup label="Crafted Resources">
+                            <option value="beams">Beams (1 pt each)</option>
+                            <option value="bulkheads">Bulkheads (2 pts each)</option>
+                            <option value="plates">Plates (1 pt each)</option>
+                            <option value="canvas">Canvas (1 pt per 2)</option>
+                        </optgroup>
+                        <optgroup label="Raw Materials">
+                            <option value="iron">Iron (1 pt per 100)</option>
+                            <option value="wood">Wood (1 pt per 1000)</option>
+                            <option value="coal">Coal (1 pt per 100)</option>
+                            <option value="resin">Resin (1 pt per 200)</option>
+                            <option value="fabric">Fabric (1 pt per 2000)</option>
+                        </optgroup>
+                    </select>
                 </div>
                 
-                <button class="btn btn-success" onclick="logDistribution()" style="width: 100%;">
-                    Log Distribution
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="donationQuantity" min="1" placeholder="Enter amount">
+                </div>
+                
+                <div class="form-group">
+                    <label>Storage Location:</label>
+                    <select id="donationLocation">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-success" onclick="logResourceDonation()" style="width: 100%;">
+                    Log Donation
                 </button>
             </div>
 
@@ -924,15 +912,8 @@
                 </p>
                 
                 <div class="form-group">
-                    <label>Recipient:</label>
-                    <select id="distributionPlayer">
-                        <option value="">-- Select Player --</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
                     <label>Resource Type:</label>
-                    <select id="distributionResource">
+                    <select id="distributionResource" onchange="updateDistributionSources()">
                         <option value="">-- Select Resource --</option>
                         <optgroup label="Crafted Resources">
                             <option value="beams">Beams</option>
@@ -951,14 +932,28 @@
                 </div>
                 
                 <div class="form-group">
+                    <label>From Location:</label>
+                    <select id="distributionLocation" onchange="updateDistributionSources()">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>From Officer's Inventory:</label>
+                    <select id="distributionFromOfficer">
+                        <option value="">-- Select resource and location first --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
                     <label>Quantity:</label>
                     <input type="number" id="distributionQuantity" min="1" placeholder="Enter amount">
                 </div>
                 
                 <div class="form-group">
-                    <label>From Location:</label>
-                    <select id="distributionLocation">
-                        <option value="">-- Select Location --</option>
+                    <label>Recipient:</label>
+                    <select id="distributionPlayer">
+                        <option value="">-- Select Player --</option>
                     </select>
                 </div>
                 
