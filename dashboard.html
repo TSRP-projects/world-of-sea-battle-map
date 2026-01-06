@@ -996,7 +996,11 @@
             battleMarks: 'printshop.png',
             escudo: 'escudo.png',
             constructionLicense: 'construction_licesnse.png',
-            imperialBlueprint: 'imperial_blueprint.png'
+            imperialBlueprint: 'imperial_blueprint.png',
+            wood: 'wood.png',
+            iron: 'iron.png',
+            fabric: 'fabric.png',
+            resin: 'resin.png'
         };
 
         auth.onAuthStateChanged(user => {
@@ -1193,10 +1197,14 @@
                 { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads },
                 { name: 'Plates', key: 'plates', icon: resourceIcons.plates },
                 { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas },
+                { name: 'Wood', key: 'wood', icon: resourceIcons.wood },
+                { name: 'Iron', key: 'iron', icon: resourceIcons.iron },
+                { name: 'Fabric', key: 'fabric', icon: resourceIcons.fabric },
+                { name: 'Resin', key: 'resin', icon: resourceIcons.resin },
                 { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks },
                 { name: 'Escudo', key: 'escudo', icon: resourceIcons.escudo },
                 { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint },
-                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense}
+                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense }
             ];
 
             resources.forEach(resource => {
@@ -1207,10 +1215,10 @@
                     <img src="${resource.icon}" alt="${resource.name}">
                     <div class="inventory-item-name">${resource.name}</div>
                     <input type="number" 
-                           id="inventory_${resource.key}" 
-                           value="${currentAmount}" 
-                           min="0"
-                           onchange="markInventoryChanged()">
+                        id="inventory_${resource.key}" 
+                        value="${currentAmount}" 
+                        min="0"
+                        onchange="markInventoryChanged()">
                 `;
                 grid.appendChild(item);
             });
@@ -1228,6 +1236,10 @@
                 bulkheads: parseInt(document.getElementById('inventory_bulkheads').value) || 0,
                 plates: parseInt(document.getElementById('inventory_plates').value) || 0,
                 canvas: parseInt(document.getElementById('inventory_canvas').value) || 0,
+                wood: parseInt(document.getElementById('inventory_wood').value) || 0,
+                iron: parseInt(document.getElementById('inventory_iron').value) || 0,
+                fabric: parseInt(document.getElementById('inventory_fabric').value) || 0,
+                resin: parseInt(document.getElementById('inventory_resin').value) || 0,
                 battleMarks: parseInt(document.getElementById('inventory_battleMarks').value) || 0,
                 escudo: parseInt(document.getElementById('inventory_escudo').value) || 0,
                 imperialBlueprint: parseInt(document.getElementById('inventory_imperialBlueprint').value) || 0,
