@@ -566,6 +566,87 @@
             font-size: 11px;
             margin-left: 8px;
         }
+
+        .resource-group {
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .resource-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .resource-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+        }
+
+        .resource-group-name {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .resource-group-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d5a2d;
+        }
+
+        .resource-location {
+            margin-left: 10px;
+            padding: 8px 12px;
+            background: rgba(139, 105, 20, 0.05);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .resource-location:last-child {
+            margin-bottom: 0;
+        }
+
+        .resource-location-header {
+            font-weight: bold;
+            color: #5c4a3a;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .resource-officer-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .resource-officer-item {
+            background: rgba(139, 105, 20, 0.15);
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #3d2b1f;
+        }
+
+        .resource-officer-name {
+            color: #8b6914;
+            font-weight: bold;
+        }
+
+        .resource-no-data {
+            color: #5c4a3a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
     </style>
 </head>
 <body>
@@ -715,6 +796,116 @@
             </div>
 
             <div class="card">
+                <h3>🤝 Transfer to Officer</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Transfer resources to another officer at the same location.
+                </p>
+                
+                <div class="form-group">
+                    <label>Resource Type:</label>
+                    <select id="officerTransferResource">
+                        <option value="">-- Select Resource --</option>
+                        <optgroup label="Crafted Resources">
+                            <option value="beams">Beams</option>
+                            <option value="bulkheads">Bulkheads</option>
+                            <option value="plates">Plates</option>
+                            <option value="canvas">Canvas</option>
+                        </optgroup>
+                        <optgroup label="Raw Materials">
+                            <option value="iron">Iron</option>
+                            <option value="wood">Wood</option>
+                            <option value="coal">Coal</option>
+                            <option value="resin">Resin</option>
+                            <option value="fabric">Fabric</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="officerTransferQuantity" min="1" placeholder="Enter amount">
+                </div>
+                
+                <div class="form-group">
+                    <label>Location:</label>
+                    <select id="officerTransferLocation">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Transfer To Officer:</label>
+                    <select id="officerTransferTo">
+                        <option value="">-- Select Officer --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Note (required):</label>
+                    <input type="text" id="officerTransferNote" placeholder="e.g., Handing off for ship build">
+                </div>
+                
+                <button class="btn btn-success" onclick="transferToOfficer()" style="width: 100%;">
+                    Transfer to Officer
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>🚚 Transfer Location</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Move your resources from one port to another.
+                </p>
+                
+                <div class="form-group">
+                    <label>Resource Type:</label>
+                    <select id="locationTransferResource">
+                        <option value="">-- Select Resource --</option>
+                        <optgroup label="Crafted Resources">
+                            <option value="beams">Beams</option>
+                            <option value="bulkheads">Bulkheads</option>
+                            <option value="plates">Plates</option>
+                            <option value="canvas">Canvas</option>
+                        </optgroup>
+                        <optgroup label="Raw Materials">
+                            <option value="iron">Iron</option>
+                            <option value="wood">Wood</option>
+                            <option value="coal">Coal</option>
+                            <option value="resin">Resin</option>
+                            <option value="fabric">Fabric</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Quantity:</label>
+                    <input type="number" id="locationTransferQuantity" min="1" placeholder="Enter amount">
+                </div>
+                
+                <div class="form-group">
+                    <label>From Location:</label>
+                    <select id="locationTransferFrom">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>To Location:</label>
+                    <select id="locationTransferTo">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Note (required):</label>
+                    <input type="text" id="locationTransferNote" placeholder="e.g., Moving to shipyard">
+                </div>
+                
+                <button class="btn btn-success" onclick="transferLocation()" style="width: 100%;">
+                    Transfer Location
+                </button>
+            </div>
+
+            <div class="card">
                 <h3>📤 Log Resource Distribution</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
                     Record resources given to a player from guild storage.
@@ -753,6 +944,13 @@
                 </div>
                 
                 <div class="form-group">
+                    <label>From Location:</label>
+                    <select id="distributionLocation">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
                     <label>Notes (optional):</label>
                     <input type="text" id="distributionNotes" placeholder="e.g., For Constitution build">
                 </div>
@@ -765,8 +963,15 @@
             <div class="card">
                 <h3>🔨 Log Crafting</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
-                    Record crafting of materials. Raw materials consumed will be deducted and crafted materials added to guild storage.
+                    Record crafting of materials. Raw materials consumed will be deducted and crafted materials added to your inventory.
                 </p>
+                
+                <div class="form-group">
+                    <label>Crafting Location:</label>
+                    <select id="craftingLocation">
+                        <option value="">-- Select Location --</option>
+                    </select>
+                </div>
                 
                 <div class="form-group">
                     <label>Crafted Material:</label>
@@ -923,10 +1128,7 @@
         <div class="card-grid">
             <div class="card">
                 <h3>🏦 Guild Resources</h3>
-                <div class="resources-edit" id="resourcesEdit"></div>
-                <button class="btn btn-success" onclick="saveAllResources()" style="margin-top: 20px; width: 100%;">
-                    Save All Resources
-                </button>
+                <div id="resourcesDisplay"></div>
             </div>
 
             <div class="card">
@@ -1018,10 +1220,9 @@
                         displayGuildAlliances();
                     });
 
-                db.collection('guildResources')
-                    .orderBy('materialType')
+                db.collection('officerInventory')
                     .onSnapshot(snapshot => {
-                        displayResources(snapshot.docs);
+                        displayResourcesWithOfficers(snapshot.docs);
                     });
 
                 db.collection('admiralLedger')
@@ -1056,8 +1257,9 @@
             const selectors = [
                 'donationLocation',
                 'initInventoryLocation',
-                'transferFromLocation',
-                'transferToLocation',
+                'distributionLocation',
+                'craftingLocation',
+                'officerTransferLocation',
                 'locationTransferFrom',
                 'locationTransferTo'
             ];
@@ -1138,6 +1340,18 @@
             const initOfficerSelector = document.getElementById('initInventoryOfficer');
             initOfficerSelector.innerHTML = '<option value="">-- Select Officer --</option>';
 
+            const officerTransferSelector = document.getElementById('officerTransferTo');
+            officerTransferSelector.innerHTML = '<option value="">-- Select Officer --</option>';
+
+            const admiralSelector = document.getElementById('admiralPlayer');
+            admiralSelector.innerHTML = '<option value="">-- Select Player --</option>';
+
+            const guildChangeSelector = document.getElementById('guildChangePlayer');
+            guildChangeSelector.innerHTML = '<option value="">-- Select Player --</option>';
+
+            const distributionSelector = document.getElementById('distributionPlayer');
+            distributionSelector.innerHTML = '<option value="">-- Select Player --</option>';
+
             docs.forEach(doc => {
                 const member = doc.data();
                 const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
@@ -1165,21 +1379,18 @@
                 officerSelector.appendChild(officerOption);
 
                 // Admiral player option
-                const admiralSelector = document.getElementById('admiralPlayer');
                 const admiralOption = document.createElement('option');
                 admiralOption.value = doc.id;
                 admiralOption.textContent = displayText + (member.isAdmiral ? ' (Admiral)' : '');
                 admiralSelector.appendChild(admiralOption);
 
                 // Guild change player option
-                const guildChangeSelector = document.getElementById('guildChangePlayer');
                 const guildChangeOption = document.createElement('option');
                 guildChangeOption.value = doc.id;
                 guildChangeOption.textContent = displayText;
                 guildChangeSelector.appendChild(guildChangeOption);
 
                 // Distribution player option
-                const distributionSelector = document.getElementById('distributionPlayer');
                 const distOption = document.createElement('option');
                 distOption.value = doc.id;
                 distOption.textContent = displayText;
@@ -1192,6 +1403,14 @@
                     initOfficerOption.textContent = displayText;
                     initOfficerSelector.appendChild(initOfficerOption);
                 }
+
+                // Officer transfer recipient option (officers only, excluding current officer)
+                if (member.isOfficer && doc.id !== currentOfficer.id) {
+                    const transferOption = document.createElement('option');
+                    transferOption.value = doc.id;
+                    transferOption.textContent = displayText;
+                    officerTransferSelector.appendChild(transferOption);
+                }
             });
         }
 
@@ -1201,24 +1420,6 @@
             checkboxes.forEach(cb => cb.checked = selectAll);
         }
 
-        function displayResources(docs) {
-            const container = document.getElementById('resourcesEdit');
-            container.innerHTML = '';
-
-            docs.forEach(doc => {
-                const resource = doc.data();
-                const item = document.createElement('div');
-                item.className = 'resource-edit-item';
-                item.innerHTML = `
-                    <label>${resource.materialType}:</label>
-                    <input type="number" 
-                           id="resource_${doc.id}" 
-                           value="${resource.currentStock}" 
-                           min="0">
-                `;
-                container.appendChild(item);
-            });
-        }
 
         function displayLedger(docs) {
             const container = document.getElementById('ledgerContainer');
@@ -1636,7 +1837,7 @@
 
                 batch.update(playerRef, updateData);
 
-                // If material donation, remove from guild resources (only for crafted resources)
+                // If material donation, remove from guild resources and officer inventory
                 if (contrib.materialType && contrib.materialQuantity) {
                     const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'resin', 'fabric', 'coal'];
                     if (guildStorageResources.includes(contrib.materialType.toLowerCase())) {
@@ -1648,6 +1849,20 @@
                         if (!resourceQuery.empty) {
                             batch.update(resourceQuery.docs[0].ref, {
                                 currentStock: firebase.firestore.FieldValue.increment(-contrib.materialQuantity)
+                            });
+                        }
+                    }
+
+                    // Remove from officer inventory (the officer who logged the donation)
+                    if (contrib.loggedBy && contrib.location) {
+                        const inventoryId = `${contrib.loggedBy}_${contrib.materialType.toLowerCase()}_${contrib.location}`;
+                        const inventoryRef = db.collection('officerInventory').doc(inventoryId);
+                        const inventoryDoc = await inventoryRef.get();
+                        
+                        if (inventoryDoc.exists) {
+                            batch.update(inventoryRef, {
+                                quantity: firebase.firestore.FieldValue.increment(-contrib.materialQuantity),
+                                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                             });
                         }
                     }
@@ -1673,40 +1888,11 @@
             }
         }
 
-        async function saveAllResources() {
-            try {
-                const snapshot = await db.collection('guildResources').get();
-                const batch = db.batch();
-
-                snapshot.docs.forEach(doc => {
-                    const newStock = parseInt(document.getElementById(`resource_${doc.id}`).value) || 0;
-                    batch.update(doc.ref, {
-                        currentStock: newStock,
-                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                        updatedBy: auth.currentUser.uid
-                    });
-                });
-
-                await batch.commit();
-
-                await logToLedger(
-                    'Guild Resources Updated',
-                    'Manual update to guild resource stockpiles'
-                );
-
-                alert('Resources updated successfully!');
-
-            } catch (err) {
-                console.error('Error updating resources:', err);
-                alert('Error: ' + err.message);
-            }
-        }
-        // Add distribution player dropdown population inside updateParticipantLists()
-  
         async function logDistribution() {
             const playerId = document.getElementById('distributionPlayer').value;
             const resourceType = document.getElementById('distributionResource').value;
             const quantity = parseInt(document.getElementById('distributionQuantity').value);
+            const location = document.getElementById('distributionLocation').value;
             const notes = document.getElementById('distributionNotes').value.trim();
 
             if (!playerId) {
@@ -1721,6 +1907,22 @@
                 alert('Enter a valid quantity');
                 return;
             }
+            if (!location) {
+                alert('Select a location');
+                return;
+            }
+
+            // Check if current officer has enough inventory at this location
+            const inventoryId = `${currentOfficer.id}_${resourceType}_${location}`;
+            const inventoryDoc = await db.collection('officerInventory').doc(inventoryId).get();
+            
+            if (!inventoryDoc.exists || inventoryDoc.data().quantity < quantity) {
+                const available = inventoryDoc.exists ? inventoryDoc.data().quantity : 0;
+                const locationData = allLocations.find(l => l.code === location);
+                const locationName = locationData ? locationData.name : location;
+                alert(`Insufficient inventory.\nYou have ${formatNumber(available)} ${resourceType} at ${locationName}.`);
+                return;
+            }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
@@ -1732,6 +1934,8 @@
                 : currentOfficer.gamertag;
 
             const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+            const locationData = allLocations.find(l => l.code === location);
+            const locationName = locationData ? locationData.name : location;
 
             try {
                 const batch = db.batch();
@@ -1744,6 +1948,7 @@
                     playerName: squadronPrefix + playerName,
                     resourceType: resourceType,
                     quantity: quantity,
+                    location: location,
                     performedBy: currentOfficer.id,
                     performedByName: officerName,
                     timestamp: timestamp,
@@ -1766,11 +1971,18 @@
                     }
                 }
 
+                // Deduct from officer inventory
+                const inventoryRef = db.collection('officerInventory').doc(inventoryId);
+                batch.update(inventoryRef, {
+                    quantity: firebase.firestore.FieldValue.increment(-quantity),
+                    lastUpdated: timestamp
+                });
+
                 // Log to Admiral's Ledger
                 const ledgerRef = db.collection('admiralLedger').doc();
                 batch.set(ledgerRef, {
                     action: 'Resource Distribution',
-                    details: `${formatNumber(quantity)} ${resourceDisplay} given to ${squadronPrefix}${playerName}${notes ? ' - ' + notes : ''}`,
+                    details: `${formatNumber(quantity)} ${resourceDisplay} given to ${squadronPrefix}${playerName} from ${locationName}${notes ? ' - ' + notes : ''}`,
                     performedBy: currentOfficer.id,
                     performedByName: officerName,
                     timestamp: timestamp
@@ -1778,12 +1990,13 @@
 
                 await batch.commit();
 
-                alert(`Distribution logged!\n${formatNumber(quantity)} ${resourceDisplay} given to ${playerName}`);
+                alert(`Distribution logged!\n${formatNumber(quantity)} ${resourceDisplay} given to ${playerName}\nFrom: ${locationName}`);
 
                 // Reset form
                 document.getElementById('distributionPlayer').value = '';
                 document.getElementById('distributionResource').value = '';
                 document.getElementById('distributionQuantity').value = '';
+                document.getElementById('distributionLocation').value = '';
                 document.getElementById('distributionNotes').value = '';
 
             } catch (err) {
@@ -1793,6 +2006,7 @@
         }
 
         async function logCrafting() {
+            const location = document.getElementById('craftingLocation').value;
             const craftedMaterial = document.getElementById('craftedMaterial').value;
             const craftedQuantity = parseInt(document.getElementById('craftedQuantity').value);
             
@@ -1802,6 +2016,10 @@
             const resinUsed = parseInt(document.getElementById('craftResin').value) || 0;
             const fabricUsed = parseInt(document.getElementById('craftFabric').value) || 0;
 
+            if (!location) {
+                alert('Select a crafting location');
+                return;
+            }
             if (!craftedMaterial) {
                 alert('Select a crafted material');
                 return;
@@ -1817,7 +2035,36 @@
                 return;
             }
 
+            // Check if officer has enough raw materials at this location
+            const rawMaterialsNeeded = [
+                { type: 'wood', amount: woodUsed },
+                { type: 'iron', amount: ironUsed },
+                { type: 'coal', amount: coalUsed },
+                { type: 'resin', amount: resinUsed },
+                { type: 'fabric', amount: fabricUsed }
+            ].filter(m => m.amount > 0);
+
+            const insufficientMaterials = [];
+            for (const material of rawMaterialsNeeded) {
+                const inventoryId = `${currentOfficer.id}_${material.type}_${location}`;
+                const inventoryDoc = await db.collection('officerInventory').doc(inventoryId).get();
+                const available = inventoryDoc.exists ? inventoryDoc.data().quantity : 0;
+                
+                if (available < material.amount) {
+                    insufficientMaterials.push(`${material.type}: need ${formatNumber(material.amount)}, have ${formatNumber(available)}`);
+                }
+            }
+
+            if (insufficientMaterials.length > 0) {
+                const locationData = allLocations.find(l => l.code === location);
+                const locationName = locationData ? locationData.name : location;
+                alert(`Insufficient materials at ${locationName}:\n${insufficientMaterials.join('\n')}`);
+                return;
+            }
+
             const craftedDisplay = craftedMaterial.charAt(0).toUpperCase() + craftedMaterial.slice(1);
+            const locationData = allLocations.find(l => l.code === location);
+            const locationName = locationData ? locationData.name : location;
             const officerName = currentOfficer.squadron 
                 ? `[${currentOfficer.squadron}] ${currentOfficer.gamertag}`
                 : currentOfficer.gamertag || 'Unknown';
@@ -1835,17 +2082,26 @@
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-                // Deduct raw materials from guild resources
+                // Deduct raw materials from officer inventory and guild resources
                 const rawMaterials = [
-                    { name: 'Wood', amount: woodUsed },
-                    { name: 'Iron', amount: ironUsed },
-                    { name: 'Coal', amount: coalUsed },
-                    { name: 'Resin', amount: resinUsed },
-                    { name: 'Fabric', amount: fabricUsed }
+                    { name: 'Wood', type: 'wood', amount: woodUsed },
+                    { name: 'Iron', type: 'iron', amount: ironUsed },
+                    { name: 'Coal', type: 'coal', amount: coalUsed },
+                    { name: 'Resin', type: 'resin', amount: resinUsed },
+                    { name: 'Fabric', type: 'fabric', amount: fabricUsed }
                 ];
 
                 for (const material of rawMaterials) {
                     if (material.amount > 0) {
+                        // Deduct from officer inventory
+                        const inventoryId = `${currentOfficer.id}_${material.type}_${location}`;
+                        const inventoryRef = db.collection('officerInventory').doc(inventoryId);
+                        batch.update(inventoryRef, {
+                            quantity: firebase.firestore.FieldValue.increment(-material.amount),
+                            lastUpdated: timestamp
+                        });
+
+                        // Deduct from guild resources
                         const resourceQuery = await db.collection('guildResources')
                             .where('materialType', '==', material.name)
                             .get();
@@ -1860,13 +2116,33 @@
                     }
                 }
 
+                // Add crafted material to officer inventory
+                const craftedInventoryId = `${currentOfficer.id}_${craftedMaterial}_${location}`;
+                const craftedInventoryRef = db.collection('officerInventory').doc(craftedInventoryId);
+                const existingCraftedInventory = await craftedInventoryRef.get();
+                
+                if (existingCraftedInventory.exists) {
+                    batch.update(craftedInventoryRef, {
+                        quantity: firebase.firestore.FieldValue.increment(craftedQuantity),
+                        lastUpdated: timestamp
+                    });
+                } else {
+                    batch.set(craftedInventoryRef, {
+                        officerId: currentOfficer.id,
+                        resourceType: craftedMaterial,
+                        location: location,
+                        quantity: craftedQuantity,
+                        lastUpdated: timestamp
+                    });
+                }
+
                 // Add crafted material to guild resources
-                const resourceQuery = await db.collection('guildResources')
+                const craftedResourceQuery = await db.collection('guildResources')
                     .where('materialType', '==', craftedDisplay)
                     .get();
                 
-                if (!resourceQuery.empty) {
-                    batch.update(resourceQuery.docs[0].ref, {
+                if (!craftedResourceQuery.empty) {
+                    batch.update(craftedResourceQuery.docs[0].ref, {
                         currentStock: firebase.firestore.FieldValue.increment(craftedQuantity),
                         lastUpdated: timestamp,
                         updatedBy: currentOfficer.id
@@ -1877,7 +2153,7 @@
                 const ledgerRef = db.collection('admiralLedger').doc();
                 batch.set(ledgerRef, {
                     action: 'Crafting Logged',
-                    details: `${officerName} crafted ${formatNumber(craftedQuantity)} ${craftedDisplay} using ${consumedString}`,
+                    details: `${officerName} crafted ${formatNumber(craftedQuantity)} ${craftedDisplay} at ${locationName} using ${consumedString}`,
                     performedBy: currentOfficer.id,
                     performedByName: officerName,
                     timestamp: timestamp
@@ -1885,9 +2161,10 @@
 
                 await batch.commit();
 
-                alert(`Crafting logged!\n${formatNumber(craftedQuantity)} ${craftedDisplay} added to guild storage\n\nConsumed: ${consumedString}`);
+                alert(`Crafting logged!\n${formatNumber(craftedQuantity)} ${craftedDisplay} added at ${locationName}\n\nConsumed: ${consumedString}`);
 
                 // Reset form
+                document.getElementById('craftingLocation').value = '';
                 document.getElementById('craftedMaterial').value = '';
                 document.getElementById('craftedQuantity').value = '';
                 document.getElementById('craftWood').value = '';
@@ -1901,6 +2178,7 @@
                 alert('Error: ' + err.message);
             }
         }
+
         async function toggleMemberDetails(playerId, button) {
             const existingRow = document.getElementById(`details-${playerId}`);
             
@@ -2305,6 +2583,341 @@
 
             } catch (err) {
                 console.error('Error initializing inventory:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function displayResourcesWithOfficers(inventoryDocs) {
+            const container = document.getElementById('resourcesDisplay');
+            
+            if (inventoryDocs.length === 0) {
+                container.innerHTML = '<div class="resource-no-data">No inventory records. Use "Initialize Inventory" to add existing holdings.</div>';
+                return;
+            }
+            
+            // Build nested structure: resourceType -> location -> officer -> quantity
+            const resourceMap = {};
+            
+            inventoryDocs.forEach(doc => {
+                const inv = doc.data();
+                if (inv.quantity <= 0) return;
+                
+                const resource = inv.resourceType;
+                const location = inv.location;
+                const officerId = inv.officerId;
+                
+                if (!resourceMap[resource]) {
+                    resourceMap[resource] = { total: 0, locations: {} };
+                }
+                
+                if (!resourceMap[resource].locations[location]) {
+                    resourceMap[resource].locations[location] = { total: 0, officers: {} };
+                }
+                
+                resourceMap[resource].total += inv.quantity;
+                resourceMap[resource].locations[location].total += inv.quantity;
+                
+                if (!resourceMap[resource].locations[location].officers[officerId]) {
+                    resourceMap[resource].locations[location].officers[officerId] = 0;
+                }
+                resourceMap[resource].locations[location].officers[officerId] += inv.quantity;
+            });
+            
+            // Get officer names
+            const officerNames = {};
+            allMembers.forEach(doc => {
+                const data = doc.data();
+                const prefix = data.squadron ? `[${data.squadron}] ` : '';
+                officerNames[doc.id] = prefix + (data.gamertag || 'Unknown');
+            });
+            
+            // Get location names
+            const locationNames = {};
+            allLocations.forEach(loc => {
+                locationNames[loc.code] = loc.name;
+            });
+            
+            // Sort resources alphabetically
+            const sortedResources = Object.keys(resourceMap).sort();
+            
+            if (sortedResources.length === 0) {
+                container.innerHTML = '<div class="resource-no-data">No inventory records. Use "Initialize Inventory" to add existing holdings.</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            sortedResources.forEach(resource => {
+                const resourceData = resourceMap[resource];
+                const resourceDisplay = resource.charAt(0).toUpperCase() + resource.slice(1);
+                
+                html += `
+                    <div class="resource-group">
+                        <div class="resource-group-header">
+                            <span class="resource-group-name">${resourceDisplay}</span>
+                            <span class="resource-group-total">${formatNumber(resourceData.total)} total</span>
+                        </div>
+                `;
+                
+                // Sort locations alphabetically
+                const sortedLocations = Object.keys(resourceData.locations).sort((a, b) => {
+                    const nameA = locationNames[a] || a;
+                    const nameB = locationNames[b] || b;
+                    return nameA.localeCompare(nameB);
+                });
+                
+                sortedLocations.forEach(location => {
+                    const locationData = resourceData.locations[location];
+                    const locationDisplay = locationNames[location] || location;
+                    
+                    html += `
+                        <div class="resource-location">
+                            <div class="resource-location-header">${locationDisplay} (${formatNumber(locationData.total)})</div>
+                            <div class="resource-officer-list">
+                    `;
+                    
+                    // Sort officers by quantity descending
+                    const sortedOfficers = Object.entries(locationData.officers)
+                        .sort((a, b) => b[1] - a[1]);
+                    
+                    sortedOfficers.forEach(([officerId, quantity]) => {
+                        const officerName = officerNames[officerId] || 'Unknown';
+                        html += `
+                            <div class="resource-officer-item">
+                                <span class="resource-officer-name">${officerName}:</span> ${formatNumber(quantity)}
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function transferToOfficer() {
+            const resourceType = document.getElementById('officerTransferResource').value;
+            const quantity = parseInt(document.getElementById('officerTransferQuantity').value);
+            const location = document.getElementById('officerTransferLocation').value;
+            const toOfficerId = document.getElementById('officerTransferTo').value;
+            const note = document.getElementById('officerTransferNote').value.trim();
+
+            if (!resourceType) {
+                alert('Select a resource type');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('Enter a valid quantity');
+                return;
+            }
+            if (!location) {
+                alert('Select a location');
+                return;
+            }
+            if (!toOfficerId) {
+                alert('Select an officer to transfer to');
+                return;
+            }
+            if (!note) {
+                alert('Note is required');
+                return;
+            }
+
+            // Check if current officer has enough inventory
+            const fromInventoryId = `${currentOfficer.id}_${resourceType}_${location}`;
+            const fromInventoryDoc = await db.collection('officerInventory').doc(fromInventoryId).get();
+            
+            if (!fromInventoryDoc.exists || fromInventoryDoc.data().quantity < quantity) {
+                const available = fromInventoryDoc.exists ? fromInventoryDoc.data().quantity : 0;
+                const locationData = allLocations.find(l => l.code === location);
+                const locationName = locationData ? locationData.name : location;
+                alert(`Insufficient inventory.\nYou have ${formatNumber(available)} ${resourceType} at ${locationName}.`);
+                return;
+            }
+
+            const toOfficerDoc = allMembers.find(m => m.id === toOfficerId);
+            const toOfficerData = toOfficerDoc ? toOfficerDoc.data() : {};
+            const toOfficerName = toOfficerData.gamertag || 'Unknown';
+            const toOfficerSquadron = toOfficerData.squadron ? `[${toOfficerData.squadron}] ` : '';
+
+            const fromOfficerName = currentOfficer.gamertag || 'Unknown';
+            const fromOfficerSquadron = currentOfficer.squadron ? `[${currentOfficer.squadron}] ` : '';
+
+            const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+            const locationData = allLocations.find(l => l.code === location);
+            const locationName = locationData ? locationData.name : location;
+
+            if (!confirm(`Transfer ${formatNumber(quantity)} ${resourceDisplay} to ${toOfficerSquadron}${toOfficerName} at ${locationName}?`)) {
+                return;
+            }
+
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Deduct from current officer's inventory
+                const fromInventoryRef = db.collection('officerInventory').doc(fromInventoryId);
+                batch.update(fromInventoryRef, {
+                    quantity: firebase.firestore.FieldValue.increment(-quantity),
+                    lastUpdated: timestamp
+                });
+
+                // Add to receiving officer's inventory
+                const toInventoryId = `${toOfficerId}_${resourceType}_${location}`;
+                const toInventoryRef = db.collection('officerInventory').doc(toInventoryId);
+                const toInventoryDoc = await toInventoryRef.get();
+
+                if (toInventoryDoc.exists) {
+                    batch.update(toInventoryRef, {
+                        quantity: firebase.firestore.FieldValue.increment(quantity),
+                        lastUpdated: timestamp
+                    });
+                } else {
+                    batch.set(toInventoryRef, {
+                        officerId: toOfficerId,
+                        resourceType: resourceType,
+                        location: location,
+                        quantity: quantity,
+                        lastUpdated: timestamp
+                    });
+                }
+
+                await batch.commit();
+
+                await logToLedger(
+                    'Officer Transfer',
+                    `${fromOfficerSquadron}${fromOfficerName} transferred ${formatNumber(quantity)} ${resourceDisplay} to ${toOfficerSquadron}${toOfficerName} at ${locationName}`,
+                    note
+                );
+
+                alert(`Transfer complete!\n${formatNumber(quantity)} ${resourceDisplay} transferred to ${toOfficerName}`);
+
+                // Reset form
+                document.getElementById('officerTransferResource').value = '';
+                document.getElementById('officerTransferQuantity').value = '';
+                document.getElementById('officerTransferLocation').value = '';
+                document.getElementById('officerTransferTo').value = '';
+                document.getElementById('officerTransferNote').value = '';
+
+            } catch (err) {
+                console.error('Error transferring to officer:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function transferLocation() {
+            const resourceType = document.getElementById('locationTransferResource').value;
+            const quantity = parseInt(document.getElementById('locationTransferQuantity').value);
+            const fromLocation = document.getElementById('locationTransferFrom').value;
+            const toLocation = document.getElementById('locationTransferTo').value;
+            const note = document.getElementById('locationTransferNote').value.trim();
+
+            if (!resourceType) {
+                alert('Select a resource type');
+                return;
+            }
+            if (!quantity || quantity < 1) {
+                alert('Enter a valid quantity');
+                return;
+            }
+            if (!fromLocation) {
+                alert('Select a from location');
+                return;
+            }
+            if (!toLocation) {
+                alert('Select a to location');
+                return;
+            }
+            if (fromLocation === toLocation) {
+                alert('From and To locations must be different');
+                return;
+            }
+            if (!note) {
+                alert('Note is required');
+                return;
+            }
+
+            // Check if current officer has enough inventory at from location
+            const fromInventoryId = `${currentOfficer.id}_${resourceType}_${fromLocation}`;
+            const fromInventoryDoc = await db.collection('officerInventory').doc(fromInventoryId).get();
+            
+            if (!fromInventoryDoc.exists || fromInventoryDoc.data().quantity < quantity) {
+                const available = fromInventoryDoc.exists ? fromInventoryDoc.data().quantity : 0;
+                const fromLocationData = allLocations.find(l => l.code === fromLocation);
+                const fromLocationName = fromLocationData ? fromLocationData.name : fromLocation;
+                alert(`Insufficient inventory.\nYou have ${formatNumber(available)} ${resourceType} at ${fromLocationName}.`);
+                return;
+            }
+
+            const officerName = currentOfficer.gamertag || 'Unknown';
+            const officerSquadron = currentOfficer.squadron ? `[${currentOfficer.squadron}] ` : '';
+
+            const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
+            const fromLocationData = allLocations.find(l => l.code === fromLocation);
+            const fromLocationName = fromLocationData ? fromLocationData.name : fromLocation;
+            const toLocationData = allLocations.find(l => l.code === toLocation);
+            const toLocationName = toLocationData ? toLocationData.name : toLocation;
+
+            if (!confirm(`Move ${formatNumber(quantity)} ${resourceDisplay} from ${fromLocationName} to ${toLocationName}?`)) {
+                return;
+            }
+
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+
+                // Deduct from source location
+                const fromInventoryRef = db.collection('officerInventory').doc(fromInventoryId);
+                batch.update(fromInventoryRef, {
+                    quantity: firebase.firestore.FieldValue.increment(-quantity),
+                    lastUpdated: timestamp
+                });
+
+                // Add to destination location
+                const toInventoryId = `${currentOfficer.id}_${resourceType}_${toLocation}`;
+                const toInventoryRef = db.collection('officerInventory').doc(toInventoryId);
+                const toInventoryDoc = await toInventoryRef.get();
+
+                if (toInventoryDoc.exists) {
+                    batch.update(toInventoryRef, {
+                        quantity: firebase.firestore.FieldValue.increment(quantity),
+                        lastUpdated: timestamp
+                    });
+                } else {
+                    batch.set(toInventoryRef, {
+                        officerId: currentOfficer.id,
+                        resourceType: resourceType,
+                        location: toLocation,
+                        quantity: quantity,
+                        lastUpdated: timestamp
+                    });
+                }
+
+                await batch.commit();
+
+                await logToLedger(
+                    'Location Transfer',
+                    `${officerSquadron}${officerName} moved ${formatNumber(quantity)} ${resourceDisplay} from ${fromLocationName} to ${toLocationName}`,
+                    note
+                );
+
+                alert(`Transfer complete!\n${formatNumber(quantity)} ${resourceDisplay} moved from ${fromLocationName} to ${toLocationName}`);
+
+                // Reset form
+                document.getElementById('locationTransferResource').value = '';
+                document.getElementById('locationTransferQuantity').value = '';
+                document.getElementById('locationTransferFrom').value = '';
+                document.getElementById('locationTransferTo').value = '';
+                document.getElementById('locationTransferNote').value = '';
+
+            } catch (err) {
+                console.error('Error transferring location:', err);
                 alert('Error: ' + err.message);
             }
         }
