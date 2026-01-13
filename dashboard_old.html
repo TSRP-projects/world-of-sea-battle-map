@@ -1,0 +1,2005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WOSB Guild Tracker</title>
+    <link rel="icon" type="image/png" href="Blackwolf Holdings Medallion.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Libre Baskerville', Georgia, serif;
+            background: url('wosb-app-background.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            color: #3d2b1f;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(244, 236, 217, 0.95);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .squadron-badge {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid #8b6914;
+        }
+        
+        .user-info h2 { 
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914; 
+            font-size: 20px; 
+        }
+        .user-info p { color: #5c4a3a; font-size: 14px; }
+        .user-info .gamertag { color: #8b6914; font-weight: bold; }
+        .user-info .tier-support { font-size: 12px; color: #5c4a3a; }
+        
+        .btn {
+            padding: 10px 20px;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .btn-primary { 
+            background: #8b6914; 
+            color: #f5f0e6; 
+        }
+        .btn-primary:hover { 
+            background: #6d5310; 
+        }
+        .btn-secondary { 
+            background: rgba(244, 236, 217, 0.9); 
+            color: #3d2b1f; 
+        }
+        .btn-secondary:hover { 
+            background: #8b6914;
+            color: #f5f0e6;
+        }
+        .btn-danger { 
+            background: #8b3a3a; 
+            color: #f5f0e6; 
+            border-color: #722;
+        }
+        .btn-danger:hover { 
+            background: #6b2a2a; 
+        }
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(244, 236, 217, 0.9);
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            color: #3d2b1f;
+            text-decoration: none;
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover { 
+            background: #8b6914;
+            color: #f5f0e6;
+        }
+        .nav-btn.active { 
+            background: #8b6914; 
+            color: #f5f0e6; 
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(244, 236, 217, 0.95);
+            border: 2px solid #8b6914;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-wide {
+            grid-column: 1 / -1;
+            margin-bottom: 10px;
+        }
+        
+        .card h3 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            margin-bottom: 15px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+        }
+        
+        .stat-row:last-child { border-bottom: none; }
+        .stat-label { color: #5c4a3a; }
+        .stat-value { color: #8b6914; font-weight: bold; }
+        
+        .tier-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            font-family: 'Cinzel', Georgia, serif;
+        }
+        
+        .tier-deckhand { background: rgba(128, 128, 128, 0.2); color: #666; }
+        .tier-bosun { background: rgba(205, 127, 50, 0.25); color: #8b5a2b; }
+        .tier-quartermaster { background: rgba(150, 150, 150, 0.25); color: #555; }
+        .tier-captain { background: rgba(139, 105, 20, 0.25); color: #8b6914; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 24px;
+            background: rgba(139, 105, 20, 0.15);
+            border: 1px solid #8b6914;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b6914 0%, #c9a227 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: bold;
+            color: #3d2b1f;
+        }
+        
+        .ship-goal-selector {
+            width: 100%;
+            padding: 10px;
+            background: #f5f0e6;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            color: #3d2b1f;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .ship-goal-selector option {
+            background: #f5f0e6;
+            color: #3d2b1f;
+            padding: 8px;
+        }
+        
+        .resource-breakdown {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .resource-item-goal {
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 180px;
+        }
+
+        .ship-sketch {
+            max-width: 500px;
+            height: auto;
+            background: transparent;
+        }
+        
+        .resource-item {
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            padding: 12px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .resource-icon {
+            width: 32px;
+            height: 32px;
+        }
+        
+        .resource-details {
+            flex: 1;
+        }
+        
+        .resource-name { 
+            font-size: 12px; 
+            color: #5c4a3a; 
+            margin-bottom: 3px;
+            font-family: 'Cinzel', Georgia, serif;
+        }
+        
+        .resource-amounts {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+        }
+        
+        .resource-player { color: #2d5a2d; font-weight: bold; }
+        .resource-guild { color: #8b6914; font-weight: bold; }
+        
+        
+        .resource-amount { font-size: 16px; color: #8b6914; font-weight: bold; }
+        
+        .leaderboard { margin-top: 10px; }
+        
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            border-radius: 5px;
+            margin-bottom: 6px;
+        }
+        
+        .leaderboard-rank { 
+            font-family: 'Cinzel', Georgia, serif;
+            font-weight: bold; 
+            color: #8b6914; 
+            margin-right: 10px; 
+        }
+        .leaderboard-name { flex: 1; color: #3d2b1f; }
+        .leaderboard-value { color: #8b6914; font-weight: bold; }
+        
+        .rank-1 .leaderboard-rank { color: #c9a227; font-size: 16px; }
+        .rank-2 .leaderboard-rank { color: #888; }
+        .rank-3 .leaderboard-rank { color: #8b5a2b; }
+        
+        .loading { 
+            text-align: center; 
+            padding: 40px; 
+            color: #8b6914;
+            font-family: 'Cinzel', Georgia, serif;
+        }
+        
+        .gamertag-input {
+            padding: 5px 10px;
+            background: #f5f0e6;
+            border: 1px solid #8b6914;
+            border-radius: 3px;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 12px;
+            color: #3d2b1f;
+            width: 150px;
+        }
+        
+        .gamertag-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .edit-gamertag {
+            cursor: pointer;
+            color: #8b6914;
+            font-size: 12px;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #5c4a3a;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        
+        .legend-player { background: #2d5a2d; }
+        .legend-guild { background: #8b6914; }
+
+        .tier-progress-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .tier-progress-label {
+            font-size: 12px;
+            color: #5c4a3a;
+        }
+        
+        .tier-progress-bar {
+            width: 150px;
+            height: 12px;
+            background: rgba(139, 105, 20, 0.15);
+            border: 1px solid #8b6914;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .tier-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #8b6914 0%, #c9a227 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .tier-progress-text {
+            font-size: 11px;
+            color: #8b6914;
+            font-weight: bold;
+        }
+        
+        .leaderboard-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .leaderboard-column h4 {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        
+        .inventory-item {
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .inventory-item img {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .inventory-item-name {
+            font-size: 11px;
+            color: #5c4a3a;
+            font-family: 'Cinzel', Georgia, serif;
+            margin-bottom: 5px;
+        }
+        
+        .inventory-item input {
+            width: 70px;
+            padding: 5px;
+            background: #f5f0e6;
+            border: 1px solid #8b6914;
+            border-radius: 3px;
+            text-align: center;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 14px;
+            color: #3d2b1f;
+        }
+        
+        .inventory-item input:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+        
+        .resource-have-need {
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        
+        .resource-sufficient {
+            color: #2d5a2d;
+        }
+        
+        .resource-insufficient {
+            color: #8b3a3a;
+        }
+        
+        .btn-build {
+            padding: 12px 30px;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        .btn-build:disabled {
+            background: #888;
+            border-color: #888;
+            cursor: not-allowed;
+        }
+        
+        .btn-build-ready {
+            background: #6b2a2a;
+            border-color: #6b2a2a;
+            animation: pulse 2s infinite;
+        }
+        
+        .btn-build-ready:hover {
+            background: #8b3a3a;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 58, 58, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(139, 58, 58, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 58, 58, 0); }
+        }
+        
+        .bottom-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 1200px) {
+            .bottom-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+            .leaderboard-columns {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .bottom-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Admiral's Ledger Styles */
+        .ledger-container {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .ledger-entry {
+            padding: 10px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.2);
+        }
+
+        .ledger-entry:last-child {
+            border-bottom: none;
+        }
+
+        .ledger-entry:hover {
+            background: rgba(139, 105, 20, 0.05);
+        }
+
+        .ledger-action {
+            font-weight: bold;
+            color: #8b6914;
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 13px;
+        }
+
+        .ledger-action.action-add { color: #2d5a2d; }
+        .ledger-action.action-remove { color: #8b3a3a; }
+        .ledger-action.action-officer { color: #8b6914; }
+
+        .ledger-details {
+            font-size: 12px;
+            color: #3d2b1f;
+            margin-top: 4px;
+        }
+
+        .ledger-justification {
+            font-style: italic;
+            color: #5c4a3a;
+            font-size: 11px;
+            margin-top: 4px;
+            padding-left: 8px;
+            border-left: 2px solid #8b6914;
+        }
+
+        .ledger-meta {
+            font-size: 10px;
+            color: #5c4a3a;
+            margin-top: 4px;
+        }
+
+        .discount-input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .discount-input-row input {
+            width: 80px;
+            padding: 8px;
+            background: #f5f0e6;
+            border: 2px solid #8b6914;
+            border-radius: 5px;
+            font-family: 'Libre Baskerville', Georgia, serif;
+            font-size: 14px;
+            color: #3d2b1f;
+            text-align: center;
+        }
+
+        .discount-input-row input:focus {
+            outline: none;
+            border-color: #c9a227;
+        }
+
+        .discount-symbol {
+            font-weight: bold;
+            color: #8b6914;
+        }
+
+        .discounted-label {
+            font-size: 11px;
+            color: #2d5a2d;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        /* Donation Breakdown Styles */
+        .donation-breakdown {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(139, 105, 20, 0.3);
+        }
+
+        .donation-header {
+            font-family: 'Cinzel', Georgia, serif;
+            font-size: 14px;
+            color: #8b6914;
+            margin-bottom: 10px;
+        }
+
+        .donation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .donation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .donation-material {
+            color: #3d2b1f;
+        }
+
+        .donation-amount {
+            color: #8b6914;
+            font-weight: bold;
+        }
+
+        .donation-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: #5c4a3a;
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        .admiral-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .admiral-list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .admiral-icon {
+            font-size: 20px;
+        }
+
+        .admiral-name {
+            font-weight: bold;
+            color: #8b6914;
+        }
+
+        .admiral-empty {
+            text-align: center;
+            color: #5c4a3a;
+            padding: 15px;
+            font-style: italic;
+        }
+
+        .ally-indicator {
+            background: linear-gradient(135deg, #2d5a2d, #3d7a3d);
+            color: #f5f0e6;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-family: 'Cinzel', Georgia, serif;
+            margin-left: 12px;
+            border: 1px solid #4a8a4a;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .resource-group {
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.3);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .resource-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .resource-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(139, 105, 20, 0.3);
+        }
+
+        .resource-group-name {
+            font-family: 'Cinzel', Georgia, serif;
+            color: #8b6914;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .resource-group-total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d5a2d;
+        }
+
+        .resource-location {
+            margin-left: 10px;
+            padding: 8px 12px;
+            background: rgba(139, 105, 20, 0.05);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .resource-location:last-child {
+            margin-bottom: 0;
+        }
+
+        .resource-location-header {
+            font-weight: bold;
+            color: #5c4a3a;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .resource-officer-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-left: 10px;
+        }
+
+        .resource-officer-item {
+            background: rgba(139, 105, 20, 0.15);
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #3d2b1f;
+        }
+
+        .resource-officer-name {
+            color: #8b6914;
+            font-weight: bold;
+        }
+
+        .resource-no-data {
+            color: #5c4a3a;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <img id="squadronBadge" class="squadron-badge" src="" alt="Squadron" title="" style="display: none;">
+            <div class="user-info">
+                <div id="gamertag-container">
+                    <span id="gamertag-display">Loading...</span>
+                    <span id="allyIndicator" class="ally-indicator" style="display: none;">Allied with Blackwolf Holdings</span>
+                    <span id="edit-gamertag" class="edit-gamertag" onclick="showGametagInput()" title="Edit gamertag">✏️</span>
+                    <span id="gamertag-edit" style="display: none;">
+                        <input type="text" id="gamertag-input" class="gamertag-input" placeholder="Enter gamertag" maxlength="30">
+                        <button class="btn btn-small btn-primary" onclick="saveGamertag()">Save</button>
+                    </span>
+                </div>
+                <p><span id="userTier">Calculating tier...</span> <span id="tierSupport" class="tier-support"></span></p>
+                <div class="tier-progress-container" id="tierProgressContainer">
+                    <span class="tier-progress-label" id="tierProgressLabel">→ Bosun:</span>
+                    <div class="tier-progress-bar">
+                        <div class="tier-progress-fill" id="tierProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <span class="tier-progress-text" id="tierProgressText">0/50</span>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-secondary" onclick="location.href='index.html'">Back to Map</button>
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <a href="dashboard.html" class="nav-btn active">Dashboard</a>
+        <a href="history.html" class="nav-btn">My History</a>
+        <a href="admin.html" class="nav-btn" id="adminNav" style="display: none;">Officer Panel</a>
+        <a href="guild-panel.html" class="nav-btn" id="guildNav" style="display: none;">Guild Panel</a>
+        <a href="ships.html" class="nav-btn" id="shipsLink" style="display: none;">Ship Database</a>
+    </div>
+
+    <div id="loading" class="loading">Loading your data...</div>
+
+    <div id="dashboard" style="display: none;">
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>⚓ Guild Admirals</h3>
+                <div id="guildAdmiralsList">
+                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📜 Admiral's Ledger</h3>
+                <div class="ledger-container" id="ledgerContainer">
+                    <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📊 Activity Status</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Forts Destroyed:</span>
+                    <span class="stat-value" id="fortsCount">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Last Activity:</span>
+                    <span class="stat-value" id="lastActivity">Never</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Status:</span>
+                    <span class="stat-value" id="activityStatus">Unknown</span>
+                </div>
+                <div class="donation-breakdown">
+                    <div class="donation-header">My Donations (All-Time)</div>
+                    <div id="donationBreakdown" class="donation-grid">
+                        <div class="donation-empty">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="card card-wide">
+            <h3>Ship Goal Progress</h3>
+            <div id="shipGoalContent">
+                <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap;">
+                    <!-- Left side: Selection and stats -->
+                    <div style="flex: 1; min-width: 280px;">
+                        <label style="color: #5c4a3a; font-size: 14px;">Select a ship you're saving for:</label>
+                        <select id="goalShipSelector" class="ship-goal-selector" onchange="setGoalShip()">
+                            <option value="">-- Choose Goal Ship --</option>
+                        </select>
+
+                        <div id="discountSection" style="display: none; margin-top: 15px;">
+                            <label style="color: #5c4a3a; font-size: 14px;">Workshop Discount (%):</label>
+                            <div class="discount-input-row">
+                                <input type="number" id="discountPercent" min="0" max="100" value="0" placeholder="0">
+                                <span class="discount-symbol">%</span>
+                                <button class="btn btn-small btn-primary" onclick="applyDiscount()">Apply</button>
+                                <button class="btn btn-small btn-secondary" onclick="clearDiscount()">Clear</button>
+                            </div>
+                            <p id="discountNote" style="font-size: 11px; color: #5c4a3a; margin-top: 5px;">
+                                Applies to materials only (Beams, Bulkheads, Plates, Canvas). Does not affect Battle Marks, Escudo, Licenses, or Blueprints.
+                            </p>
+                        </div>
+                        
+                        <div id="goalStats" style="margin-top: 20px; display: none;">
+                            <div class="stat-row">
+                                <span class="stat-label">Goal Ship:</span>
+                                <span class="stat-value" id="goalShipName">-</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Your Share:</span>
+                                <span class="stat-value" id="playerSharePercent">75%</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-label">Guild Support:</span>
+                                <span class="stat-value" id="guildSharePercent">25%</span>
+                            </div>
+                        </div>
+                        
+                        <div id="goalProgressContainer" style="display: none; margin-top: 15px;">
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="color: #5c4a3a; font-size: 14px;">Your Progress</span>
+                                    <span style="color: #2d5a2d; font-size: 12px; font-weight: bold;" id="playerProgressPercent">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="playerProgressFill" style="width: 0%;"></div>
+                                    <div class="progress-text" id="playerProgressText">0%</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="color: #5c4a3a; font-size: 14px;">Guild Progress</span>
+                                    <span style="color: #8b6914; font-size: 12px; font-weight: bold;" id="guildProgressPercent">0%</span>
+                                </div>
+                                <div class="progress-bar" style="background: rgba(139, 105, 20, 0.1);">
+                                    <div class="progress-fill" id="guildProgressFill" style="width: 0%; background: linear-gradient(90deg, #8b6914 0%, #c9a227 100%);"></div>
+                                    <div class="progress-text" id="guildProgressText">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right side: Reserved for ship image -->
+                    <div id="shipImageContainer" style="flex: 0 0 520px; min-height: 150px; display: none; background: transparent;">
+                        <img id="goalShipImage" src="" alt="Ship" style="max-width: 100%; height: auto;">
+                    </div>
+                </div>
+                
+                <div id="resourceBreakdown" style="display: none; margin-top: 15px;">
+                    <h4 style="font-family: 'Cinzel', Georgia, serif; color: #8b6914; margin-bottom: 10px; text-align: center;">Resource Breakdown</h4>
+                    <div class="legend" style="justify-content: center;">
+                        <div class="legend-item"><div class="legend-color legend-player"></div> Your Share (Have/Need)</div>
+                        <div class="legend-item"><div class="legend-color legend-guild"></div> Guild Support</div>
+                    </div>
+                    <div class="resource-breakdown" id="resourceBreakdownGrid"></div>
+                    <div style="text-align: center;">
+                        <button class="btn btn-primary btn-build" id="buildShipBtn" onclick="buildShip()" disabled>
+                            ⚓ Build Ship
+                        </button>
+                        <p id="buildShipStatus" style="margin-top: 10px; font-size: 13px; color: #5c4a3a;"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-cards">
+            <div class="card">
+                <h3>🏆 Leaderboards</h3>
+                <div class="leaderboard-columns">
+                    <div class="leaderboard-column">
+                        <h4>⚔️ Fort Busting</h4>
+                        <div class="leaderboard" id="fortLeaderboard">
+                            <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard-column">
+                        <h4>💎 Resource Donations</h4>
+                        <div class="leaderboard" id="resourceLeaderboard">
+                            <div style="text-align: center; color: #5c4a3a;">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🏗️ My Resources</h3>
+                <div class="inventory-grid" id="inventoryGrid"></div>
+                <button class="btn btn-primary" onclick="saveInventory()" style="margin-top: 15px; width: 100%;">Save Inventory</button>
+            </div>
+
+            <div class="card">
+                <h3>🏦 Guild Resources</h3>
+                <div id="resourcesDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        let currentPlayer = null;
+        let allShips = [];
+        let allLocations = [];
+        let allMembers = [];
+        let guildResources = {};
+        let currentDiscount = 0;
+
+        const resourceIcons = {
+            beams: 'beams.png',
+            bulkheads: 'bulkheads.png',
+            plates: 'plates.png',
+            canvas: 'canvas.png',
+            battleMarks: 'printshop.png',
+            escudo: 'escudo.png',
+            constructionLicense: 'construction_licesnse.png',
+            imperialBlueprint: 'imperial_blueprint.png',
+            wood: 'wood.png',
+            iron: 'iron_ingot.png',
+            fabric: 'fabric.png',
+            resin: 'resin.png'
+        };
+
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                loadDashboard(user.uid);
+            }
+        });
+
+        async function loadDashboard(userId) {
+            try {
+                // Load ships FIRST
+                const shipsSnapshot = await db.collection('shipCosts').orderBy('tier').get();
+                allShips = shipsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                populateShipSelector();
+
+                // Load locations
+                const locationsSnapshot = await db.collection('locations').where('isActive', '==', true).get();
+                allLocations = locationsSnapshot.docs.map(doc => ({ code: doc.id, ...doc.data() }));
+                allLocations.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Load members (for officer names in resource display)
+                db.collection('players')
+                    .orderBy('totalPoints', 'desc')
+                    .onSnapshot(snapshot => {
+                        allMembers = snapshot.docs;
+                    });
+
+                // THEN set up player listener
+                db.collection('players').doc(userId).onSnapshot(async doc => {
+                    if (doc.exists) {
+                        currentPlayer = { id: doc.id, ...doc.data() };
+                        
+                        // Load guild alliance status
+                        let isAlly = true; // Default to allied
+                        if (currentPlayer.squadron) {
+                            try {
+                                const guildDoc = await db.collection('guilds').doc(currentPlayer.squadron).get();
+                                if (guildDoc.exists) {
+                                    isAlly = guildDoc.data().isAlly === true;
+                                }
+                            } catch (err) {
+                                console.error('Error loading guild:', err);
+                            }
+                        }
+                        currentPlayer.isAlly = isAlly;
+                        
+                        updatePlayerUI(currentPlayer);
+                    }
+                });
+                
+                // Listen to guildResources for totals (used in ship goal calculations)
+                db.collection('guildResources').onSnapshot(snapshot => {
+                    guildResources = {};
+                    snapshot.docs.forEach(doc => {
+                        const data = doc.data();
+                        guildResources[data.materialType.toLowerCase()] = data.currentStock || 0;
+                    });
+                    
+                    // Refresh ship goal progress when guild resources update
+                    if (currentPlayer) {
+                        const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                        updateShipGoalProgress(currentPlayer, availablePoints);
+                    }
+                });
+
+                // Listen to officerInventory for detailed resource display
+                db.collection('officerInventory').onSnapshot(snapshot => {
+                    displayResourcesWithOfficers(snapshot.docs);
+                });
+
+                // Real-time listener for Admiral's Ledger
+                db.collection('admiralLedger')
+                    .orderBy('timestamp', 'desc')
+                    .limit(15)
+                    .onSnapshot(snapshot => {
+                        displayLedger(snapshot.docs);
+                    });
+
+                loadLeaderboards();
+                loadDonationBreakdown(userId);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+
+            } catch (err) {
+                console.error('Error loading dashboard:', err);
+                alert('Error loading dashboard: ' + err.message);
+            }
+        }
+
+        function updatePlayerUI(player) {
+            // Load guild admirals
+            loadGuildAdmirals(player.squadron);
+
+            // Display gamertag
+            const gamertagDisplay = document.getElementById('gamertag-display');
+            if (player.gamertag) {
+                const prefix = player.squadron ? `[${player.squadron}] ` : '';
+                gamertagDisplay.textContent = prefix + player.gamertag;
+            } else {
+                gamertagDisplay.textContent = 'Set gamertag';
+                gamertagDisplay.style.fontStyle = 'italic';
+                gamertagDisplay.style.color = '#999';
+            }
+
+            // Display ally indicator
+            const allyIndicator = document.getElementById('allyIndicator');
+            if (player.isAlly && player.squadron !== 'BWH') {
+                allyIndicator.style.display = 'inline-block';
+            } else {
+                allyIndicator.style.display = 'none';
+            }
+
+            // Display squadron badge
+            const squadronBadge = document.getElementById('squadronBadge');
+            if (player.squadron) {
+                const squadronLogos = {
+                    'BWC': 'Blackwolf Chapter Medallion.png',
+                    'BWH': 'Blackwolf Holdings Medallion.png'
+                };
+                const squadronNames = {
+                    'BWC': 'Blackwolf Chapter',
+                    'BWH': 'Blackwolf Holdings'
+                };
+                squadronBadge.src = squadronLogos[player.squadron];
+                squadronBadge.title = squadronNames[player.squadron];
+                squadronBadge.style.display = 'block';
+            } else {
+                squadronBadge.style.display = 'none';
+            }
+
+            const availablePoints = player.totalPoints - player.sharesRedeemed;
+
+            const tier = getTierFromPoints(availablePoints, player.isAlly);
+            document.getElementById('userTier').textContent = `${tier.emoji} ${tier.name}`;
+            document.getElementById('tierSupport').textContent = `(${Math.round(tier.support * 100)}% guild support)`;
+
+            // Update tier progress bar
+            const nextTier = getNextTier(tier);
+            const tierProgressContainer = document.getElementById('tierProgressContainer');
+            if (nextTier) {
+                tierProgressContainer.style.display = 'flex';
+                const pointsIntoTier = availablePoints - tier.min;
+                const pointsNeededForNext = nextTier.min - tier.min;
+                const progressPercent = Math.min((pointsIntoTier / pointsNeededForNext) * 100, 100);
+                
+                document.getElementById('tierProgressLabel').textContent = `→ ${nextTier.name}:`;
+                document.getElementById('tierProgressFill').style.width = progressPercent + '%';
+                document.getElementById('tierProgressText').textContent = `${availablePoints}/${nextTier.min}`;
+                
+
+            } else {
+                tierProgressContainer.style.display = 'none';
+                
+            }
+
+            document.getElementById('fortsCount').textContent = player.fortsDestroyed || 0;
+
+            if (player.lastActivity) {
+                const lastActivity = player.lastActivity.toDate();
+                const daysAgo = Math.floor((Date.now() - lastActivity) / (1000 * 60 * 60 * 24));
+                document.getElementById('lastActivity').textContent = 
+                    daysAgo === 0 ? 'Today' : `${daysAgo} days ago`;
+                
+                const isActive = daysAgo <= 30;
+                document.getElementById('activityStatus').textContent = isActive ? 'Active ✓' : 'Inactive ✗';
+                document.getElementById('activityStatus').style.color = isActive ? '#2d5a2d' : '#8b3a3a';
+            }
+
+            // Display player inventory
+            displayInventory(player.inventory || {});
+
+            updateShipGoalProgress(player, availablePoints);
+
+            if (player.isOfficer) {
+                document.getElementById('adminNav').style.display = 'inline-block';
+                document.getElementById('shipsLink').style.display = 'inline-block';
+            }
+
+            // Show Guild Panel for admirals (squadron = guild)
+            if (player.isAdmiral) {
+                document.getElementById('guildNav').style.display = 'inline-block';
+            }
+        }
+
+        function displayInventory(inventory) {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = '';
+
+            const resources = [
+                { name: 'Beams', key: 'beams', icon: resourceIcons.beams },
+                { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads },
+                { name: 'Plates', key: 'plates', icon: resourceIcons.plates },
+                { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas },
+                { name: 'Wood', key: 'wood', icon: resourceIcons.wood },
+                { name: 'Iron', key: 'iron', icon: resourceIcons.iron },
+                { name: 'Fabric', key: 'fabric', icon: resourceIcons.fabric },
+                { name: 'Resin', key: 'resin', icon: resourceIcons.resin },
+                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks },
+                { name: 'Escudo', key: 'escudo', icon: resourceIcons.escudo },
+                { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint },
+                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense }
+            ];
+
+            resources.forEach(resource => {
+                const currentAmount = inventory[resource.key] || 0;
+                const item = document.createElement('div');
+                item.className = 'inventory-item';
+                item.innerHTML = `
+                    <img src="${resource.icon}" alt="${resource.name}">
+                    <div class="inventory-item-name">${resource.name}</div>
+                    <input type="number" 
+                        id="inventory_${resource.key}" 
+                        value="${currentAmount}" 
+                        min="0"
+                        onchange="markInventoryChanged()">
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        let inventoryChanged = false;
+
+        function markInventoryChanged() {
+            inventoryChanged = true;
+        }
+
+        async function saveInventory() {
+            const inventory = {
+                beams: parseInt(document.getElementById('inventory_beams').value) || 0,
+                bulkheads: parseInt(document.getElementById('inventory_bulkheads').value) || 0,
+                plates: parseInt(document.getElementById('inventory_plates').value) || 0,
+                canvas: parseInt(document.getElementById('inventory_canvas').value) || 0,
+                wood: parseInt(document.getElementById('inventory_wood').value) || 0,
+                iron: parseInt(document.getElementById('inventory_iron').value) || 0,
+                fabric: parseInt(document.getElementById('inventory_fabric').value) || 0,
+                resin: parseInt(document.getElementById('inventory_resin').value) || 0,
+                battleMarks: parseInt(document.getElementById('inventory_battleMarks').value) || 0,
+                escudo: parseInt(document.getElementById('inventory_escudo').value) || 0,
+                imperialBlueprint: parseInt(document.getElementById('inventory_imperialBlueprint').value) || 0,
+                constructionLicense: parseInt(document.getElementById('inventory_constructionLicense').value) || 0
+            };
+
+            try {
+                await db.collection('players').doc(auth.currentUser.uid).update({
+                    inventory: inventory,
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                inventoryChanged = false;
+                alert('Inventory saved!');
+            } catch (err) {
+                console.error('Error saving inventory:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function populateShipSelector() {
+            const selector = document.getElementById('goalShipSelector');
+            selector.innerHTML = '<option value="">-- Choose Goal Ship --</option>';
+            
+            allShips.forEach(ship => {
+                const option = document.createElement('option');
+                option.value = ship.id;
+                option.textContent = `${ship.name} (Tier ${ship.tier}${ship.Class ? ' - ' + ship.Class : ''})`;
+                selector.appendChild(option);
+            });
+
+            if (currentPlayer && currentPlayer.goalShipId) {
+                selector.value = currentPlayer.goalShipId;
+            }
+        }
+
+        function updateShipGoalProgress(player, availablePoints) {
+            const goalStats = document.getElementById('goalStats');
+            const progressContainer = document.getElementById('goalProgressContainer');
+            const resourceBreakdown = document.getElementById('resourceBreakdown');
+            const selector = document.getElementById('goalShipSelector');
+
+            if (player.goalShipId) {
+                selector.value = player.goalShipId;
+            }
+
+            if (!player.goalShipId) {
+                goalStats.style.display = 'none';
+                progressContainer.style.display = 'none';
+                resourceBreakdown.style.display = 'none';
+                document.getElementById('discountSection').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('discountSection').style.display = 'block';
+
+            const goalShip = allShips.find(s => s.id === player.goalShipId);
+            if (!goalShip) {
+                console.log('Goal ship not found:', player.goalShipId);
+                return;
+            }
+
+            goalStats.style.display = 'block';
+            progressContainer.style.display = 'block';
+            resourceBreakdown.style.display = 'block';
+
+            const tier = getTierFromPoints(availablePoints);
+            const guildSupportPercent = tier.support;
+            const playerSharePercent = 1 - guildSupportPercent;
+
+            document.getElementById('goalShipName').textContent = 
+                `${goalShip.name} (Tier ${goalShip.tier})`;
+            document.getElementById('playerSharePercent').textContent = Math.round(playerSharePercent * 100) + '%';
+            document.getElementById('guildSharePercent').textContent = Math.round(guildSupportPercent * 100) + '%';
+
+            // Calculate player progress
+            const playerInventory = player.inventory || {};
+            const guildSupportedResources = ['beams', 'bulkheads', 'plates', 'canvas'];
+            const playerOnlyResources = ['battleMarks', 'constructionLicense', 'escudo', 'imperialBlueprint'];
+
+            let playerTotalNeeded = 0;
+            let playerTotalHave = 0;
+            let guildTotalNeeded = 0;
+            let guildTotalHave = 0;
+
+            // Calculate player's share of guild-supported resources (with discount)
+            guildSupportedResources.forEach(key => {
+                const shipTotal = goalShip[key] || 0;
+                if (shipTotal === 0) return;
+
+                const discountedTotal = Math.ceil(shipTotal * (1 - currentDiscount));
+                const playerNeeds = Math.ceil(discountedTotal * playerSharePercent);
+                const guildNeeds = Math.floor(discountedTotal * guildSupportPercent);
+                
+                const playerHas = Math.min(playerInventory[key] || 0, playerNeeds);
+                const guildHas = Math.min(guildResources[key] || 0, guildNeeds);
+                
+                playerTotalNeeded += playerNeeds;
+                playerTotalHave += playerHas;
+                
+                guildTotalNeeded += guildNeeds;
+                guildTotalHave += guildHas;
+            });
+
+            // Calculate player-only resources
+            playerOnlyResources.forEach(key => {
+                const shipTotal = goalShip[key] || 0;
+                if (shipTotal === 0) return;
+
+                const playerHas = Math.min(playerInventory[key] || 0, shipTotal);
+                
+                playerTotalNeeded += shipTotal;
+                playerTotalHave += playerHas;
+            });
+
+            // Update player progress bar
+            const playerProgressPercent = playerTotalNeeded > 0 ? Math.min((playerTotalHave / playerTotalNeeded) * 100, 100) : 0;
+            document.getElementById('playerProgressFill').style.width = playerProgressPercent + '%';
+            document.getElementById('playerProgressText').textContent = playerProgressPercent.toFixed(1) + '%';
+            document.getElementById('playerProgressPercent').textContent = playerProgressPercent.toFixed(1) + '%';
+
+            // Update guild progress bar
+            const guildProgressPercent = guildTotalNeeded > 0 ? Math.min((guildTotalHave / guildTotalNeeded) * 100, 100) : 100;
+            document.getElementById('guildProgressFill').style.width = guildProgressPercent + '%';
+            document.getElementById('guildProgressText').textContent = guildProgressPercent.toFixed(1) + '%';
+            document.getElementById('guildProgressPercent').textContent = guildProgressPercent.toFixed(1) + '%';
+
+            displayResourceBreakdown(goalShip, playerSharePercent, guildSupportPercent);
+
+            // Show ship image if available
+            const shipImageContainer = document.getElementById('shipImageContainer');
+            const shipImages = {
+                
+            };
+            
+            if (shipImages[goalShip.id]) {
+                document.getElementById('goalShipImage').src = shipImages[goalShip.id];
+                document.getElementById('goalShipImage').className = 'ship-sketch';
+                shipImageContainer.style.display = 'block';
+            } else {
+                shipImageContainer.style.display = 'none';
+            }
+        }
+        function displayResourceBreakdown(ship, playerPercent, guildPercent) {
+            const grid = document.getElementById('resourceBreakdownGrid');
+            grid.innerHTML = '';
+
+            const playerInventory = currentPlayer.inventory || {};
+
+            const resources = [
+                { name: 'Beams', key: 'beams', icon: resourceIcons.beams, guildSupported: true, discountable: true },
+                { name: 'Bulkheads', key: 'bulkheads', icon: resourceIcons.bulkheads, guildSupported: true, discountable: true },
+                { name: 'Plates', key: 'plates', icon: resourceIcons.plates, guildSupported: true, discountable: true },
+                { name: 'Canvas', key: 'canvas', icon: resourceIcons.canvas, guildSupported: true, discountable: true },
+                { name: 'Battle Marks', key: 'battleMarks', icon: resourceIcons.battleMarks, guildSupported: false, discountable: false },
+                { name: 'Construction License', key: 'constructionLicense', icon: resourceIcons.constructionLicense, guildSupported: false, discountable: false },
+                { name: 'Escudo', key: 'escudo', icon: resourceIcons.escudo, guildSupported: false, discountable: false },
+                { name: 'Imperial Blueprint', key: 'imperialBlueprint', icon: resourceIcons.imperialBlueprint, guildSupported: false, discountable: false }
+            ];
+
+            let allPlayerResourcesMet = true;
+            let allGuildResourcesMet = true;
+
+            resources.forEach(resource => {
+                const total = ship[resource.key] || 0;
+                if (total === 0) return;
+
+                let effectiveTotal = total;
+                let discountedLabel = '';
+                
+                if (resource.discountable && currentDiscount > 0) {
+                    effectiveTotal = Math.ceil(total * (1 - currentDiscount));
+                    discountedLabel = `<span class="discounted-label">(${Math.round(currentDiscount * 100)}% off)</span>`;
+                }
+
+                let playerAmount, guildAmount;
+                
+                if (resource.guildSupported) {
+                    playerAmount = Math.ceil(effectiveTotal * playerPercent);
+                    guildAmount = Math.floor(effectiveTotal * guildPercent);
+                } else {
+                    playerAmount = effectiveTotal;
+                    guildAmount = 0;
+                }
+
+                const playerHas = playerInventory[resource.key] || 0;
+                const guildHas = guildResources[resource.key] || 0;
+                
+                const playerSufficient = playerHas >= playerAmount;
+                const guildSufficient = guildAmount === 0 || guildHas >= guildAmount;
+                
+                if (!playerSufficient) {
+                    allPlayerResourcesMet = false;
+                }
+                if (!guildSufficient) {
+                    allGuildResourcesMet = false;
+                }
+
+                const item = document.createElement('div');
+                item.className = 'resource-item-goal';
+                item.innerHTML = `
+                    <img src="${resource.icon}" alt="${resource.name}" class="resource-icon">
+                    <div class="resource-details">
+                        <div class="resource-name">${resource.name} (${formatNumber(effectiveTotal)} total)${discountedLabel}</div>
+                        <div class="resource-amounts">
+                            <span class="resource-have-need ${playerSufficient ? 'resource-sufficient' : 'resource-insufficient'}">
+                                You: ${formatNumber(playerHas)}/${formatNumber(playerAmount)}
+                            </span>
+                            ${resource.guildSupported ? `<span class="resource-have-need ${guildSufficient ? 'resource-sufficient' : 'resource-insufficient'}">Guild: ${formatNumber(guildHas)}/${formatNumber(guildAmount)}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+
+            updateBuildButtonState(allPlayerResourcesMet && allGuildResourcesMet, ship);
+        }
+
+        async function buildShip() {
+            if (!currentPlayer.goalShipId) {
+                alert('No ship selected');
+                return;
+            }
+
+            const goalShip = allShips.find(s => s.id === currentPlayer.goalShipId);
+            if (!goalShip) {
+                alert('Ship not found');
+                return;
+            }
+
+            const confirmBuild = confirm(`Are you sure you want to mark ${goalShip.name} as built?\n\nThis will consume resources from both your inventory and guild storage.`);
+            if (!confirmBuild) return;
+
+            try {
+                const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                const tier = getTierFromPoints(availablePoints);
+                const guildPercent = tier.support;
+                const playerPercent = 1 - guildPercent;
+
+                const playerInventory = currentPlayer.inventory || {};
+                const newInventory = { ...playerInventory };
+
+                // Calculate resource consumption
+                const resourceKeys = ['beams', 'bulkheads', 'plates', 'canvas'];
+                const guildConsumption = {};
+
+                resourceKeys.forEach(key => {
+                    const total = goalShip[key] || 0;
+                    const playerShare = Math.ceil(total * playerPercent);
+                    const guildShare = Math.floor(total * guildPercent);
+                    
+                    newInventory[key] = (newInventory[key] || 0) - playerShare;
+                    guildConsumption[key] = guildShare;
+                });
+
+                // Battle marks (player only)
+                const battleMarksNeeded = goalShip.battleMarks || 0;
+                newInventory.battleMarks = (newInventory.battleMarks || 0) - battleMarksNeeded;
+
+                // Construction license (player only)
+                const constructionLicenseNeeded = goalShip.constructionLicense || 0;
+                newInventory.constructionLicense = (newInventory.constructionLicense || 0) - constructionLicenseNeeded;
+
+                // Escudo (player only)
+                const escudoNeeded = goalShip.escudo || 0;
+                newInventory.escudo = (newInventory.escudo || 0) - escudoNeeded;
+
+                // Imperial Blueprint (player only)
+                const imperialBlueprintNeeded = goalShip.imperialBlueprint || 0;
+                newInventory.imperialBlueprint = (newInventory.imperialBlueprint || 0) - imperialBlueprintNeeded;
+
+                // Update player document
+                await db.collection('players').doc(auth.currentUser.uid).update({
+                    inventory: newInventory,
+                    goalShipId: null,
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update guild resources
+                const batch = db.batch();
+                
+                for (const [key, amount] of Object.entries(guildConsumption)) {
+                    if (amount > 0) {
+                        const resourceName = key.charAt(0).toUpperCase() + key.slice(1);
+                        const resourceQuery = await db.collection('guildResources')
+                            .where('materialType', '==', resourceName)
+                            .get();
+                        
+                        if (!resourceQuery.empty) {
+                            const resourceRef = resourceQuery.docs[0].ref;
+                            batch.update(resourceRef, {
+                                currentStock: firebase.firestore.FieldValue.increment(-amount),
+                                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    }
+                }
+
+                await batch.commit();
+
+                alert(`🎉 Congratulations! ${goalShip.name} has been built!\n\nResources have been deducted from your inventory and guild storage.`);
+
+            } catch (err) {
+                console.error('Error building ship:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function updateBuildButtonState(allResourcesMet, ship) {
+            const buildBtn = document.getElementById('buildShipBtn');
+            const buildStatus = document.getElementById('buildShipStatus');
+
+            if (allResourcesMet) {
+                buildBtn.disabled = false;
+                buildBtn.classList.add('btn-build-ready');
+                buildStatus.textContent = `Ready to build ${ship.name}!`;
+                buildStatus.style.color = '#2d5a2d';
+            } else {
+                buildBtn.disabled = true;
+                buildBtn.classList.remove('btn-build-ready');
+                buildStatus.textContent = 'Both you and the guild must have all required resources';
+                buildStatus.style.color = '#5c4a3a';
+            }
+        }
+
+        async function setGoalShip() {
+            const newGoalId = document.getElementById('goalShipSelector').value;
+            
+            if (!newGoalId) {
+                // Clear the goal
+                try {
+                    await db.collection('players').doc(auth.currentUser.uid).update({
+                        goalShipId: null
+                    });
+                } catch (err) {
+                    console.error('Error clearing goal ship:', err);
+                }
+                return;
+            }
+
+            try {
+                await db.collection('players').doc(auth.currentUser.uid).update({
+                    goalShipId: newGoalId
+                });
+            } catch (err) {
+                console.error('Error setting goal ship:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function applyDiscount() {
+            const discountInput = document.getElementById('discountPercent');
+            let discount = parseFloat(discountInput.value) || 0;
+            
+            if (discount < 0) discount = 0;
+            if (discount > 100) discount = 100;
+            
+            discountInput.value = discount;
+            currentDiscount = discount / 100;
+            
+            if (currentPlayer) {
+                const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                updateShipGoalProgress(currentPlayer, availablePoints);
+            }
+        }
+
+        function clearDiscount() {
+            document.getElementById('discountPercent').value = 0;
+            currentDiscount = 0;
+            
+            if (currentPlayer) {
+                const availablePoints = currentPlayer.totalPoints - currentPlayer.sharesRedeemed;
+                updateShipGoalProgress(currentPlayer, availablePoints);
+            }
+        }
+
+        function showGametagInput() {
+            document.getElementById('gamertag-display').style.display = 'none';
+            document.getElementById('edit-gamertag').style.display = 'none';
+            document.getElementById('gamertag-edit').style.display = 'inline';
+            
+            const input = document.getElementById('gamertag-input');
+            input.value = currentPlayer.gamertag || '';
+            input.focus();
+        }
+
+        async function saveGamertag() {
+            const gamertag = document.getElementById('gamertag-input').value.trim();
+            
+            try {
+                await db.collection('players').doc(auth.currentUser.uid).update({
+                    gamertag: gamertag
+                });
+                
+                document.getElementById('gamertag-display').style.display = 'inline';
+                document.getElementById('edit-gamertag').style.display = 'inline';
+                document.getElementById('gamertag-edit').style.display = 'none';
+            } catch (err) {
+                console.error('Error saving gamertag:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function loadLeaderboards() {
+            db.collection('players')
+                .orderBy('fortsDestroyed', 'desc')
+                .limit(10)
+                .onSnapshot(snapshot => {
+                    const fortLeaderboard = document.getElementById('fortLeaderboard');
+                    if (snapshot.empty) {
+                        fortLeaderboard.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No fort data yet</div>';
+                        return;
+                    }
+                    
+                    fortLeaderboard.innerHTML = '';
+                    let rank = 0;
+                    snapshot.docs.forEach(doc => {
+                        const player = doc.data();
+                        if (player.fortsDestroyed > 0) {
+                            rank++;
+                            const displayName = player.gamertag || 'Unknown';
+                            const item = document.createElement('div');
+                            item.className = `leaderboard-item rank-${rank}`;
+                            item.innerHTML = `
+                                <span class="leaderboard-rank">#${rank}</span>
+                                <span class="leaderboard-name">${displayName}</span>
+                                <span class="leaderboard-value">${player.fortsDestroyed} forts</span>
+                            `;
+                            fortLeaderboard.appendChild(item);
+                        }
+                    });
+                    
+                    if (rank === 0) {
+                        fortLeaderboard.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No fort data yet</div>';
+                    }
+                });
+            
+            db.collection('contributions')
+                .where('activityType', '==', 'Material Donation')
+                .onSnapshot(async snapshot => {
+                    const playerTotals = {};
+                    snapshot.docs.forEach(doc => {
+                        const contrib = doc.data();
+                        if (!playerTotals[contrib.playerId]) {
+                            playerTotals[contrib.playerId] = { points: 0, playerId: contrib.playerId };
+                        }
+                        playerTotals[contrib.playerId].points += contrib.pointsEarned;
+                    });
+                    
+                    const sorted = Object.values(playerTotals)
+                        .sort((a, b) => b.points - a.points)
+                        .slice(0, 10);
+                    
+                    await displayResourceLeaderboard(sorted);
+                });
+        }
+
+        async function displayResourceLeaderboard(sorted) {
+            const resourceLeaderboard = document.getElementById('resourceLeaderboard');
+            
+            if (sorted.length === 0) {
+                resourceLeaderboard.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No donations yet</div>';
+                return;
+            }
+            
+            resourceLeaderboard.innerHTML = '';
+            
+            for (let i = 0; i < sorted.length; i++) {
+                const entry = sorted[i];
+                const playerDoc = await db.collection('players').doc(entry.playerId).get();
+                const playerData = playerDoc.exists ? playerDoc.data() : {};
+                const displayName = playerData.gamertag || 'Unknown';
+                
+                const item = document.createElement('div');
+                item.className = `leaderboard-item rank-${i + 1}`;
+                item.innerHTML = `
+                    <span class="leaderboard-rank">#${i + 1}</span>
+                    <span class="leaderboard-name">${displayName}</span>
+                    <span class="leaderboard-value">${formatNumber(entry.points)} pts</span>
+                `;
+                resourceLeaderboard.appendChild(item);
+            }
+        }
+
+        function displayResourcesWithOfficers(inventoryDocs) {
+            const container = document.getElementById('resourcesDisplay');
+            
+            if (inventoryDocs.length === 0) {
+                container.innerHTML = '<div class="resource-no-data">No guild resources tracked yet.</div>';
+                return;
+            }
+            
+            // Build nested structure: resourceType -> location -> officer -> quantity
+            const resourceMap = {};
+            
+            inventoryDocs.forEach(doc => {
+                const inv = doc.data();
+                if (inv.quantity <= 0) return;
+                
+                const resource = inv.resourceType;
+                const location = inv.location;
+                const officerId = inv.officerId;
+                
+                if (!resourceMap[resource]) {
+                    resourceMap[resource] = { total: 0, locations: {} };
+                }
+                
+                if (!resourceMap[resource].locations[location]) {
+                    resourceMap[resource].locations[location] = { total: 0, officers: {} };
+                }
+                
+                resourceMap[resource].total += inv.quantity;
+                resourceMap[resource].locations[location].total += inv.quantity;
+                
+                if (!resourceMap[resource].locations[location].officers[officerId]) {
+                    resourceMap[resource].locations[location].officers[officerId] = 0;
+                }
+                resourceMap[resource].locations[location].officers[officerId] += inv.quantity;
+            });
+            
+            // Get officer names
+            const officerNames = {};
+            allMembers.forEach(doc => {
+                const data = doc.data();
+                const prefix = data.squadron ? `[${data.squadron}] ` : '';
+                officerNames[doc.id] = prefix + (data.gamertag || 'Unknown');
+            });
+            
+            // Get location names
+            const locationNames = {};
+            allLocations.forEach(loc => {
+                locationNames[loc.code] = loc.name;
+            });
+            
+            // Sort resources alphabetically
+            const sortedResources = Object.keys(resourceMap).sort();
+            
+            if (sortedResources.length === 0) {
+                container.innerHTML = '<div class="resource-no-data">No guild resources tracked yet.</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            sortedResources.forEach(resource => {
+                const resourceData = resourceMap[resource];
+                const resourceDisplay = resource.charAt(0).toUpperCase() + resource.slice(1);
+                
+                html += `
+                    <div class="resource-group">
+                        <div class="resource-group-header">
+                            <span class="resource-group-name">${resourceDisplay}</span>
+                            <span class="resource-group-total">${formatNumber(resourceData.total)} total</span>
+                        </div>
+                `;
+                
+                // Sort locations alphabetically
+                const sortedLocations = Object.keys(resourceData.locations).sort((a, b) => {
+                    const nameA = locationNames[a] || a;
+                    const nameB = locationNames[b] || b;
+                    return nameA.localeCompare(nameB);
+                });
+                
+                sortedLocations.forEach(location => {
+                    const locationData = resourceData.locations[location];
+                    const locationDisplay = locationNames[location] || location;
+                    
+                    html += `
+                        <div class="resource-location">
+                            <div class="resource-location-header">${locationDisplay} (${formatNumber(locationData.total)})</div>
+                            <div class="resource-officer-list">
+                    `;
+                    
+                    // Sort officers by quantity descending
+                    const sortedOfficers = Object.entries(locationData.officers)
+                        .sort((a, b) => b[1] - a[1]);
+                    
+                    sortedOfficers.forEach(([officerId, quantity]) => {
+                        const officerName = officerNames[officerId] || 'Unknown';
+                        html += `
+                            <div class="resource-officer-item">
+                                <span class="resource-officer-name">${officerName}:</span> ${formatNumber(quantity)}
+                            </div>
+                        `;
+                    });
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function getNextTier(currentTier) {
+            const tiersList = [TIERS.DECKHAND, TIERS.BOSUN, TIERS.QUARTERMASTER, TIERS.CAPTAIN];
+            const currentIndex = tiersList.findIndex(t => t.name === currentTier.name);
+            return tiersList[currentIndex + 1] || null;
+        }
+
+        async function logout() {
+            await auth.signOut();
+            window.location.href = 'login.html';
+        }
+
+        async function loadDonationBreakdown(playerId) {
+            const breakdownDiv = document.getElementById('donationBreakdown');
+            
+            try {
+                const snapshot = await db.collection('contributions')
+                    .where('playerId', '==', playerId)
+                    .where('activityType', '==', 'Material Donation')
+                    .get();
+                
+                if (snapshot.empty) {
+                    breakdownDiv.innerHTML = '<div class="donation-empty">No donations yet</div>';
+                    return;
+                }
+                
+                const totals = {};
+                snapshot.docs.forEach(doc => {
+                    const contrib = doc.data();
+                    const material = contrib.materialType;
+                    const quantity = contrib.materialQuantity || 0;
+                    
+                    if (material && quantity > 0) {
+                        if (!totals[material]) {
+                            totals[material] = 0;
+                        }
+                        totals[material] += quantity;
+                    }
+                });
+                
+                const displayOrder = [
+                    'beams', 'bulkheads', 'plates', 'canvas',
+                    'iron', 'coal', 'wood', 'resin', 'fabric'
+                ];
+                
+                const materialNames = {
+                    beams: 'Beams',
+                    bulkheads: 'Bulkheads',
+                    plates: 'Plates',
+                    canvas: 'Canvas',
+                    iron: 'Iron',
+                    coal: 'Coal',
+                    wood: 'Wood',
+                    resin: 'Resin',
+                    fabric: 'Fabric'
+                };
+                
+                breakdownDiv.innerHTML = '';
+                let hasData = false;
+                
+                displayOrder.forEach(material => {
+                    if (totals[material] && totals[material] > 0) {
+                        hasData = true;
+                        const item = document.createElement('div');
+                        item.className = 'donation-item';
+                        item.innerHTML = `
+                            <span class="donation-material">${materialNames[material] || material}</span>
+                            <span class="donation-amount">${formatNumber(totals[material])}</span>
+                        `;
+                        breakdownDiv.appendChild(item);
+                    }
+                });
+                
+                Object.keys(totals).forEach(material => {
+                    if (!displayOrder.includes(material) && totals[material] > 0) {
+                        hasData = true;
+                        const item = document.createElement('div');
+                        item.className = 'donation-item';
+                        item.innerHTML = `
+                            <span class="donation-material">${materialNames[material] || material}</span>
+                            <span class="donation-amount">${formatNumber(totals[material])}</span>
+                        `;
+                        breakdownDiv.appendChild(item);
+                    }
+                });
+                
+                if (!hasData) {
+                    breakdownDiv.innerHTML = '<div class="donation-empty">No donations yet</div>';
+                }
+                
+            } catch (error) {
+                console.error('Error loading donation breakdown:', error);
+                breakdownDiv.innerHTML = '<div class="donation-empty">Error loading data</div>';
+            }
+        }
+        function displayLedger(docs) {
+            const container = document.getElementById('ledgerContainer');
+            
+            if (docs.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #5c4a3a;">No entries yet</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            docs.forEach(doc => {
+                const entry = doc.data();
+                let actionClass = 'action-add';
+                if (entry.action.includes('Remove') || entry.action.includes('Demote')) {
+                    actionClass = 'action-remove';
+                } else if (entry.action.includes('Officer') || entry.action.includes('Promote')) {
+                    actionClass = 'action-officer';
+                }
+
+                const timestamp = entry.timestamp ? entry.timestamp.toDate().toLocaleString() : 'Unknown';
+
+                const entryDiv = document.createElement('div');
+                entryDiv.className = 'ledger-entry';
+                entryDiv.innerHTML = `
+                    <div class="ledger-action ${actionClass}">${entry.action}</div>
+                    <div class="ledger-details">${entry.details || ''}</div>
+                    ${entry.justification ? `<div class="ledger-justification">"${entry.justification}"</div>` : ''}
+                    <div class="ledger-meta">By ${entry.performedByName || 'Unknown'} • ${timestamp}</div>
+                `;
+                container.appendChild(entryDiv);
+            });
+        }
+
+        async function loadGuildAdmirals(squadron) {
+            const container = document.getElementById('guildAdmiralsList');
+            
+            if (!squadron) {
+                container.innerHTML = '<div class="admiral-empty">No guild assigned</div>';
+                return;
+            }
+            
+            try {
+                const snapshot = await db.collection('players')
+                    .where('squadron', '==', squadron)
+                    .where('isAdmiral', '==', true)
+                    .get();
+                
+                if (snapshot.empty) {
+                    container.innerHTML = '<div class="admiral-empty">No admirals in your guild</div>';
+                    return;
+                }
+                
+                container.innerHTML = '';
+                snapshot.docs.forEach(doc => {
+                    const admiral = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'admiral-list-item';
+                    item.innerHTML = `
+                        <span class="admiral-icon">⚓</span>
+                        <span class="admiral-name">${admiral.gamertag || 'Unknown'}</span>
+                    `;
+                    container.appendChild(item);
+                });
+                
+            } catch (err) {
+                console.error('Error loading guild admirals:', err);
+                container.innerHTML = '<div class="admiral-empty">Error loading admirals</div>';
+            }
+        }
+    </script>
+</body>
+</html>

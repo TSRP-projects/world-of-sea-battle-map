@@ -160,44 +160,6 @@
             font-family: 'Cinzel', Georgia, serif;
         }
         
-        .resources-edit {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .resource-edit-item {
-            background: rgba(139, 105, 20, 0.1);
-            border: 1px solid rgba(139, 105, 20, 0.3);
-            padding: 15px;
-            border-radius: 5px;
-        }
-        
-        .resource-edit-item label {
-            display: block;
-            font-family: 'Cinzel', Georgia, serif;
-            color: #8b6914;
-            margin-bottom: 8px;
-            font-size: 12px;
-        }
-        
-        .resource-edit-item input {
-            width: 100%;
-            padding: 8px;
-            background: #f5f0e6;
-            border: 2px solid #8b6914;
-            border-radius: 5px;
-            color: #3d2b1f;
-            font-family: 'Libre Baskerville', Georgia, serif;
-            font-size: 14px;
-        }
-        
-        .resource-edit-item input:focus {
-            outline: none;
-            border-color: #c9a227;
-        }
-        
         .participant-list {
             max-height: 250px;
             overflow-y: auto;
@@ -264,19 +226,6 @@
             background: #f5f0e6;
             color: #3d2b1f;
         }
-        
-        .tier-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        .tier-deckhand { background: rgba(128, 128, 128, 0.2); color: #666; }
-        .tier-bosun { background: rgba(205, 127, 50, 0.25); color: #8b5a2b; }
-        .tier-quartermaster { background: rgba(150, 150, 150, 0.25); color: #555; }
-        .tier-captain { background: rgba(139, 105, 20, 0.25); color: #8b6914; }
         
         .gamertag { font-weight: bold; color: #8b6914; }
         
@@ -549,7 +498,7 @@
             color: #5c4a3a;
         }
 
-        .ally-badge {
+        .partner-badge {
             background: #2d5a2d;
             color: #f5f0e6;
             padding: 3px 8px;
@@ -558,7 +507,7 @@
             margin-left: 8px;
         }
 
-        .non-ally-badge {
+        .non-partner-badge {
             background: #5c4a3a;
             color: #f5f0e6;
             padding: 3px 8px;
@@ -647,6 +596,52 @@
             padding: 20px;
         }
 
+        .rate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(139, 105, 20, 0.1);
+            border: 1px solid rgba(139, 105, 20, 0.2);
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .rate-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .rate-resource {
+            font-weight: bold;
+            color: #3d2b1f;
+        }
+
+        .rate-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rate-input {
+            width: 70px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #8b6914;
+            border-radius: 3px;
+            font-family: 'Libre Baskerville', Georgia, serif;
+        }
+
+        .rate-multiplier {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .rate-normal { background: rgba(139, 105, 20, 0.2); color: #8b6914; }
+        .rate-needed { background: rgba(45, 90, 45, 0.2); color: #2d5a2d; }
+        .rate-critical { background: rgba(139, 58, 58, 0.2); color: #8b3a3a; }
+        .rate-surplus { background: rgba(90, 90, 90, 0.2); color: #666; }
+
     </style>
 </head>
 <body>
@@ -670,7 +665,7 @@
             <div class="card">
                 <h3>⚔️ Log Fort Raid</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
-                    Select participants. Each player receives 10 points and +1 fort count.
+                    Select participants. Each player receives 10 Holding Coins and +1 fort count.
                 </p>
                 
                 <div class="form-group">
@@ -693,7 +688,7 @@
             <div class="card">
                 <h3>📦 Log Resource Donation</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
-                    Record a player's material contribution to the guild.
+                    Record a player's material contribution. HC earned based on current exchange rates.
                 </p>
                 
                 <div class="form-group">
@@ -705,27 +700,32 @@
                 
                 <div class="form-group">
                     <label>Resource Type:</label>
-                    <select id="donationResource">
+                    <select id="donationResource" onchange="updateDonationPreview()">
                         <option value="">-- Select Resource --</option>
                         <optgroup label="Crafted Resources">
-                            <option value="beams">Beams (1 pt each)</option>
-                            <option value="bulkheads">Bulkheads (2 pts each)</option>
-                            <option value="plates">Plates (1 pt each)</option>
-                            <option value="canvas">Canvas (1 pt per 2)</option>
+                            <option value="beams">Beams</option>
+                            <option value="bulkheads">Bulkheads</option>
+                            <option value="plates">Plates</option>
+                            <option value="canvas">Canvas</option>
                         </optgroup>
                         <optgroup label="Raw Materials">
-                            <option value="iron">Iron (1 pt per 100)</option>
-                            <option value="wood">Wood (1 pt per 1000)</option>
-                            <option value="coal">Coal (1 pt per 100)</option>
-                            <option value="resin">Resin (1 pt per 200)</option>
-                            <option value="fabric">Fabric (1 pt per 2000)</option>
+                            <option value="iron">Iron</option>
+                            <option value="wood">Wood</option>
+                            <option value="coal">Coal</option>
+                            <option value="resin">Resin</option>
+                            <option value="fabric">Fabric</option>
                         </optgroup>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label>Quantity:</label>
-                    <input type="number" id="donationQuantity" min="1" placeholder="Enter amount">
+                    <input type="number" id="donationQuantity" min="1" placeholder="Enter amount" onchange="updateDonationPreview()">
+                </div>
+                
+                <div id="donationPreview" style="display: none; padding: 10px; background: rgba(45, 90, 45, 0.1); border-radius: 5px; margin-bottom: 15px;">
+                    <span style="color: #2d5a2d; font-weight: bold;">HC Earned: <span id="previewHC">0</span></span>
+                    <span style="color: #5c4a3a; font-size: 12px; margin-left: 10px;">(Rate: <span id="previewRate">1.0</span>x)</span>
                 </div>
                 
                 <div class="form-group">
@@ -743,7 +743,7 @@
             <div class="card">
                 <h3>📋 Initialize Inventory</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
-                    Record existing officer holdings. Use for initial setup only. Does not affect points.
+                    Record existing officer holdings. Use for initial setup only. Does not affect Holding Coins.
                 </p>
                 
                 <div class="form-group">
@@ -959,7 +959,7 @@
                 
                 <div class="form-group">
                     <label>Notes (optional):</label>
-                    <input type="text" id="distributionNotes" placeholder="e.g., For Constitution build">
+                    <input type="text" id="distributionNotes" placeholder="e.g., Shop purchase, alliance order">
                 </div>
                 
                 <button class="btn btn-success" onclick="logDistribution()" style="width: 100%;">
@@ -1099,13 +1099,26 @@
             </div>
 
             <div class="card">
-                <h3>🏴 Manage Guild Alliances</h3>
+                <h3>🏴 Manage Trade Partners</h3>
                 <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
-                    Allied guilds receive up to 50% support. Non-allied guilds cap at 30%.
+                    Trade partners can place ship orders. Members earn gold fulfilling orders.
                 </p>
                 <div id="guildAllianceList">
                     <div style="text-align: center; color: #5c4a3a;">Loading guilds...</div>
                 </div>
+            </div>
+
+            <div class="card">
+                <h3>💰 Exchange Rates</h3>
+                <p style="color: #5c4a3a; margin-bottom: 15px; font-size: 13px;">
+                    Set HC rates for donations. Higher rates attract more donations of needed resources.
+                </p>
+                <div id="exchangeRatesList">
+                    <div style="text-align: center; color: #5c4a3a;">Loading rates...</div>
+                </div>
+                <button class="btn btn-primary" onclick="saveExchangeRates()" style="width: 100%; margin-top: 15px;">
+                    Save Exchange Rates
+                </button>
             </div>
         </div>
 
@@ -1116,11 +1129,9 @@
                     <thead>
                         <tr>
                             <th>Gamertag</th>
-                            <th>Total Pts</th>
-                            <th>Redeemed</th>
-                            <th>Available</th>
-                            <th>Tier</th>
-                            <th>Goal Ship</th>
+                            <th>Total HC</th>
+                            <th>Spent</th>
+                            <th>Balance</th>
                             <th>Forts</th>
                             <th>Last Activity</th>
                             <th>Details</th>
@@ -1150,7 +1161,6 @@
         </div>
     </div>
 
-    <!-- Remove Contribution Modal -->
     <div class="modal-overlay" id="removeContributionModal">
         <div class="modal">
             <h3>🗑️ Remove Contribution</h3>
@@ -1171,13 +1181,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
     <script>
-        let allShips = {};
         let allMembers = [];
         let allGuilds = [];
         let allLocations = [];
         let currentOfficer = null;
         let selectedPlayerId = null;
         let selectedContributionId = null;
+        let exchangeRates = {};
 
         auth.onAuthStateChanged(async user => {
             if (!user) {
@@ -1191,7 +1201,6 @@
                 }
                 currentOfficer = { id: user.uid, ...playerDoc.data() };
 
-                // Show Guild Panel if also an admiral
                 if (currentOfficer.isAdmiral) {
                     document.getElementById('guildNav').style.display = 'inline-block';
                 }
@@ -1202,21 +1211,26 @@
 
         async function loadAdminData() {
             try {
-                const shipsSnapshot = await db.collection('shipCosts').get();
-                shipsSnapshot.docs.forEach(doc => {
-                    allShips[doc.id] = doc.data();
-                });
-
-                // Load guilds
                 const guildsSnapshot = await db.collection('guilds').orderBy('name').get();
                 allGuilds = guildsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 populateGuildSelector();
 
-                // Load locations
                 const locationsSnapshot = await db.collection('locations').where('isActive', '==', true).get();
                 allLocations = locationsSnapshot.docs.map(doc => ({ code: doc.id, ...doc.data() }));
                 allLocations.sort((a, b) => a.name.localeCompare(b.name));
                 populateLocationSelectors();
+
+                const ratesSnapshot = await db.collection('guildResources').get();
+                ratesSnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const key = data.materialType.toLowerCase();
+                    exchangeRates[key] = {
+                        base: data.baseHCValue || POINT_VALUES[key.toUpperCase()] || 1,
+                        current: data.currentHCValue || data.baseHCValue || POINT_VALUES[key.toUpperCase()] || 1,
+                        multiplier: data.rateMultiplier || 1.0
+                    };
+                });
+                displayExchangeRates();
 
                 db.collection('players')
                     .orderBy('totalPoints', 'desc')
@@ -1291,13 +1305,7 @@
 
             docs.forEach(doc => {
                 const member = doc.data();
-                const availablePoints = member.totalPoints - member.sharesRedeemed;
-                const tier = getTierFromPoints(availablePoints);
-
-                let goalShipName = '-';
-                if (member.goalShipId && allShips[member.goalShipId]) {
-                    goalShipName = allShips[member.goalShipId].name;
-                }
+                const balance = (member.totalPoints || 0) - (member.sharesRedeemed || 0);
 
                 let lastActivityText = 'Never';
                 if (member.lastActivity) {
@@ -1313,11 +1321,9 @@
                 const row = tbody.insertRow();
                 row.innerHTML = `
                     <td><span class="gamertag">${member.gamertag ? squadronPrefix + member.gamertag : '-'}</span>${officerBadge}${admiralBadge}</td>
-                    <td>${formatNumber(member.totalPoints)}</td>
-                    <td>${formatNumber(member.sharesRedeemed)}</td>
-                    <td>${formatNumber(availablePoints)}</td>
-                    <td><span class="tier-badge tier-${tier.name.toLowerCase()}">${tier.emoji} ${tier.name}</span></td>
-                    <td>${goalShipName}</td>
+                    <td>${formatNumber(member.totalPoints || 0)}</td>
+                    <td>${formatNumber(member.sharesRedeemed || 0)}</td>
+                    <td>${formatNumber(balance)}</td>
                     <td>${member.fortsDestroyed || 0}</td>
                     <td>${lastActivityText}</td>
                     <td>
@@ -1364,7 +1370,6 @@
                 const squadronPrefix = member.squadron ? `[${member.squadron}] ` : '';
                 const displayText = member.gamertag ? squadronPrefix + member.gamertag : 'No gamertag';
                 
-                // Fort participant checkbox
                 const label = document.createElement('label');
                 label.innerHTML = `
                     <input type="checkbox" class="fort-participant" value="${doc.id}">
@@ -1373,37 +1378,31 @@
                 `;
                 fortContainer.appendChild(label);
 
-                // Donation player option
                 const donationOption = document.createElement('option');
                 donationOption.value = doc.id;
                 donationOption.textContent = displayText;
                 donationSelector.appendChild(donationOption);
 
-                // Officer player option
                 const officerOption = document.createElement('option');
                 officerOption.value = doc.id;
                 officerOption.textContent = displayText + (member.isOfficer ? ' (Officer)' : '');
                 officerSelector.appendChild(officerOption);
 
-                // Admiral player option
                 const admiralOption = document.createElement('option');
                 admiralOption.value = doc.id;
                 admiralOption.textContent = displayText + (member.isAdmiral ? ' (Admiral)' : '');
                 admiralSelector.appendChild(admiralOption);
 
-                // Guild change player option
                 const guildChangeOption = document.createElement('option');
                 guildChangeOption.value = doc.id;
                 guildChangeOption.textContent = displayText;
                 guildChangeSelector.appendChild(guildChangeOption);
 
-                // Distribution player option
                 const distOption = document.createElement('option');
                 distOption.value = doc.id;
                 distOption.textContent = displayText;
                 distributionSelector.appendChild(distOption);
 
-                // Initialize inventory officer option (officers only)
                 if (member.isOfficer) {
                     const initOfficerOption = document.createElement('option');
                     initOfficerOption.value = doc.id;
@@ -1411,7 +1410,6 @@
                     initOfficerSelector.appendChild(initOfficerOption);
                 }
 
-                // Officer transfer recipient option (officers only, excluding current officer)
                 if (member.isOfficer && doc.id !== currentOfficer.id) {
                     const transferOption = document.createElement('option');
                     transferOption.value = doc.id;
@@ -1427,6 +1425,127 @@
             checkboxes.forEach(cb => cb.checked = selectAll);
         }
 
+        function displayExchangeRates() {
+            const container = document.getElementById('exchangeRatesList');
+            
+            const resources = [
+                { name: 'Beams', key: 'beams', base: 1.0 },
+                { name: 'Bulkheads', key: 'bulkheads', base: 2.0 },
+                { name: 'Plates', key: 'plates', base: 2.0 },
+                { name: 'Canvas', key: 'canvas', base: 1.0 },
+                { name: 'Iron', key: 'iron', base: 0.01 },
+                { name: 'Wood', key: 'wood', base: 0.001 },
+                { name: 'Coal', key: 'coal', base: 0.01 },
+                { name: 'Resin', key: 'resin', base: 0.005 },
+                { name: 'Fabric', key: 'fabric', base: 0.0005 }
+            ];
+            
+            container.innerHTML = resources.map(r => {
+                const rate = exchangeRates[r.key] || { current: r.base, multiplier: 1.0 };
+                const multiplier = rate.multiplier || 1.0;
+                let rateClass = 'rate-normal';
+                let rateLabel = '1.0x';
+                
+                if (multiplier >= 2.0) {
+                    rateClass = 'rate-critical';
+                    rateLabel = multiplier.toFixed(1) + 'x CRITICAL';
+                } else if (multiplier >= 1.5) {
+                    rateClass = 'rate-needed';
+                    rateLabel = multiplier.toFixed(1) + 'x NEEDED';
+                } else if (multiplier <= 0.5) {
+                    rateClass = 'rate-surplus';
+                    rateLabel = multiplier.toFixed(1) + 'x SURPLUS';
+                } else {
+                    rateLabel = multiplier.toFixed(1) + 'x';
+                }
+                
+                return `
+                    <div class="rate-item">
+                        <span class="rate-resource">${r.name}</span>
+                        <div class="rate-value">
+                            <input type="number" 
+                                class="rate-input" 
+                                id="rate_${r.key}" 
+                                value="${multiplier.toFixed(1)}" 
+                                min="0.1" 
+                                max="5.0" 
+                                step="0.1">
+                            <span class="rate-multiplier ${rateClass}">${rateLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function saveExchangeRates() {
+            const resources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'coal', 'resin', 'fabric'];
+            
+            try {
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                
+                for (const key of resources) {
+                    const input = document.getElementById(`rate_${key}`);
+                    if (!input) continue;
+                    
+                    const multiplier = parseFloat(input.value) || 1.0;
+                    const resourceName = key.charAt(0).toUpperCase() + key.slice(1);
+                    
+                    const resourceQuery = await db.collection('guildResources')
+                        .where('materialType', '==', resourceName)
+                        .get();
+                    
+                    if (!resourceQuery.empty) {
+                        const baseValue = POINT_VALUES[key.toUpperCase()] || 1;
+                        batch.update(resourceQuery.docs[0].ref, {
+                            rateMultiplier: multiplier,
+                            currentHCValue: baseValue * multiplier,
+                            baseHCValue: baseValue,
+                            rateSetBy: currentOfficer.id,
+                            rateSetAt: timestamp
+                        });
+                        
+                        exchangeRates[key] = {
+                            base: baseValue,
+                            current: baseValue * multiplier,
+                            multiplier: multiplier
+                        };
+                    }
+                }
+                
+                await batch.commit();
+                
+                await logToLedger(
+                    'Exchange Rates Updated',
+                    `Exchange rates updated by officer`
+                );
+                
+                displayExchangeRates();
+                alert('Exchange rates saved!');
+                
+            } catch (err) {
+                console.error('Error saving exchange rates:', err);
+                alert('Error: ' + err.message);
+            }
+        }
+
+        function updateDonationPreview() {
+            const resourceType = document.getElementById('donationResource').value;
+            const quantity = parseInt(document.getElementById('donationQuantity').value) || 0;
+            const preview = document.getElementById('donationPreview');
+            
+            if (!resourceType || quantity < 1) {
+                preview.style.display = 'none';
+                return;
+            }
+            
+            const rate = exchangeRates[resourceType] || { current: POINT_VALUES[resourceType.toUpperCase()] || 1, multiplier: 1.0 };
+            const hcEarned = parseFloat((rate.current * quantity).toFixed(2));
+            
+            document.getElementById('previewHC').textContent = formatNumber(hcEarned);
+            document.getElementById('previewRate').textContent = rate.multiplier.toFixed(1);
+            preview.style.display = 'block';
+        }
 
         function displayLedger(docs) {
             const container = document.getElementById('ledgerContainer');
@@ -1523,10 +1642,10 @@
                 
                 await logToLedger(
                     'Fort Raid Logged',
-                    `${checkboxes.length} participants: ${participantNames.join(', ')} (+${POINT_VALUES.FORT_RAID} pts each)`
+                    `${checkboxes.length} participants: ${participantNames.join(', ')} (+${POINT_VALUES.FORT_RAID} HC each)`
                 );
                 
-                alert(`Fort raid logged! ${checkboxes.length} participants awarded ${POINT_VALUES.FORT_RAID} points each.`);
+                alert(`Fort raid logged! ${checkboxes.length} participants awarded ${POINT_VALUES.FORT_RAID} Holding Coins each.`);
                 
                 checkboxes.forEach(cb => cb.checked = false);
                 document.getElementById('selectAllFort').checked = false;
@@ -1543,34 +1662,20 @@
             const quantity = parseInt(document.getElementById('donationQuantity').value);
             const location = document.getElementById('donationLocation').value;
 
-            if (!playerId) {
-                alert('Select a player');
-                return;
-            }
-            if (!resourceType) {
-                alert('Select a resource type');
-                return;
-            }
-            if (!quantity || quantity < 1) {
-                alert('Enter a valid quantity');
-                return;
-            }
-            if (!location) {
-                alert('Select a storage location');
-                return;
-            }
+            if (!playerId) { alert('Select a player'); return; }
+            if (!resourceType) { alert('Select a resource type'); return; }
+            if (!quantity || quantity < 1) { alert('Enter a valid quantity'); return; }
+            if (!location) { alert('Select a storage location'); return; }
 
-            const pointValue = POINT_VALUES[resourceType.toUpperCase()] || 0;
-            if (pointValue === 0) {
-                alert('Unknown resource type');
-                return;
-            }
+            const rate = exchangeRates[resourceType] || { current: POINT_VALUES[resourceType.toUpperCase()] || 0 };
+            const pointValue = rate.current;
+            
+            if (pointValue === 0) { alert('Unknown resource type'); return; }
 
             const pointsEarned = parseFloat((pointValue * quantity).toFixed(2));
             
             if (pointsEarned < 0.01) {
-                alert(`Quantity too low. Minimum for ${resourceType}:\n` +
-                    `- Iron: 100\n- Wood: 1000\n- Resin: 200\n- Fabric: 2000\n- Canvas: 2`);
+                alert(`Quantity too low to earn Holding Coins.`);
                 return;
             }
 
@@ -1588,14 +1693,12 @@
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-                // Update player points
                 const playerRef = db.collection('players').doc(playerId);
                 batch.update(playerRef, {
                     totalPoints: firebase.firestore.FieldValue.increment(pointsEarned),
                     lastActivity: timestamp
                 });
 
-                // Create contribution record
                 const contribRef = db.collection('contributions').doc();
                 batch.set(contribRef, {
                     playerId: playerId,
@@ -1605,13 +1708,13 @@
                     materialType: resourceType,
                     materialQuantity: quantity,
                     location: location,
+                    rateMultiplier: exchangeRates[resourceType]?.multiplier || 1.0,
                     notes: `Donated ${formatNumber(quantity)} ${resourceType} at ${locationName}`,
                     loggedBy: currentOfficer.id,
                     loggedByName: officerSquadron + officerName,
                     createdAt: timestamp
                 });
 
-                // Update guild resources total
                 const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'coal', 'resin', 'fabric'];
                 if (guildStorageResources.includes(resourceType)) {
                     const resourceName = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
@@ -1629,7 +1732,6 @@
                     }
                 }
 
-                // Update officer inventory
                 const inventoryId = `${currentOfficer.id}_${resourceType}_${location}`;
                 const inventoryRef = db.collection('officerInventory').doc(inventoryId);
                 const existingInventory = await inventoryRef.get();
@@ -1651,18 +1753,22 @@
 
                 await batch.commit();
 
+                const rateInfo = exchangeRates[resourceType]?.multiplier !== 1.0 
+                    ? ` (${exchangeRates[resourceType].multiplier.toFixed(1)}x rate)` 
+                    : '';
+
                 await logToLedger(
                     'Resource Donation Logged',
-                    `${playerName} donated ${formatNumber(quantity)} ${resourceType}. Stored by ${officerSquadron}${officerName} at ${locationName}. (+${pointsEarned} pts)`
+                    `${playerName} donated ${formatNumber(quantity)} ${resourceType}. Stored by ${officerSquadron}${officerName} at ${locationName}. (+${pointsEarned} HC${rateInfo})`
                 );
 
-                alert(`Donation logged!\n${formatNumber(quantity)} ${resourceType} = ${pointsEarned} points\nStored at ${locationName}`);
+                alert(`Donation logged!\n${formatNumber(quantity)} ${resourceType} = ${pointsEarned} Holding Coins\nStored at ${locationName}`);
 
-                // Reset form
                 document.getElementById('donationPlayer').value = '';
                 document.getElementById('donationResource').value = '';
                 document.getElementById('donationQuantity').value = '';
                 document.getElementById('donationLocation').value = '';
+                document.getElementById('donationPreview').style.display = 'none';
 
             } catch (err) {
                 console.error('Error logging donation:', err);
@@ -1672,36 +1778,22 @@
 
         async function promoteToOfficer() {
             const playerId = document.getElementById('officerPlayer').value;
-            if (!playerId) {
-                alert('Select a player');
-                return;
-            }
+            if (!playerId) { alert('Select a player'); return; }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
             
-            if (playerData.isOfficer) {
-                alert('This player is already an officer');
-                return;
-            }
+            if (playerData.isOfficer) { alert('This player is already an officer'); return; }
 
             const playerName = playerData.gamertag || 'Unknown';
 
             if (!confirm(`Promote ${playerName} to Officer?`)) return;
 
             try {
-                await db.collection('players').doc(playerId).update({
-                    isOfficer: true
-                });
-
-                await logToLedger(
-                    'Officer Promoted',
-                    `${playerName} was promoted to Officer`
-                );
-
+                await db.collection('players').doc(playerId).update({ isOfficer: true });
+                await logToLedger('Officer Promoted', `${playerName} was promoted to Officer`);
                 alert(`${playerName} is now an Officer!`);
                 document.getElementById('officerPlayer').value = '';
-
             } catch (err) {
                 console.error('Error promoting officer:', err);
                 alert('Error: ' + err.message);
@@ -1710,41 +1802,23 @@
 
         async function demoteOfficer() {
             const playerId = document.getElementById('officerPlayer').value;
-            if (!playerId) {
-                alert('Select a player');
-                return;
-            }
+            if (!playerId) { alert('Select a player'); return; }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
             
-            if (!playerData.isOfficer) {
-                alert('This player is not an officer');
-                return;
-            }
-
-            if (playerId === currentOfficer.id) {
-                alert('You cannot demote yourself');
-                return;
-            }
+            if (!playerData.isOfficer) { alert('This player is not an officer'); return; }
+            if (playerId === currentOfficer.id) { alert('You cannot demote yourself'); return; }
 
             const playerName = playerData.gamertag || 'Unknown';
 
             if (!confirm(`Remove Officer status from ${playerName}?`)) return;
 
             try {
-                await db.collection('players').doc(playerId).update({
-                    isOfficer: false
-                });
-
-                await logToLedger(
-                    'Officer Demoted',
-                    `${playerName} was removed as Officer`
-                );
-
+                await db.collection('players').doc(playerId).update({ isOfficer: false });
+                await logToLedger('Officer Demoted', `${playerName} was removed as Officer`);
                 alert(`${playerName} is no longer an Officer`);
                 document.getElementById('officerPlayer').value = '';
-
             } catch (err) {
                 console.error('Error demoting officer:', err);
                 alert('Error: ' + err.message);
@@ -1782,7 +1856,7 @@
                             <div class="contribution-type">${contrib.activityType}</div>
                             <div class="contribution-details">
                                 ${contrib.materialType ? `${contrib.materialQuantity} ${contrib.materialType} • ` : ''}
-                                +${contrib.pointsEarned} pts • ${date}
+                                +${contrib.pointsEarned} HC • ${date}
                             </div>
                         </div>
                     `;
@@ -1801,38 +1875,28 @@
 
         async function confirmRemoveContribution() {
             const selectedRadio = document.querySelector('input[name="selectedContribution"]:checked');
-            if (!selectedRadio) {
-                alert('Select a contribution to remove');
-                return;
-            }
+            if (!selectedRadio) { alert('Select a contribution to remove'); return; }
 
             const justification = document.getElementById('removeJustification').value.trim();
-            if (!justification) {
-                alert('Justification is required');
-                return;
-            }
+            if (!justification) { alert('Justification is required'); return; }
 
             const contributionId = selectedRadio.value;
 
             try {
                 const contribDoc = await db.collection('contributions').doc(contributionId).get();
-                if (!contribDoc.exists) {
-                    alert('Contribution not found');
-                    return;
-                }
+                if (!contribDoc.exists) { alert('Contribution not found'); return; }
 
                 const contrib = contribDoc.data();
                 const playerDoc = allMembers.find(m => m.id === contrib.playerId);
                 const playerData = playerDoc ? playerDoc.data() : {};
                 const playerName = playerData.gamertag || contrib.playerName || 'Unknown';
 
-                if (!confirm(`Remove this ${contrib.activityType} entry?\n\nThis will deduct ${contrib.pointsEarned} points from ${playerName}.`)) {
+                if (!confirm(`Remove this ${contrib.activityType} entry?\n\nThis will deduct ${contrib.pointsEarned} Holding Coins from ${playerName}.`)) {
                     return;
                 }
 
                 const batch = db.batch();
 
-                // Remove points from player
                 const playerRef = db.collection('players').doc(contrib.playerId);
                 const updateData = {
                     totalPoints: firebase.firestore.FieldValue.increment(-contrib.pointsEarned)
@@ -1844,7 +1908,6 @@
 
                 batch.update(playerRef, updateData);
 
-                // If material donation, remove from guild resources and officer inventory
                 if (contrib.materialType && contrib.materialQuantity) {
                     const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'resin', 'fabric', 'coal'];
                     if (guildStorageResources.includes(contrib.materialType.toLowerCase())) {
@@ -1860,7 +1923,6 @@
                         }
                     }
 
-                    // Remove from officer inventory (the officer who logged the donation)
                     if (contrib.loggedBy && contrib.location) {
                         const inventoryId = `${contrib.loggedBy}_${contrib.materialType.toLowerCase()}_${contrib.location}`;
                         const inventoryRef = db.collection('officerInventory').doc(inventoryId);
@@ -1875,14 +1937,13 @@
                     }
                 }
 
-                // Delete the contribution
                 batch.delete(db.collection('contributions').doc(contributionId));
 
                 await batch.commit();
 
                 await logToLedger(
                     'Contribution Removed',
-                    `Removed ${contrib.activityType} from ${playerName} (-${contrib.pointsEarned} pts)${contrib.materialType ? ` • ${contrib.materialQuantity} ${contrib.materialType} returned` : ''}`,
+                    `Removed ${contrib.activityType} from ${playerName} (-${contrib.pointsEarned} HC)${contrib.materialType ? ` • ${contrib.materialQuantity} ${contrib.materialType} returned` : ''}`,
                     justification
                 );
 
@@ -1903,35 +1964,19 @@
             const playerId = document.getElementById('distributionPlayer').value;
             const notes = document.getElementById('distributionNotes').value.trim();
 
-            if (!resourceType) {
-                alert('Select a resource type');
-                return;
-            }
-            if (!location) {
-                alert('Select a location');
-                return;
-            }
-            if (!fromOfficerId) {
-                alert('Select which officer inventory to draw from');
-                return;
-            }
-            if (!quantity || quantity < 1) {
-                alert('Enter a valid quantity');
-                return;
-            }
-            if (!playerId) {
-                alert('Select a recipient');
-                return;
-            }
+            if (!resourceType) { alert('Select a resource type'); return; }
+            if (!location) { alert('Select a location'); return; }
+            if (!fromOfficerId) { alert('Select which officer inventory to draw from'); return; }
+            if (!quantity || quantity < 1) { alert('Enter a valid quantity'); return; }
+            if (!playerId) { alert('Select a recipient'); return; }
 
-            // Verify inventory still has enough (in case it changed)
             const inventoryId = `${fromOfficerId}_${resourceType}_${location}`;
             const inventoryDoc = await db.collection('officerInventory').doc(inventoryId).get();
             
             if (!inventoryDoc.exists || inventoryDoc.data().quantity < quantity) {
                 const available = inventoryDoc.exists ? inventoryDoc.data().quantity : 0;
                 alert(`Insufficient inventory. Only ${formatNumber(available)} available.`);
-                updateDistributionSources(); // Refresh the dropdown
+                updateDistributionSources();
                 return;
             }
 
@@ -1957,7 +2002,6 @@
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-                // Create distribution record
                 const distRef = db.collection('distributions').doc();
                 batch.set(distRef, {
                     playerId: playerId,
@@ -1973,7 +2017,6 @@
                     notes: notes || null
                 });
 
-                // Deduct from guild resources
                 const guildStorageResources = ['beams', 'bulkheads', 'plates', 'canvas', 'iron', 'wood', 'coal', 'resin', 'fabric'];
                 if (guildStorageResources.includes(resourceType)) {
                     const resourceQuery = await db.collection('guildResources')
@@ -1989,14 +2032,12 @@
                     }
                 }
 
-                // Deduct from the source officer's inventory
                 const inventoryRef = db.collection('officerInventory').doc(inventoryId);
                 batch.update(inventoryRef, {
                     quantity: firebase.firestore.FieldValue.increment(-quantity),
                     lastUpdated: timestamp
                 });
 
-                // Log to Admiral's Ledger
                 const ledgerRef = db.collection('admiralLedger').doc();
                 batch.set(ledgerRef, {
                     action: 'Resource Distribution',
@@ -2010,7 +2051,6 @@
 
                 alert(`Distribution logged!\n${formatNumber(quantity)} ${resourceDisplay} given to ${playerName}\nFrom: ${fromOfficerName}'s inventory at ${locationName}`);
 
-                // Reset form
                 document.getElementById('distributionResource').value = '';
                 document.getElementById('distributionLocation').value = '';
                 document.getElementById('distributionFromOfficer').innerHTML = '<option value="">-- Select resource and location first --</option>';
@@ -2035,26 +2075,13 @@
             const resinUsed = parseInt(document.getElementById('craftResin').value) || 0;
             const fabricUsed = parseInt(document.getElementById('craftFabric').value) || 0;
 
-            if (!location) {
-                alert('Select a crafting location');
-                return;
-            }
-            if (!craftedMaterial) {
-                alert('Select a crafted material');
-                return;
-            }
-            if (!craftedQuantity || craftedQuantity < 1) {
-                alert('Enter the quantity produced');
-                return;
-            }
+            if (!location) { alert('Select a crafting location'); return; }
+            if (!craftedMaterial) { alert('Select a crafted material'); return; }
+            if (!craftedQuantity || craftedQuantity < 1) { alert('Enter the quantity produced'); return; }
             
             const totalRawUsed = woodUsed + ironUsed + coalUsed + resinUsed + fabricUsed;
-            if (totalRawUsed === 0) {
-                alert('Enter at least one raw material consumed');
-                return;
-            }
+            if (totalRawUsed === 0) { alert('Enter at least one raw material consumed'); return; }
 
-            // Check if officer has enough raw materials at this location
             const rawMaterialsNeeded = [
                 { type: 'wood', amount: woodUsed },
                 { type: 'iron', amount: ironUsed },
@@ -2088,7 +2115,6 @@
                 ? `[${currentOfficer.squadron}] ${currentOfficer.gamertag}`
                 : currentOfficer.gamertag || 'Unknown';
 
-            // Build consumed materials string for ledger
             const consumedParts = [];
             if (woodUsed > 0) consumedParts.push(`${formatNumber(woodUsed)} Wood`);
             if (ironUsed > 0) consumedParts.push(`${formatNumber(ironUsed)} Iron`);
@@ -2101,7 +2127,6 @@
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-                // Deduct raw materials from officer inventory and guild resources
                 const rawMaterials = [
                     { name: 'Wood', type: 'wood', amount: woodUsed },
                     { name: 'Iron', type: 'iron', amount: ironUsed },
@@ -2112,7 +2137,6 @@
 
                 for (const material of rawMaterials) {
                     if (material.amount > 0) {
-                        // Deduct from officer inventory
                         const inventoryId = `${currentOfficer.id}_${material.type}_${location}`;
                         const inventoryRef = db.collection('officerInventory').doc(inventoryId);
                         batch.update(inventoryRef, {
@@ -2120,7 +2144,6 @@
                             lastUpdated: timestamp
                         });
 
-                        // Deduct from guild resources
                         const resourceQuery = await db.collection('guildResources')
                             .where('materialType', '==', material.name)
                             .get();
@@ -2135,7 +2158,6 @@
                     }
                 }
 
-                // Add crafted material to officer inventory
                 const craftedInventoryId = `${currentOfficer.id}_${craftedMaterial}_${location}`;
                 const craftedInventoryRef = db.collection('officerInventory').doc(craftedInventoryId);
                 const existingCraftedInventory = await craftedInventoryRef.get();
@@ -2155,7 +2177,6 @@
                     });
                 }
 
-                // Add crafted material to guild resources
                 const craftedResourceQuery = await db.collection('guildResources')
                     .where('materialType', '==', craftedDisplay)
                     .get();
@@ -2168,7 +2189,6 @@
                     });
                 }
 
-                // Log to Admiral's Ledger
                 const ledgerRef = db.collection('admiralLedger').doc();
                 batch.set(ledgerRef, {
                     action: 'Crafting Logged',
@@ -2182,7 +2202,6 @@
 
                 alert(`Crafting logged!\n${formatNumber(craftedQuantity)} ${craftedDisplay} added at ${locationName}\n\nConsumed: ${consumedString}`);
 
-                // Reset form
                 document.getElementById('craftingLocation').value = '';
                 document.getElementById('craftedMaterial').value = '';
                 document.getElementById('craftedQuantity').value = '';
@@ -2201,7 +2220,6 @@
         async function toggleMemberDetails(playerId, button) {
             const existingRow = document.getElementById(`details-${playerId}`);
             
-            // If already expanded, collapse it
             if (existingRow) {
                 existingRow.remove();
                 button.textContent = 'Expand';
@@ -2215,7 +2233,7 @@
             detailsRow.id = `details-${playerId}`;
             detailsRow.className = 'details-row';
             detailsRow.innerHTML = `
-                <td colspan="10">
+                <td colspan="8">
                     <div class="details-content">
                         <div class="details-section">
                             <h4>📥 Contributions Made</h4>
@@ -2236,7 +2254,6 @@
             parentRow.after(detailsRow);
             button.textContent = 'Collapse';
             
-            // Load contributions
             try {
                 const contributions = await db.collection('contributions')
                     .where('playerId', '==', playerId)
@@ -2251,15 +2268,12 @@
                     contContainer.innerHTML = contributions.docs.map(doc => {
                         const c = doc.data();
                         const date = c.createdAt ? c.createdAt.toDate().toLocaleDateString() : 'Unknown';
-                        const details = c.materialType 
-                            ? `${formatNumber(c.materialQuantity)} ${c.materialType}` 
-                            : c.activityType;
                         return `
                             <div class="details-item">
                                 <div class="details-item-type">${c.activityType}</div>
                                 <div class="details-item-meta">
                                     ${c.materialType ? formatNumber(c.materialQuantity) + ' ' + c.materialType + ' • ' : ''}
-                                    +${c.pointsEarned} pts • ${date}
+                                    +${c.pointsEarned} HC • ${date}
                                 </div>
                             </div>
                         `;
@@ -2271,7 +2285,6 @@
                     '<div class="no-records">Error loading contributions</div>';
             }
             
-            // Load distributions
             try {
                 const distributions = await db.collection('distributions')
                     .where('playerId', '==', playerId)
@@ -2306,36 +2319,22 @@
 
         async function promoteToAdmiral() {
             const playerId = document.getElementById('admiralPlayer').value;
-            if (!playerId) {
-                alert('Select a player');
-                return;
-            }
+            if (!playerId) { alert('Select a player'); return; }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
             
-            if (playerData.isAdmiral) {
-                alert('This player is already an admiral');
-                return;
-            }
+            if (playerData.isAdmiral) { alert('This player is already an admiral'); return; }
 
             const playerName = playerData.gamertag || 'Unknown';
 
             if (!confirm(`Promote ${playerName} to Admiral?`)) return;
 
             try {
-                await db.collection('players').doc(playerId).update({
-                    isAdmiral: true
-                });
-
-                await logToLedger(
-                    'Admiral Promoted',
-                    `${playerName} was promoted to Admiral`
-                );
-
+                await db.collection('players').doc(playerId).update({ isAdmiral: true });
+                await logToLedger('Admiral Promoted', `${playerName} was promoted to Admiral`);
                 alert(`${playerName} is now an Admiral!`);
                 document.getElementById('admiralPlayer').value = '';
-
             } catch (err) {
                 console.error('Error promoting admiral:', err);
                 alert('Error: ' + err.message);
@@ -2344,36 +2343,22 @@
 
         async function demoteAdmiral() {
             const playerId = document.getElementById('admiralPlayer').value;
-            if (!playerId) {
-                alert('Select a player');
-                return;
-            }
+            if (!playerId) { alert('Select a player'); return; }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
             
-            if (!playerData.isAdmiral) {
-                alert('This player is not an admiral');
-                return;
-            }
+            if (!playerData.isAdmiral) { alert('This player is not an admiral'); return; }
 
             const playerName = playerData.gamertag || 'Unknown';
 
             if (!confirm(`Remove Admiral status from ${playerName}?`)) return;
 
             try {
-                await db.collection('players').doc(playerId).update({
-                    isAdmiral: false
-                });
-
-                await logToLedger(
-                    'Admiral Demoted',
-                    `${playerName} was removed as Admiral`
-                );
-
+                await db.collection('players').doc(playerId).update({ isAdmiral: false });
+                await logToLedger('Admiral Demoted', `${playerName} was removed as Admiral`);
                 alert(`${playerName} is no longer an Admiral`);
                 document.getElementById('admiralPlayer').value = '';
-
             } catch (err) {
                 console.error('Error demoting admiral:', err);
                 alert('Error: ' + err.message);
@@ -2384,14 +2369,8 @@
             const playerId = document.getElementById('guildChangePlayer').value;
             const newGuild = document.getElementById('newGuildSelect').value;
             
-            if (!playerId) {
-                alert('Select a player');
-                return;
-            }
-            if (!newGuild) {
-                alert('Select a guild');
-                return;
-            }
+            if (!playerId) { alert('Select a player'); return; }
+            if (!newGuild) { alert('Select a guild'); return; }
 
             const playerDoc = allMembers.find(m => m.id === playerId);
             const playerData = playerDoc ? playerDoc.data() : {};
@@ -2401,27 +2380,16 @@
             const guildData = allGuilds.find(g => g.code === newGuild);
             const newGuildName = guildData ? guildData.name : newGuild;
 
-            if (oldGuild === newGuild) {
-                alert('Player is already in this guild');
-                return;
-            }
+            if (oldGuild === newGuild) { alert('Player is already in this guild'); return; }
 
             if (!confirm(`Move ${playerName} from ${oldGuild} to ${newGuildName}?`)) return;
 
             try {
-                await db.collection('players').doc(playerId).update({
-                    squadron: newGuild // squadron = guild
-                });
-
-                await logToLedger(
-                    'Guild Change',
-                    `${playerName} moved from ${oldGuild} to ${newGuildName}`
-                );
-
+                await db.collection('players').doc(playerId).update({ squadron: newGuild });
+                await logToLedger('Guild Change', `${playerName} moved from ${oldGuild} to ${newGuildName}`);
                 alert(`${playerName} is now in ${newGuildName}`);
                 document.getElementById('guildChangePlayer').value = '';
                 document.getElementById('newGuildSelect').value = '';
-
             } catch (err) {
                 console.error('Error changing guild:', err);
                 alert('Error: ' + err.message);
@@ -2436,7 +2404,6 @@
                 return;
             }
             
-            // Count members per guild
             const memberCounts = {};
             allMembers.forEach(doc => {
                 const squadron = doc.data().squadron;
@@ -2447,23 +2414,23 @@
             
             container.innerHTML = allGuilds.map(guild => {
                 const memberCount = memberCounts[guild.code] || 0;
-                const isAlly = guild.isAlly === true;
-                const badge = isAlly 
-                    ? '<span class="ally-badge">ALLIED</span>' 
-                    : '<span class="non-ally-badge">NON-ALLIED</span>';
-                const buttonText = isAlly ? 'Remove Ally' : 'Mark as Ally';
-                const buttonClass = isAlly ? 'btn-danger' : 'btn-success';
+                const isPartner = guild.isAlly === true;
+                const badge = isPartner 
+                    ? '<span class="partner-badge">TRADE PARTNER</span>' 
+                    : '<span class="non-partner-badge">NOT PARTNER</span>';
+                const buttonText = isPartner ? 'Remove Partner' : 'Add as Partner';
+                const buttonClass = isPartner ? 'btn-danger' : 'btn-success';
                 
                 return `
                     <div class="guild-alliance-item">
                         <div class="guild-alliance-info">
-                            <img src="${guild.logo}" alt="${guild.name}" class="guild-alliance-logo">
+                            <img src="${guild.logo || 'default_guild.png'}" alt="${guild.name}" class="guild-alliance-logo">
                             <div>
                                 <div class="guild-alliance-name">${guild.name}${badge}</div>
-                                <div class="guild-alliance-meta">${memberCount} member${memberCount !== 1 ? 's' : ''} • Max support: ${isAlly ? '50%' : '30%'}</div>
+                                <div class="guild-alliance-meta">${memberCount} member${memberCount !== 1 ? 's' : ''}</div>
                             </div>
                         </div>
-                        <button class="btn btn-small ${buttonClass}" onclick="toggleGuildAlliance('${guild.code}', ${isAlly})">
+                        <button class="btn btn-small ${buttonClass}" onclick="toggleGuildAlliance('${guild.code}', ${isPartner})">
                             ${buttonText}
                         </button>
                     </div>
@@ -2471,35 +2438,32 @@
             }).join('');
         }
 
-        async function toggleGuildAlliance(guildCode, currentlyAlly) {
+        async function toggleGuildAlliance(guildCode, currentlyPartner) {
             const guild = allGuilds.find(g => g.code === guildCode);
             const guildName = guild ? guild.name : guildCode;
-            const newStatus = !currentlyAlly;
+            const newStatus = !currentlyPartner;
             
-            const action = newStatus ? 'mark as allied' : 'remove allied status from';
+            const action = newStatus ? 'add as trade partner' : 'remove trade partner status from';
             if (!confirm(`Are you sure you want to ${action} ${guildName}?`)) return;
             
             try {
-                await db.collection('guilds').doc(guildCode).update({
-                    isAlly: newStatus
-                });
+                await db.collection('guilds').doc(guildCode).update({ isAlly: newStatus });
                 
-                // Update local cache
                 const guildIndex = allGuilds.findIndex(g => g.code === guildCode);
                 if (guildIndex >= 0) {
                     allGuilds[guildIndex].isAlly = newStatus;
                 }
                 
                 await logToLedger(
-                    newStatus ? 'Guild Allied' : 'Guild Alliance Removed',
-                    `${guildName} ${newStatus ? 'marked as allied (50% max support)' : 'removed from alliance (30% max support)'}`
+                    newStatus ? 'Trade Partner Added' : 'Trade Partner Removed',
+                    `${guildName} ${newStatus ? 'added as trade partner' : 'removed as trade partner'}`
                 );
                 
                 displayGuildAlliances();
-                alert(`${guildName} is now ${newStatus ? 'an allied guild' : 'a non-allied guild'}`);
+                alert(`${guildName} is now ${newStatus ? 'a trade partner' : 'no longer a trade partner'}`);
                 
             } catch (err) {
-                console.error('Error updating guild alliance:', err);
+                console.error('Error updating guild partnership:', err);
                 alert('Error: ' + err.message);
             }
         }
@@ -2511,26 +2475,11 @@
             const location = document.getElementById('initInventoryLocation').value;
             const note = document.getElementById('initInventoryNote').value.trim();
 
-            if (!officerId) {
-                alert('Select an officer');
-                return;
-            }
-            if (!resourceType) {
-                alert('Select a resource type');
-                return;
-            }
-            if (!quantity || quantity < 1) {
-                alert('Enter a valid quantity');
-                return;
-            }
-            if (!location) {
-                alert('Select a storage location');
-                return;
-            }
-            if (!note) {
-                alert('Note is required');
-                return;
-            }
+            if (!officerId) { alert('Select an officer'); return; }
+            if (!resourceType) { alert('Select a resource type'); return; }
+            if (!quantity || quantity < 1) { alert('Enter a valid quantity'); return; }
+            if (!location) { alert('Select a storage location'); return; }
+            if (!note) { alert('Note is required'); return; }
 
             const officerDoc = allMembers.find(m => m.id === officerId);
             const officerData = officerDoc ? officerDoc.data() : {};
@@ -2542,7 +2491,7 @@
             
             const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
 
-            if (!confirm(`Initialize inventory:\n${formatNumber(quantity)} ${resourceDisplay}\nHeld by: ${officerSquadron}${officerName}\nLocation: ${locationName}\n\nThis does not affect points. Continue?`)) {
+            if (!confirm(`Initialize inventory:\n${formatNumber(quantity)} ${resourceDisplay}\nHeld by: ${officerSquadron}${officerName}\nLocation: ${locationName}\n\nThis does not affect Holding Coins. Continue?`)) {
                 return;
             }
 
@@ -2550,7 +2499,6 @@
                 const batch = db.batch();
                 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
-                // Update officer inventory
                 const inventoryId = `${officerId}_${resourceType}_${location}`;
                 const inventoryRef = db.collection('officerInventory').doc(inventoryId);
                 const existingInventory = await inventoryRef.get();
@@ -2570,7 +2518,6 @@
                     });
                 }
 
-                // Update guild resources total
                 const resourceQuery = await db.collection('guildResources')
                     .where('materialType', '==', resourceDisplay)
                     .get();
@@ -2593,7 +2540,6 @@
 
                 alert(`Inventory initialized!\n${formatNumber(quantity)} ${resourceDisplay}\nAssigned to ${officerName} at ${locationName}`);
 
-                // Reset form
                 document.getElementById('initInventoryOfficer').value = '';
                 document.getElementById('initInventoryResource').value = '';
                 document.getElementById('initInventoryQuantity').value = '';
@@ -2614,7 +2560,6 @@
                 return;
             }
             
-            // Build nested structure: resourceType -> location -> officer -> quantity
             const resourceMap = {};
             
             inventoryDocs.forEach(doc => {
@@ -2642,7 +2587,6 @@
                 resourceMap[resource].locations[location].officers[officerId] += inv.quantity;
             });
             
-            // Get officer names
             const officerNames = {};
             allMembers.forEach(doc => {
                 const data = doc.data();
@@ -2650,13 +2594,11 @@
                 officerNames[doc.id] = prefix + (data.gamertag || 'Unknown');
             });
             
-            // Get location names
             const locationNames = {};
             allLocations.forEach(loc => {
                 locationNames[loc.code] = loc.name;
             });
             
-            // Sort resources alphabetically
             const sortedResources = Object.keys(resourceMap).sort();
             
             if (sortedResources.length === 0) {
@@ -2678,7 +2620,6 @@
                         </div>
                 `;
                 
-                // Sort locations alphabetically
                 const sortedLocations = Object.keys(resourceData.locations).sort((a, b) => {
                     const nameA = locationNames[a] || a;
                     const nameB = locationNames[b] || b;
@@ -2695,7 +2636,6 @@
                             <div class="resource-officer-list">
                     `;
                     
-                    // Sort officers by quantity descending
                     const sortedOfficers = Object.entries(locationData.officers)
                         .sort((a, b) => b[1] - a[1]);
                     
@@ -2720,241 +2660,16 @@
             container.innerHTML = html;
         }
 
-        async function transferToOfficer() {
-            const resourceType = document.getElementById('officerTransferResource').value;
-            const quantity = parseInt(document.getElementById('officerTransferQuantity').value);
-            const location = document.getElementById('officerTransferLocation').value;
-            const toOfficerId = document.getElementById('officerTransferTo').value;
-            const note = document.getElementById('officerTransferNote').value.trim();
-
-            if (!resourceType) {
-                alert('Select a resource type');
-                return;
-            }
-            if (!quantity || quantity < 1) {
-                alert('Enter a valid quantity');
-                return;
-            }
-            if (!location) {
-                alert('Select a location');
-                return;
-            }
-            if (!toOfficerId) {
-                alert('Select an officer to transfer to');
-                return;
-            }
-            if (!note) {
-                alert('Note is required');
-                return;
-            }
-
-            // Check if current officer has enough inventory
-            const fromInventoryId = `${currentOfficer.id}_${resourceType}_${location}`;
-            const fromInventoryDoc = await db.collection('officerInventory').doc(fromInventoryId).get();
-            
-            if (!fromInventoryDoc.exists || fromInventoryDoc.data().quantity < quantity) {
-                const available = fromInventoryDoc.exists ? fromInventoryDoc.data().quantity : 0;
-                const locationData = allLocations.find(l => l.code === location);
-                const locationName = locationData ? locationData.name : location;
-                alert(`Insufficient inventory.\nYou have ${formatNumber(available)} ${resourceType} at ${locationName}.`);
-                return;
-            }
-
-            const toOfficerDoc = allMembers.find(m => m.id === toOfficerId);
-            const toOfficerData = toOfficerDoc ? toOfficerDoc.data() : {};
-            const toOfficerName = toOfficerData.gamertag || 'Unknown';
-            const toOfficerSquadron = toOfficerData.squadron ? `[${toOfficerData.squadron}] ` : '';
-
-            const fromOfficerName = currentOfficer.gamertag || 'Unknown';
-            const fromOfficerSquadron = currentOfficer.squadron ? `[${currentOfficer.squadron}] ` : '';
-
-            const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
-            const locationData = allLocations.find(l => l.code === location);
-            const locationName = locationData ? locationData.name : location;
-
-            if (!confirm(`Transfer ${formatNumber(quantity)} ${resourceDisplay} to ${toOfficerSquadron}${toOfficerName} at ${locationName}?`)) {
-                return;
-            }
-
-            try {
-                const batch = db.batch();
-                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-
-                // Deduct from current officer's inventory
-                const fromInventoryRef = db.collection('officerInventory').doc(fromInventoryId);
-                batch.update(fromInventoryRef, {
-                    quantity: firebase.firestore.FieldValue.increment(-quantity),
-                    lastUpdated: timestamp
-                });
-
-                // Add to receiving officer's inventory
-                const toInventoryId = `${toOfficerId}_${resourceType}_${location}`;
-                const toInventoryRef = db.collection('officerInventory').doc(toInventoryId);
-                const toInventoryDoc = await toInventoryRef.get();
-
-                if (toInventoryDoc.exists) {
-                    batch.update(toInventoryRef, {
-                        quantity: firebase.firestore.FieldValue.increment(quantity),
-                        lastUpdated: timestamp
-                    });
-                } else {
-                    batch.set(toInventoryRef, {
-                        officerId: toOfficerId,
-                        resourceType: resourceType,
-                        location: location,
-                        quantity: quantity,
-                        lastUpdated: timestamp
-                    });
-                }
-
-                await batch.commit();
-
-                await logToLedger(
-                    'Officer Transfer',
-                    `${fromOfficerSquadron}${fromOfficerName} transferred ${formatNumber(quantity)} ${resourceDisplay} to ${toOfficerSquadron}${toOfficerName} at ${locationName}`,
-                    note
-                );
-
-                alert(`Transfer complete!\n${formatNumber(quantity)} ${resourceDisplay} transferred to ${toOfficerName}`);
-
-                // Reset form
-                document.getElementById('officerTransferResource').value = '';
-                document.getElementById('officerTransferQuantity').value = '';
-                document.getElementById('officerTransferLocation').value = '';
-                document.getElementById('officerTransferTo').value = '';
-                document.getElementById('officerTransferNote').value = '';
-
-            } catch (err) {
-                console.error('Error transferring to officer:', err);
-                alert('Error: ' + err.message);
-            }
-        }
-
-        async function transferLocation() {
-            const resourceType = document.getElementById('locationTransferResource').value;
-            const quantity = parseInt(document.getElementById('locationTransferQuantity').value);
-            const fromLocation = document.getElementById('locationTransferFrom').value;
-            const toLocation = document.getElementById('locationTransferTo').value;
-            const note = document.getElementById('locationTransferNote').value.trim();
-
-            if (!resourceType) {
-                alert('Select a resource type');
-                return;
-            }
-            if (!quantity || quantity < 1) {
-                alert('Enter a valid quantity');
-                return;
-            }
-            if (!fromLocation) {
-                alert('Select a from location');
-                return;
-            }
-            if (!toLocation) {
-                alert('Select a to location');
-                return;
-            }
-            if (fromLocation === toLocation) {
-                alert('From and To locations must be different');
-                return;
-            }
-            if (!note) {
-                alert('Note is required');
-                return;
-            }
-
-            // Check if current officer has enough inventory at from location
-            const fromInventoryId = `${currentOfficer.id}_${resourceType}_${fromLocation}`;
-            const fromInventoryDoc = await db.collection('officerInventory').doc(fromInventoryId).get();
-            
-            if (!fromInventoryDoc.exists || fromInventoryDoc.data().quantity < quantity) {
-                const available = fromInventoryDoc.exists ? fromInventoryDoc.data().quantity : 0;
-                const fromLocationData = allLocations.find(l => l.code === fromLocation);
-                const fromLocationName = fromLocationData ? fromLocationData.name : fromLocation;
-                alert(`Insufficient inventory.\nYou have ${formatNumber(available)} ${resourceType} at ${fromLocationName}.`);
-                return;
-            }
-
-            const officerName = currentOfficer.gamertag || 'Unknown';
-            const officerSquadron = currentOfficer.squadron ? `[${currentOfficer.squadron}] ` : '';
-
-            const resourceDisplay = resourceType.charAt(0).toUpperCase() + resourceType.slice(1);
-            const fromLocationData = allLocations.find(l => l.code === fromLocation);
-            const fromLocationName = fromLocationData ? fromLocationData.name : fromLocation;
-            const toLocationData = allLocations.find(l => l.code === toLocation);
-            const toLocationName = toLocationData ? toLocationData.name : toLocation;
-
-            if (!confirm(`Move ${formatNumber(quantity)} ${resourceDisplay} from ${fromLocationName} to ${toLocationName}?`)) {
-                return;
-            }
-
-            try {
-                const batch = db.batch();
-                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-
-                // Deduct from source location
-                const fromInventoryRef = db.collection('officerInventory').doc(fromInventoryId);
-                batch.update(fromInventoryRef, {
-                    quantity: firebase.firestore.FieldValue.increment(-quantity),
-                    lastUpdated: timestamp
-                });
-
-                // Add to destination location
-                const toInventoryId = `${currentOfficer.id}_${resourceType}_${toLocation}`;
-                const toInventoryRef = db.collection('officerInventory').doc(toInventoryId);
-                const toInventoryDoc = await toInventoryRef.get();
-
-                if (toInventoryDoc.exists) {
-                    batch.update(toInventoryRef, {
-                        quantity: firebase.firestore.FieldValue.increment(quantity),
-                        lastUpdated: timestamp
-                    });
-                } else {
-                    batch.set(toInventoryRef, {
-                        officerId: currentOfficer.id,
-                        resourceType: resourceType,
-                        location: toLocation,
-                        quantity: quantity,
-                        lastUpdated: timestamp
-                    });
-                }
-
-                await batch.commit();
-
-                await logToLedger(
-                    'Location Transfer',
-                    `${officerSquadron}${officerName} moved ${formatNumber(quantity)} ${resourceDisplay} from ${fromLocationName} to ${toLocationName}`,
-                    note
-                );
-
-                alert(`Transfer complete!\n${formatNumber(quantity)} ${resourceDisplay} moved from ${fromLocationName} to ${toLocationName}`);
-
-                // Reset form
-                document.getElementById('locationTransferResource').value = '';
-                document.getElementById('locationTransferQuantity').value = '';
-                document.getElementById('locationTransferFrom').value = '';
-                document.getElementById('locationTransferTo').value = '';
-                document.getElementById('locationTransferNote').value = '';
-
-            } catch (err) {
-                console.error('Error transferring location:', err);
-                alert('Error: ' + err.message);
-            }
-        }
-
         async function updateDistributionSources() {
             const resourceType = document.getElementById('distributionResource').value;
             const location = document.getElementById('distributionLocation').value;
             const fromOfficerSelect = document.getElementById('distributionFromOfficer');
             
-            // Reset dropdown
             fromOfficerSelect.innerHTML = '<option value="">-- Select resource and location first --</option>';
             
-            if (!resourceType || !location) {
-                return;
-            }
+            if (!resourceType || !location) { return; }
             
             try {
-                // Query all inventory records for this resource at this location
                 const inventorySnapshot = await db.collection('officerInventory')
                     .where('resourceType', '==', resourceType)
                     .where('location', '==', location)
@@ -2966,7 +2681,7 @@
                     const inv = doc.data();
                     if (inv.quantity > 0) {
                         sources.push({
-                            odfficerId: inv.officerId,
+                            officerId: inv.officerId,
                             quantity: inv.quantity,
                             docId: doc.id
                         });
@@ -2980,18 +2695,17 @@
                     return;
                 }
                 
-                // Get officer names
                 fromOfficerSelect.innerHTML = '<option value="">-- Select source --</option>';
                 
                 sources.forEach(source => {
-                    const memberDoc = allMembers.find(m => m.id === source.odfficerId);
+                    const memberDoc = allMembers.find(m => m.id === source.officerId);
                     const memberData = memberDoc ? memberDoc.data() : {};
                     const prefix = memberData.squadron ? `[${memberData.squadron}] ` : '';
                     const name = memberData.gamertag || 'Unknown';
                     const isOfficer = memberData.isOfficer ? '' : ' (former officer)';
                     
                     const option = document.createElement('option');
-                    option.value = source.odfficerId;
+                    option.value = source.officerId;
                     option.textContent = `${prefix}${name}${isOfficer} - ${formatNumber(source.quantity)} available`;
                     option.dataset.available = source.quantity;
                     fromOfficerSelect.appendChild(option);
